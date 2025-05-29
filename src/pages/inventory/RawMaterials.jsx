@@ -136,8 +136,12 @@ export default function RawMaterials() {
       fetchCategories();
       toast.success("Category added successfully");
     } catch (error) {
-      console.log('errors is category', error)
-      const errorMessage = error?.message || 'Error adding category';
+      console.log('errors is category', error);
+      // Extract server error message if available
+      const errorMessage =
+        error.response && error.response.data && error.response.data.message
+          ? error.response.data.message
+          : error.message || 'Error adding category';
       toast.error(errorMessage);
     }
   };

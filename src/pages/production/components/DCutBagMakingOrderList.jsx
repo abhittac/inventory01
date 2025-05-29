@@ -26,7 +26,7 @@ import {
 
 import { QrCodeScanner, Update, LocalShipping, Receipt } from '@mui/icons-material';
 import toast from 'react-hot-toast';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import OrderService from '../../../services/dcutBagMakingService';
 import QRCodeScanner from '../../../components/QRCodeScanner'; // Assuming this is your QRCodeScanner component
 
@@ -326,84 +326,127 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
     return colors[status] || 'default';
   };
 
+  const renderAddSubcategoryDialog = () => {
+    const [searchTerm, setSearchTerm] = useState("");
 
+    // Filter materials by search term
+    const filteredMaterials = useMemo(() => {
+      if (!searchTerm) return requiredMaterials;
 
-  const renderAddSubcategoryDialog = () => (
-    <Dialog
-      open={addSubcategoryDialogOpen}
-      onClose={() => setAddSubcategoryDialogOpen(false)}
-      maxWidth="xl"
-      fullWidth
-      sx={{ minHeight: "80vh" }}
-    >
-      <DialogTitle>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography>
-            Row Material - <strong>{rollSize}</strong> (Roll Size)
-          </Typography>
-          <Typography>
-            Total Quantity In Kg: <strong>{totalQuantity}</strong>
-          </Typography>
-        </Box>
-      </DialogTitle>
-      <DialogContent>
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Order ID</TableCell>
-                  <TableCell>GSM</TableCell>
-                  <TableCell>Fabric Color</TableCell>
-                  <TableCell>Roll Size</TableCell>
-                  <TableCell>Quantity(Kg)</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {noOrdersFound ? (
+      const lowerSearch = searchTerm.toLowerCase();
+
+      return requiredMaterials.filter((material) => {
+        // safely convert to string and lowercase before matching
+        const gsm = material.gsm?.toString().toLowerCase() || "";
+        const fabricColor = material.fabricColor?.toLowerCase() || "";
+        const rollSize = material.rollSize?.toString().toLowerCase() || "";
+        const quantity = material.quantity?.toString().toLowerCase() || "";
+
+        return (
+          gsm.includes(lowerSearch) ||
+          fabricColor.includes(lowerSearch) ||
+          rollSize.includes(lowerSearch) ||
+          quantity.includes(lowerSearch)
+        );
+      });
+    }, [searchTerm, requiredMaterials]);
+
+    return (
+      <Dialog
+        open={addSubcategoryDialogOpen}
+        onClose={() => setAddSubcategoryDialogOpen(false)}
+        maxWidth="xl"
+        fullWidth
+        sx={{ minHeight: "80vh" }}
+      >
+        <DialogTitle>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography>
+              Raw Material - <strong>{rollSize}</strong> (Roll Size)
+            </Typography>
+            <Typography>
+              Total Quantity In Kg: <strong>{totalQuantity}</strong>
+            </Typography>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            {/* Search Input */}
+            <Grid item xs={12} sx={{ mb: 2 }}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                label="Search Materials"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by GSM, Fabric Color, Roll Size, or Quantity"
+              />
+            </Grid>
+
+            <TableContainer>
+              <Table>
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
-                      <Typography>No records found for this order.</Typography>
-                    </TableCell>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Order ID</TableCell>
+                    <TableCell>GSM</TableCell>
+                    <TableCell>Fabric Color</TableCell>
+                    <TableCell>Roll Size</TableCell>
+                    <TableCell>Quantity(Kg)</TableCell>
+                    <TableCell>Actions</TableCell>
                   </TableRow>
-                ) : (
-                  requiredMaterials.map((material) => (
-                    <TableRow key={material._id}>
-                      <TableCell>{material._id}</TableCell>
-                      <TableCell>{selectedOrderId}</TableCell>
-                      <TableCell>{material.gsm}</TableCell>
-                      <TableCell style={{ filter: 'blur(5px)' }}>{material.fabricColor}</TableCell>
-                      <TableCell style={{ filter: 'blur(5px)' }}>{material.rollSize}</TableCell>
-                      <TableCell >{material.quantity}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          size="small"
-                          onClick={() => handleVerifyOrder(selectedOrderId, material._id)}
-                        >
-                          Scanner
-                        </Button>
+                </TableHead>
+
+                <TableBody>
+                  {noOrdersFound || filteredMaterials.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">
+                        <Typography>No records found for this order.</Typography>
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>
-      </DialogContent>
-    </Dialog>
-  );
-
+                  ) : (
+                    filteredMaterials.map((material) => (
+                      <TableRow key={material._id}>
+                        <TableCell>{material._id}</TableCell>
+                        <TableCell>{selectedOrderId}</TableCell>
+                        <TableCell>{material.gsm}</TableCell>
+                        <TableCell style={{ filter: "blur(5px)" }}>
+                          {material.fabricColor}
+                        </TableCell>
+                        <TableCell style={{ filter: "blur(5px)" }}>
+                          {material.rollSize}
+                        </TableCell>
+                        <TableCell>{material.quantity}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            size="small"
+                            onClick={() =>
+                              handleVerifyOrder(selectedOrderId, material._id)
+                            }
+                          >
+                            Scanner
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+        </DialogContent>
+      </Dialog>
+    );
+  };
   return (
     <>
       <Card>
