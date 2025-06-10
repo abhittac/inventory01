@@ -63,8 +63,8 @@ export default function ProductionTable({ type }) {
                 <TableCell>Bag Size</TableCell>
                 <TableCell>GSM</TableCell>
                 <TableCell>Quantity</TableCell>
-                <TableCell>Print Colour</TableCell>
-                <TableCell>Fabric Colour</TableCell>
+                <TableCell>Print Color</TableCell>
+                <TableCell>Bag Color</TableCell>
                 <TableCell>Fabric Quality</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>

@@ -120,9 +120,11 @@ export default function FinishedProducts() {
   const filteredProducts = products
     .filter((product) => {
       const customerName = product?.orderDetails?.customerName || '';
+      const jobName = product?.orderDetails?.jobName || '';
       const orderId = product?.order_id?.toString() || '';
       return (
         customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        jobName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         orderId.includes(searchQuery)
       );
     })
@@ -170,6 +172,7 @@ export default function FinishedProducts() {
               <TableRow>
                 <TableCell>Order ID</TableCell>
                 <TableCell>Customer Name</TableCell>
+                <TableCell>jobName</TableCell>
                 <TableCell>Quantity</TableCell>
                 <TableCell>Order Price</TableCell>
                 <TableCell>Status</TableCell>
@@ -181,6 +184,7 @@ export default function FinishedProducts() {
                 <TableRow key={product._id}>
                   <TableCell>{product.order_id || 'N/A'}</TableCell>
                   <TableCell>{product.orderDetails?.customerName || 'N/A'}</TableCell>
+                  <TableCell>{product.orderDetails?.jobName || 'N/A'}</TableCell>
                   <TableCell>{product.orderDetails?.quantity || 'N/A'}</TableCell>
                   <TableCell>₹{product.orderDetails?.orderPrice || 'N/A'}</TableCell>
                   <TableCell>

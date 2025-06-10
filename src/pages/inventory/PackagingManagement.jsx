@@ -90,10 +90,12 @@ export default function PackagingManagement() {
   const filteredOrders = orders
     .filter(order => {
       const customerName = order?.order?.customerName || ""; // Ensure safe access
+      const jobName = order?.order?.jobName || ""; // Ensure safe access
       const orderId = order?.order_id?.toString() || ""; // Convert number to string safely
       return (
         customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        orderId.toLowerCase().includes(searchQuery.toLowerCase())
+        orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        jobName.toLowerCase().includes(searchQuery.toLowerCase())
       );
     })
     .filter(order => (statusFilter ? order?.status === statusFilter : true));
@@ -286,7 +288,7 @@ export default function PackagingManagement() {
       handleCloseDialog();  // Close the dialog on success
     } catch (error) {
       console.error('Failed to add package:', error);
-      alert(`Failed to add package: ${error.message || 'Unknown error'}`);
+      toast.error(`Failed to add package: ${error.message || 'Unknown error'}`);
     }
   };
 
@@ -338,105 +340,132 @@ export default function PackagingManagement() {
 
   const generatePackageLabel = async (pkg, salesOrder, unitNumbers) => {
     return new Promise(async (resolve) => {
-      console.log("Package Data:", pkg);
-      console.log("Sales Order:", salesOrder);
-
-      if (!pkg || !salesOrder) {
+      if (!pkg || !salesOrder || !salesOrder.order) {
         toast.error("Invalid package or sales order data");
         return resolve();
       }
-
-      // Create a 2" x 3" PDF
-      const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "in",
-        format: [2, 4], // 2 inches wide, 3 inches tall
-      });
-      // Load QR Code
-      const generateQRCode = async (order) => {
-        return new Promise((resolve, reject) => {
-          if (!order) return resolve(null);
-          const canvas = document.createElement("canvas");
-          try {
-            let qrData = `Order ID: ${order.orderId}, Job Name: ${order.jobName}`;
-            QRCode.toCanvas(canvas, qrData, { width: 150, margin: 1 });
-            resolve(canvas.toDataURL("image/png"));
-          } catch (error) {
-            console.error("QR Code error:", error);
-            reject(error);
-          }
-        });
-      };
-      const marginLeft = 0.15;
-      const pageWidth = doc.internal.pageSize.getWidth();
-      let currentY = 0.2; // Initial start position
-
-      // 1️⃣ **Company Details**
-      doc.setFontSize(6);
-      doc.text("Thailiwale", marginLeft, currentY);
-      doc.text("Phone: +91 7999857050", marginLeft, currentY + 0.2);
-      currentY += 0.3;
-
-      // 2️⃣ **Line Separator**
-      doc.setLineWidth(0.01);
-      doc.line(marginLeft, currentY, pageWidth - marginLeft, currentY);
-      currentY += 0.2;
-
-      // 3️⃣ **Order Details (Formatted as Key-Value Pairs)**
-      doc.setFontSize(5.5);
-      const order = salesOrder.order || {};
+      // console.log('pkg', pkg);
+      // console.log('salesOrder', salesOrder);
+      // console.log('unitNumbers', unitNumbers);
+      // return false;
+      const order = salesOrder.order;
       const bagDetails = order.bagDetails || {};
 
-      const orderDetails = [
-        ["Order ID:", order.orderId || "N/A"],
-        ["Customer:", order.customerName || "N/A"],
-        ["Email:", order.email || "N/A"],
-        ["Mobile:", order.mobileNumber || "N/A"],
-        ["Job Name:", order.jobName || "N/A"],
-        ["Fabric:", bagDetails.type || "N/A"],
-        ["GSM:", bagDetails.gsm || "N/A"],
-        ["Color:", bagDetails.color || "N/A"],
-        ["Length (cm):", pkg.length || "N/A"],
-        ["Width (cm):", pkg.width || "N/A"],
-        ["Height (cm):", pkg.height || "N/A"],
-        ["Weight (kg):", pkg.weight || "N/A"],
-      ];
+      const generateQRCode = async () => {
+        return new Promise((resolve) => {
+          const canvas = document.createElement("canvas");
+          const qrText = `Order ID: ${order.orderId}\nPackage ID: ${pkg._id}\nWeight: ${pkg.weight} kg`;
+          QRCode.toCanvas(canvas, qrText, { width: 80, margin: 1 }, (error) => {
+            resolve(error ? null : canvas.toDataURL("image/png"));
+          });
+        });
+      };
 
-      // Add conditional unit numbers
-      if (unitNumbers.flexo !== "N/A" && unitNumbers.wcut !== "N/A") {
-        orderDetails.push(
-          ["WCut Flexo Unit No:", unitNumbers.flexo || "N/A"],
-          ["Wcut Bagmaking Unit No:", unitNumbers.wcut || "N/A"]
-        );
-      } else if (unitNumbers.dcut !== "N/A" && unitNumbers.opsert !== "N/A") {
-        orderDetails.push(
-          ["DCUT Unit No:", unitNumbers.dcut || "N/A"],
-          ["Offset Unit No:", unitNumbers.opsert || "N/A"]
-        );
-      }
-
-      const maxWidth = pageWidth - 0.3;
-      // Display order details in PDF
-      orderDetails.forEach(([label, value]) => {
-        doc.text(`${label} ${value}`, marginLeft, currentY, { maxWidth });
-        currentY += 0.18;
+      // Custom PDF size: width 140mm x height 180mm
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [180, 200]
       });
 
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 10;
+      let currentY = 10;
 
-      // Generate and Add QR Code
-      const qrBase64 = await generateQRCode(salesOrder.order);
-      if (qrBase64) {
-        const qrSize = 0.7;
-        doc.addImage(qrBase64, "PNG", marginLeft + 0.5, currentY, qrSize, qrSize);
-        currentY += qrSize + 0.1;
+      // Header
+      const logoSize = 20;
+      doc.addImage(COMPANY_LOGO, "PNG", margin, currentY, logoSize, logoSize);
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Manufacturer of Non Woven Bags", margin + logoSize + 5, currentY + 10);
+      currentY += logoSize + 8;
+
+      // Divider
+      doc.setDrawColor(180);
+      doc.line(margin, currentY, pageWidth - margin, currentY);
+      currentY += 6;
+
+      // Two Column Data
+      const leftColumn = [
+        ["Order ID", order.orderId],
+        ["Package ID", pkg._id],
+        ["Flexo Unit No.", unitNumbers?.flexo || "N/A"],
+        ["Bag Size", bagDetails.size || `${pkg.length}x${pkg.width} cm`],
+        ["Print Colour", bagDetails.printColor || "N/A"]
+      ];
+
+      const rightColumn = [
+        ["GSM", bagDetails.gsm || "N/A"],
+        ["Bag Colour", bagDetails.color || "N/A"],
+        ["Bag Type", bagDetails.type || "N/A"],
+        ["Net Weight", `${pkg.weight} kg`],
+        ["Bag Making Unit No.", unitNumbers?.wcut || "N/A"]
+      ];
+
+      const leftX = margin;
+      const rightX = pageWidth / 2 + 2;
+      const rowHeight = 9;
+      doc.setFontSize(10);
+
+      for (let i = 0; i < leftColumn.length; i++) {
+        // Left
+        doc.setFont("helvetica", "bold");
+        doc.text(`${leftColumn[i][0]}:`, leftX, currentY);
+        doc.setFont("helvetica", "normal");
+        doc.text(leftColumn[i][1] || "N/A", leftX + 30, currentY);
+
+        // Right
+        if (rightColumn[i]) {
+          doc.setFont("helvetica", "bold");
+          doc.text(`${rightColumn[i][0]}:`, rightX, currentY);
+          doc.setFont("helvetica", "normal");
+
+          doc.text(String(rightColumn[i][1]) || "N/A", rightX + 40, currentY);
+        }
+
+        currentY += rowHeight;
+      }
+      console.log(Array.isArray(pkg)); // true if it's an array
+
+      currentY += 6;
+      doc.line(margin, currentY, pageWidth - margin, currentY);
+      currentY += 8;
+
+      // Job & Customer Info
+      const addField = (label, value) => {
+        doc.setFont("helvetica", "bold");
+        doc.text(`${label}:`, margin, currentY);
+        doc.setFont("helvetica", "normal");
+        const lines = doc.splitTextToSize(value || "N/A", pageWidth - margin * 2 - 30);
+        doc.text(lines, margin + 30, currentY);
+        currentY += lines.length * 6;
+      };
+
+      addField("Job Name", order.jobName);
+      addField("Customer Name", order.customerName);
+      addField("Fabric Quality", order.fabricQuality);
+      addField("Address", order.address);
+      const totalPackages = Array.isArray(pkg) ? pkg.length : 1;
+      addField("Total Packages", totalPackages);
+
+      currentY += 5;
+      // QR Code
+      const qrCode = await generateQRCode();
+      if (qrCode) {
+        const qrSize = 50;
+        const qrX = (pageWidth - qrSize) / 2;
+        doc.addImage(qrCode, "PNG", qrX, currentY, qrSize, qrSize);
+        doc.setFontSize(8);
+        doc.text("Scan for details", qrX + qrSize / 2, currentY + qrSize + 6, { align: "center" });
       }
 
-      // Save PDF
-      doc.save(`package-label-${pkg._id}.pdf`);
-      toast.success(`Package label downloaded: ${pkg._id}`);
+      // Save
+      doc.save(`Label_${order.orderId}_${pkg._id}.pdf`);
+      toast.success("Package label generated!");
       resolve();
     });
   };
+
 
   return (
     <>
@@ -482,6 +511,11 @@ export default function PackagingManagement() {
                 <TableRow>
                   <TableCell>Order ID</TableCell>
                   <TableCell>Customer</TableCell>
+
+                  <TableCell>Bag Type</TableCell>
+                  <TableCell>Job Name</TableCell>
+                  <TableCell>Number of Packages</TableCell>
+
                   <TableCell>Bag Size</TableCell>
                   <TableCell>Weight (kg)</TableCell>
                   <TableCell>Status</TableCell>
@@ -495,6 +529,11 @@ export default function PackagingManagement() {
                     <TableRow key={order._id}>
                       <TableCell>{order?.order_id || 'N/A'}</TableCell>
                       <TableCell>{order?.order?.customerName || 'N/A'}</TableCell>
+
+                      <TableCell>{order?.order?.bagDetails?.type}</TableCell>
+                      <TableCell>{order?.order?.jobName || 'N/A'}</TableCell>
+                      <TableCell>{order?.package_details?.length || 0}</TableCell>
+
                       <TableCell>
                         {order?.order?.bagDetails?.size || 'N/A'}
                       </TableCell>
@@ -590,9 +629,9 @@ export default function PackagingManagement() {
                     pkg.package_details.map((pkgDetail) => (
                       <TableRow key={pkgDetail._id}>
                         <TableCell>{pkgDetail._id}</TableCell>
-                        <TableCell>{pkgDetail.length}</TableCell>
-                        <TableCell>{pkgDetail.width}</TableCell>
-                        <TableCell>{pkgDetail.height}</TableCell>
+                        <TableCell>{pkgDetail.length != null ? pkgDetail.length : 'N/A'}</TableCell>
+                        <TableCell>{pkgDetail.width != null ? pkgDetail.width : 'N/A'}</TableCell>
+                        <TableCell>{pkgDetail.height != null ? pkgDetail.height : 'N/A'}</TableCell>
                         <TableCell>{pkgDetail.weight}</TableCell>
                         <TableCell>
                           <IconButton

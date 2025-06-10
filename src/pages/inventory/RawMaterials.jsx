@@ -38,6 +38,9 @@ import "jspdf-autotable";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { API_BASE_URL } from "../../config/constants";
+
+import orderService from '/src/services/orderService.js';
+import FormSelect from '../../components/common/FormSelect';
 import authService from "../../services/authService";
 import QRCodeDialog from "../../components/sales/orders/QRCodeDialog";
 import { QRCodeCanvas } from "qrcode.react";
@@ -76,6 +79,15 @@ export default function RawMaterials() {
 
   const [unitToUpdate, setQuantityToUpdate] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+
+  const [bagAttributes, setBagAttributes] = useState({
+    "bag-color": [],
+    "fabric-quality": [],
+    "gsm": [],
+    "size": [],
+    "handle-color": [],
+    "roll-size": []
+  });
 
   const [newCategory, setNewCategory] = useState({
     category: "",
@@ -296,6 +308,9 @@ export default function RawMaterials() {
       );
 
       const subcategories = response.data.data || [];
+      console.log('subcategories', subcategories)
+      // console.log('subcategories', subcategories);
+
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const marginLeft = 14;
@@ -310,15 +325,14 @@ export default function RawMaterials() {
       doc.addImage(COMPANY_LOGO, "PNG", marginLeft, currentY, logoSize, logoSize);
       doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
-      doc.text("Thailiwale", textX, currentY + 5);
+      doc.text("Thailiwale Industries Private Limited", textX, currentY + 5);
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
 
       // Address (properly spaced)
-      doc.text("Address: 201/1/4, SR Compound, Dewas Naka,", textX, currentY + 12);
-      doc.text("Lasudia Mori, Indore, Madhya Pradesh 452016", textX, currentY + 19);
-      doc.text("Email: info@thailiwale.com", textX, currentY + 26);
-      doc.text("Phone: +91 7999857050", textX, currentY + 33);
+      doc.text("201/1/4, SR Compound, Lasudiya Mori, Lasudia, Indore 453771", textX, currentY + 12);
+      doc.text("Email: info@thailiwale.com", textX, currentY + 19);
+      doc.text("Phone: +917999857050, +918989788532", textX, currentY + 26);
 
       // Line Separator
       currentY += 40;
@@ -338,6 +352,7 @@ export default function RawMaterials() {
         ["GSM", category.gsm],
         ["Fabric Quality", category.fabric_quality],
         ["Quantity", `${category.quantity_kgs} kg`],
+        ["Total Rolls", Array.isArray(subcategories) ? subcategories.length : 0],
       ];
 
       doc.autoTable({
@@ -358,10 +373,11 @@ export default function RawMaterials() {
       // **Subcategories Table**
       if (subcategories.length > 0) {
         doc.setFontSize(12);
-        doc.text("Subcategories:", marginLeft, currentY);
+        doc.text("Roll Details:", marginLeft, currentY);
         currentY += 5;
 
         const tableColumn = [
+          "Roll ID",
           "Fabric Color",
           "Roll Size",
           "GSM",
@@ -388,6 +404,7 @@ export default function RawMaterials() {
         // **Ensure Exact Number of Rows**
         subcategories.forEach((sub) => {
           tableRows.push([
+            sub._id,
             sub.fabricColor,
             sub.rollSize,
             sub.gsm,
@@ -410,15 +427,17 @@ export default function RawMaterials() {
           },
           bodyStyles: { fontSize: 10, cellPadding: 8 },
           columnStyles: {
-            0: { cellWidth: 30 },
-            1: { cellWidth: 30 },
-            2: { cellWidth: 25 },
-            3: { cellWidth: 40 },
-            4: { cellWidth: 30 },
-            5: { cellWidth: 40 },
+            0: { cellWidth: 30 }, // Material ID
+            1: { cellWidth: 30 }, // Fabric Color
+            2: { cellWidth: 25 }, // Roll Size
+            3: { cellWidth: 25 }, // GSM
+            4: { cellWidth: 30 }, // Fabric Quality
+            5: { cellWidth: 25 }, // Quantity (kg)
+            6: { cellWidth: 30 }, // QR Code
           },
+
           didDrawCell: (data) => {
-            if (data.column.index === 5 && data.row.section === "body") {
+            if (data.column.index === 6 && data.row.section === "body") {  // QR Code column
               const qrSize = 18;
               const xPos = data.cell.x + (data.cell.width - qrSize) / 2;
               const yPos = data.cell.y + (data.cell.height - qrSize) / 2;
@@ -428,7 +447,8 @@ export default function RawMaterials() {
                 doc.addImage(qrCodes[subcategoryIndex], "PNG", xPos, yPos, qrSize, qrSize);
               }
             }
-          },
+          }
+
         });
 
         currentY = doc.autoTable.previous.finalY + 10;
@@ -544,8 +564,23 @@ export default function RawMaterials() {
   };
 
   useEffect(() => {
+    fetchBagAttributes();
     fetchSubCategories();
   }, [selectedCategory]);
+
+  const fetchBagAttributes = async () => {
+    try {
+      const response = await orderService.getBagAttributes();
+      console.log('response', response.data.gsm)
+      if (response.success) {
+        setBagAttributes(response.data);
+      }
+    } catch (error) {
+      toast.error('Error fetching bag attributes');
+    }
+  };
+
+
 
   const renderAddCategoryDialog = () => (
     <Dialog
@@ -575,50 +610,80 @@ export default function RawMaterials() {
               </Select>
             </FormControl>
           </Grid>
+
           <Grid item xs={12}>
-            <TextField
-              label="Fabric Color"
-              fullWidth
-              value={newCategory.fabricColor}
-              onChange={(e) =>
-                setNewCategory({ ...newCategory, fabricColor: e.target.value })
-              }
-            />
+            <FormControl fullWidth>
+              <InputLabel>Fabric Color</InputLabel>
+              <Select
+                value={newCategory.fabricColor || ''}
+                label="Fabric Color"
+                onChange={(e) =>
+                  setNewCategory({ ...newCategory, fabricColor: e.target.value })
+                }
+              >
+                {bagAttributes['bag-color'].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              label="Roll Size"
-              fullWidth
-              value={newCategory.rollSize}
-              onChange={(e) =>
-                setNewCategory({ ...newCategory, rollSize: e.target.value })
-              }
-            />
+            <FormControl fullWidth>
+              <InputLabel>Roll Size</InputLabel>
+              <Select
+                value={newCategory.rollSize || ''}
+                label="Roll Size"
+                onChange={(e) =>
+                  setNewCategory({ ...newCategory, rollSize: e.target.value })
+                }
+              >
+                {bagAttributes['roll-size'].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              label="GSM"
-              fullWidth
-              type="number"
-              value={newCategory.gsm}
-              onChange={(e) =>
-                setNewCategory({ ...newCategory, gsm: e.target.value })
-              }
-            />
+            <FormControl fullWidth>
+              <InputLabel>GSM</InputLabel>
+              <Select
+                value={newCategory.gsm || ''}
+                label="GSM"
+                onChange={(e) =>
+                  setNewCategory({ ...newCategory, gsm: e.target.value })
+                }
+              >
+                {bagAttributes.gsm.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              label="Fabric Quality"
-              fullWidth
-              value={newCategory.fabricQuality}
-              onChange={(e) =>
-                setNewCategory({
-                  ...newCategory,
-                  fabricQuality: e.target.value,
-                })
-              }
-            />
+            <FormControl fullWidth>
+              <InputLabel>Fabric Quality</InputLabel>
+              <Select
+                value={newCategory.fabricQuality || ''}
+                label="Fabric Quality"
+                onChange={(e) =>
+                  setNewCategory({ ...newCategory, fabricQuality: e.target.value })
+                }
+              >
+                {bagAttributes['fabric-quality'].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
+
           <Grid item xs={12} className="hidden">
             <TextField
               label="Quantity (kg)"
@@ -695,7 +760,7 @@ export default function RawMaterials() {
                 (opt) => opt.value === selectedCategory?.category
               )?.label
             }{" "}
-            - Subcategories
+            - Roll List
           </Typography>
           <Button
             variant="contained"
@@ -703,7 +768,7 @@ export default function RawMaterials() {
             startIcon={<Add />}
             onClick={() => setAddSubcategoryDialogOpen(true)}
           >
-            Add Subcategory
+            Add a Roll
           </Button>
         </Box>
       </DialogTitle>

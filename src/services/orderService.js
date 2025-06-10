@@ -31,7 +31,15 @@ const orderService = {
   getOrderByMobileNumber: async (mobileNumber) => {
     const response = await api.get(`/sales/orders/get/mobile-numbers?mobileNumber=${mobileNumber}`);
     return response.data; // This will return order details based on the mobile number
-  }
+  },
+  getBagAttributes: async () => {
+    try {
+      const response = await api.get(`/sales/bag-attributes`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, error };
+    }
+  },
 };
 
 export default orderService;

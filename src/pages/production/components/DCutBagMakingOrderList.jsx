@@ -55,9 +55,15 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [rollSize, setRollSize] = useState(0);
 
+  const [updateScrapModalOpen, setUpdateScrapModalOpen] = useState(false);
+  const [scrapToUpdate, setScrapToUpdate] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [modalActionType, setModalActionType] = useState(''); // 'bag' or 'billing'
+
+
   useEffect(() => {
     fetchOrders();
-  }, [status]);
+  }, [status, selectedOrder]);
 
   const fetchOrders = () => {
     OrderService.listOrders(status)
@@ -197,6 +203,62 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
       });
   };
 
+
+  const handleOpenScrapModal = (order, actionType) => {
+    console.log("Order received:", order);
+    console.log("Type of order:", typeof order); // should be object
+    console.log("Order ID:", order?.orderId);    // should be visible
+
+    setSelectedOrder(order);
+    setModalActionType(actionType);
+    setUpdateScrapModalOpen(true);
+  };
+
+
+  const handleScrapModalSubmit = () => {
+    if (!scrapToUpdate || scrapToUpdate <= 0) {
+      toast.error("Please enter a valid scrap amount.");
+      return;
+    }
+
+    const orderId = selectedOrder?.orderId || selectedOrder?._id; // Fallback to _id if orderId doesn't exist
+    if (!orderId) {
+      toast.error("Invalid order ID.");
+      return;
+    }
+
+    console.log('scrapToUpdate', scrapToUpdate);
+    console.log('Order ID:', orderId);
+
+    if (modalActionType === 'opsert') {
+      OrderService.handleMoveToOpsert(orderId, scrapToUpdate)
+        .then(() => {
+          toast.success('Order moved to Offset');
+          fetchOrders();
+          setUpdateScrapModalOpen(false);
+          setScrapToUpdate('');
+        })
+        .catch((error) => {
+          toast.error('Failed to move to Offset');
+        });
+
+    } else if (modalActionType === 'billing') {
+      OrderService.directBilling(orderId, scrapToUpdate, 'W-cut')
+        .then(() => {
+          toast.success('Order moved to billing successfully');
+          fetchOrders();
+          setUpdateScrapModalOpen(false);
+          setScrapToUpdate('');
+        })
+        .catch((error) => {
+          toast.error('Failed to move to billing');
+        });
+    }
+  };
+
+
+
+
   const handleMoveToOpsert = (orderId) => {
     // API call to move order to delivery
     OrderService.handleMoveToOpsert(orderId, bagType)
@@ -256,7 +318,7 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => handleMoveToDelivery(order._id)}
+            onClick={() => handleOpenScrapModal(order._id, 'opsert')}
           >
             Move to Delivery
           </Button>
@@ -296,7 +358,7 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
               variant="contained"
               color="secondary"
               size="small"
-              onClick={() => handleBillingClick(order)}
+              onClick={() => handleOpenScrapModal(order, 'billing')}
             >
               Direct Billing
             </Button>
@@ -305,7 +367,7 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
               variant="contained"
               color="primary"
               size="small"
-              onClick={() => handleMoveToOpsert(order.orderId)}
+              onClick={() => handleOpenScrapModal(order, 'opsert')}
             >
               Move to Offset
             </Button>
@@ -454,13 +516,18 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
           <Table>
             <TableHead>
               <TableRow>
+
                 <TableCell>Order ID</TableCell>
                 <TableCell>Job Name</TableCell>
-                <TableCell>Bag Type</TableCell>
-                <TableCell>Fabric Type</TableCell>
+                <TableCell> Roll Size</TableCell>
                 <TableCell>GSM</TableCell>
-                <TableCell>Fabric Color</TableCell>
+                <TableCell>Bag Color</TableCell>
+                <TableCell>Print Color</TableCell>
+                <TableCell>Fabric Type</TableCell>
+                <TableCell>Fabric Quality</TableCell>
+                <TableCell>Bag Type</TableCell>
                 <TableCell>Bag Size</TableCell>
+                <TableCell>Cylinder Size</TableCell>
                 <TableCell>Quantity</TableCell>
                 <TableCell>Remarks</TableCell>
                 <TableCell>Status</TableCell>
@@ -479,27 +546,17 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
                   <TableRow key={order._id}>
                     <TableCell>{order.orderId}</TableCell>
                     <TableCell>{order.jobName}</TableCell>
-                    <TableCell>{order.bagDetails?.type}</TableCell>
+                    <TableCell>{order.productionManagers?.[0]?.production_details?.roll_size || '-'}</TableCell>
+                    <TableCell>{order.bagDetails?.gsm || '-'}</TableCell>
                     <TableCell>{order.bagDetails?.color || '-'}</TableCell>
-
-                    {order.dcutbagmakingDetails?.[0]?.status === 'pending' ? (
-                      <>
-                        <TableCell style={{ filter: 'blur(5px)' }}>{order.bagDetails?.gsm}</TableCell>
-                        <TableCell style={{ filter: 'blur(5px)' }}>{order.bagDetails?.printColor}</TableCell>
-                        <TableCell style={{ filter: 'blur(5px)' }}>{order.bagDetails?.size}</TableCell>
-                        <TableCell style={{ filter: 'blur(5px)' }}>{order.quantity}</TableCell>
-                        <TableCell style={{ filter: 'blur(5px)' }}>{order.remarks || '-'}</TableCell>
-                      </>
-                    ) : (
-                      <>
-                        <TableCell>{order.bagDetails?.gsm}</TableCell>
-                        <TableCell>{order.bagDetails?.printColor}</TableCell>
-                        <TableCell>{order.bagDetails?.size}</TableCell>
-                        <TableCell>{order.quantity}</TableCell>
-                        <TableCell>{order.remarks || '-'}</TableCell>
-                      </>
-                    )}
-
+                    <TableCell>{order.bagDetails?.printColor || '-'}</TableCell>
+                    <TableCell>{order.bagDetails?.type || '-'}</TableCell>
+                    <TableCell>{order.fabricQuality || '-'}</TableCell>
+                    <TableCell>{order.productionManagers?.[0]?.production_details?.type || '-'}</TableCell>
+                    <TableCell>{order.bagDetails?.size || '-'}</TableCell>
+                    <TableCell>{order.productionManagers?.[0]?.production_details?.cylinder_size || '-'}</TableCell>
+                    <TableCell>{order.quantity}</TableCell>
+                    <TableCell>{order.productionManagers?.[0]?.production_details?.remarks || order.remarks || '-'}</TableCell>
                     <TableCell>
                       <Chip
                         label={order.dcutbagmakingDetails?.[0]?.status}
@@ -550,6 +607,45 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
           </Box>
         </Box>
       </Modal>
+
+
+
+      <Modal
+        open={updateScrapModalOpen}
+        onClose={() => setUpdateScrapModalOpen(false)}
+      >
+        <Box sx={modalStyle}>
+          <Typography variant="h6" gutterBottom>
+            Enter Scrap Quantity for{" "}
+            {modalActionType === 'bag'
+              ? 'Bag Making'
+              : modalActionType === 'billing'
+                ? 'Direct Billing'
+                : modalActionType === 'opsert'
+                  ? 'Offset'
+                  : ''}
+          </Typography>
+
+          <TextField
+            fullWidth
+            sx={{ mt: 2 }}
+            label="Scrap Quantity"
+            type="number"
+            value={scrapToUpdate}
+            onChange={(e) => setScrapToUpdate(e.target.value)}
+            inputProps={{ min: 0 }}
+          />
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+            <Button onClick={() => setUpdateScrapModalOpen(false)} sx={{ mr: 1 }}>
+              Cancel
+            </Button>
+            <Button variant="contained" onClick={handleScrapModalSubmit}>
+              Submit
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
       {/* QR Code Scanner Dialog */}
       <Dialog
         open={showScanner}

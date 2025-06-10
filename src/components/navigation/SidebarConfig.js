@@ -9,6 +9,13 @@ export const menuConfigs = {
     { title: 'w-cut Bag Making', path: '/admin/wcut', icon: 'Assessment' },
     { title: 'd-cut Bag Making', path: '/admin/dcut', icon: 'Assessment' },
     { title: 'Opsert', path: '/admin/opsert', icon: 'Assessment' },
+
+    { title: 'Bag Color', path: '/admin/bag-color', icon: 'ColorLens' },
+    { title: 'Fabric Quality', path: '/admin/fabric-quality', icon: 'Texture' },
+    { title: 'GSM', path: '/admin/gsm', icon: 'LineWeight' },
+    { title: 'Size', path: '/admin/size', icon: 'Straighten' },
+    { title: 'Handle Color', path: '/admin/handle-color', icon: 'PanToolAlt' },
+    { title: 'Roll Size', path: '/admin/roll-size', icon: 'Crop' }
   ],
 
   production_manager: [

@@ -41,7 +41,7 @@ export default function QRCodeDialog({ open, onClose, orderData }) {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Order QR Code</DialogTitle>
+      <DialogTitle>Roll QR Code</DialogTitle>
       <DialogContent>
         <Box
           ref={qrRef}
@@ -57,7 +57,7 @@ export default function QRCodeDialog({ open, onClose, orderData }) {
           <QRCodeCanvas value={qrData} size={300} level="M" includeMargin={true} />
 
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            Scan this QR code to get order details
+            Scan this QR to get Roll details
           </Typography>
           <Box sx={{ mt: 2 }}>
             <Typography variant="body2">
@@ -73,7 +73,7 @@ export default function QRCodeDialog({ open, onClose, orderData }) {
               <strong>GSM:</strong> {orderData.gsm}
             </Typography>
             <Typography variant="body2">
-              <strong>Quantity:</strong> {orderData.quantity}
+              <strong>Quantity(KGS):</strong> {orderData.quantity}
             </Typography>
           </Box>
         </Box>

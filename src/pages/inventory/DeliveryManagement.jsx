@@ -79,11 +79,13 @@ export default function DeliveryManagement() {
   const filteredOrders = deliveries
     .filter((delivery) => {
       const customerName = delivery?.orderDetails?.customerName || '';
+      const jobName = delivery?.orderDetails?.jobName || '';
       const mobileNumber = delivery?.orderDetails?.mobileNumber || '';
       const agent = delivery?.orderDetails?.agent || '';
       const orderId = delivery?.orderId?.toString() || '';
       return (
         customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        jobName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         orderId.includes(searchQuery) ||
         mobileNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         agent.toLowerCase().includes(searchQuery.toLowerCase())
@@ -182,7 +184,8 @@ export default function DeliveryManagement() {
                   <TableRow>
                     <TableCell>Order ID</TableCell>
                     <TableCell>Agent Name</TableCell>
-                    <TableCell>Customer</TableCell>
+                    <TableCell>Customer Name</TableCell>
+                    <TableCell>Job Name</TableCell>
                     <TableCell>Address</TableCell>
                     <TableCell>Mobile No.</TableCell>
                     <TableCell>Delivery Date</TableCell>
@@ -196,11 +199,15 @@ export default function DeliveryManagement() {
                       <TableCell>{delivery.orderId || 'N/A'}</TableCell>
                       <TableCell>{delivery.orderDetails?.agent || 'N/A'}</TableCell>
                       <TableCell>{delivery.orderDetails?.customerName || 'N/A'}</TableCell>
+                      <TableCell>{delivery.orderDetails?.jobName || 'N/A'}</TableCell>
                       <TableCell>{delivery.orderDetails?.address || 'N/A'}</TableCell>
                       <TableCell>{delivery.orderDetails?.mobileNumber || 'N/A'}</TableCell>
-                      <TableCell>{delivery?.deliveryDate
-                        ? new Date(delivery.deliveryDate).toLocaleString()
-                        : 'N/A'}</TableCell>
+                      <TableCell>
+                        {delivery?.deliveryDate
+                          ? new Date(delivery.deliveryDate).toISOString().split('T')[0]
+                          : 'N/A'}
+                      </TableCell>
+
 
                       <TableCell>
                         <Chip
@@ -304,10 +311,10 @@ export default function DeliveryManagement() {
                 fullWidth
                 required
                 InputLabelProps={{
-                  shrink: true
+                  shrink: true,
                 }}
                 inputProps={{
-                  min: new Date().toISOString().split('T')[0]
+                  min: new Date().toISOString().split('T')[0], // allow today and future
                 }}
               />
             </Grid>

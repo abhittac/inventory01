@@ -135,11 +135,12 @@ export default function WCutProductionPage() {
                   <TableRow>
                     <TableCell>Order ID</TableCell>
                     <TableCell>Job Name</TableCell>
+                    <TableCell>Bag Type</TableCell>
                     <TableCell>Bag Size</TableCell>
                     <TableCell>GSM</TableCell>
                     <TableCell>Quantity</TableCell>
                     <TableCell>Print Color</TableCell>
-                    <TableCell>Fabric Color</TableCell>
+                    <TableCell>Bag Color</TableCell>
                     <TableCell>Fabric Quality</TableCell>
                     <TableCell>Production Status</TableCell>
                     <TableCell>Actions</TableCell>
@@ -152,6 +153,7 @@ export default function WCutProductionPage() {
                       <TableRow key={record.id}>
                         <TableCell>{record.orderId}</TableCell>
                         <TableCell>{record.jobName || 'N/A'}</TableCell>
+                        <TableCell>{record.bagDetails?.type || 'N/A'}</TableCell>
                         <TableCell>{record.bagDetails?.size || 'N/A'}</TableCell>
                         <TableCell>{record.bagDetails?.gsm || 'N/A'}</TableCell>
                         <TableCell>{record.quantity}</TableCell>

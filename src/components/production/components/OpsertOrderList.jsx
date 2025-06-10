@@ -84,7 +84,7 @@ export default function OpsertOrderList({ orders, onFilterChange, filters }) {
                     label={order.status}
                     color={
                       order.status === 'completed' ? 'success' :
-                      order.status === 'in_progress' ? 'warning' : 'default'
+                        order.status === 'in_progress' ? 'warning' : 'default'
                     }
                     size="small"
                   />

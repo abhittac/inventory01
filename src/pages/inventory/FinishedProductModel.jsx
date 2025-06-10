@@ -237,7 +237,18 @@ export default function FinishedProductModel({ open, production, onClose }) {
                                                         <TableCell>{subcategory.quantity}</TableCell>
                                                     </TableRow>
                                                 ))}
+
+                                                {/* ✅ Row for Scrap Quantity */}
+                                                <TableRow>
+                                                    <TableCell colSpan={5} sx={{ fontWeight: 'bold' }}>
+                                                        Scrap Quantity
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontWeight: 'bold' }}>
+                                                        {productionData.productionDetails?.scrapQuantity ?? 0}
+                                                    </TableCell>
+                                                </TableRow>
                                             </TableBody>
+
                                         </Table>
                                     </TableContainer>
                                 </Grid>

@@ -166,11 +166,11 @@ export default function DCutProductionPage() {
                 <TableRow>
                   <TableCell>Order ID</TableCell>
                   <TableCell>Job Name</TableCell>
+                  <TableCell>Bag Type</TableCell>
                   <TableCell>Bag Size</TableCell>
                   <TableCell>GSM</TableCell>
                   <TableCell>Quantity</TableCell>
-                  <TableCell>Print Color</TableCell>
-                  <TableCell>Fabric Color</TableCell>
+                  <TableCell>Bag Color</TableCell>
                   <TableCell>Production Status</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
@@ -180,10 +180,10 @@ export default function DCutProductionPage() {
                   <TableRow key={record.id}>
                     <TableCell>{record.orderId}</TableCell>
                     <TableCell>{record.jobName || 'N/A'}</TableCell>
+                    <TableCell>{record.bagDetails?.type || 'N/A'}</TableCell>
                     <TableCell>{record.bagDetails?.size || 'N/A'}</TableCell>
                     <TableCell>{record.bagDetails?.gsm || 'N/A'}</TableCell>
                     <TableCell>{record.quantity}</TableCell>
-                    <TableCell>{record.bagDetails?.printColor || 'N/A'}</TableCell>
                     <TableCell>{record.bagDetails?.color || 'N/A'}</TableCell>
                     <TableCell>
                       <Chip

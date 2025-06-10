@@ -7,7 +7,7 @@ export default function UpdateDetailsDialog({ open, onClose, record, quantityKg,
   const [formData, setFormData] = useState({
     type: '',
     roll_size: '',
-    cylinder_size: '',
+    cylinder_size: 0,
     quantity_kgs: '',
     quantity_rolls: '',
     remarks: '',
@@ -32,7 +32,7 @@ export default function UpdateDetailsDialog({ open, onClose, record, quantityKg,
       setFormData({
         type: type || '',
         roll_size: '',
-        cylinder_size: '',
+        cylinder_size: 0,
         quantity_kgs: quantityKg,
         quantity_rolls: '',
         remarks: '',
@@ -77,12 +77,19 @@ export default function UpdateDetailsDialog({ open, onClose, record, quantityKg,
         <DialogTitle>Update {type} Production Details</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={12}>
               <TextField fullWidth label="Roll Size" name="roll_size" value={formData.roll_size} onChange={handleChange} required />
             </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField fullWidth label="Cylinder Size" name="cylinder_size" value={formData.cylinder_size} onChange={handleChange} required />
+            <Grid item xs={12} md={6} sx={{ display: 'none' }}>
+              <TextField
+                fullWidth
+                label="Cylinder Size"
+                name="cylinder_size"
+                value={formData.cylinder_size === "" ? 0 : formData.cylinder_size}
+                onChange={handleChange}
+              />
             </Grid>
+
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -96,7 +103,7 @@ export default function UpdateDetailsDialog({ open, onClose, record, quantityKg,
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField fullWidth label="Quantity (in Number of Rolls)" name="quantity_rolls" type="number" value={formData.quantity_rolls} onChange={handleChange} required />
+              <TextField fullWidth label="Quantity (in Kgs)" name="quantity_rolls" type="number" value={formData.quantity_rolls} onChange={handleChange} required />
             </Grid>
             <Grid item xs={12}>
               <TextField fullWidth label="Remarks (if Any)" name="remarks" value={formData.remarks} onChange={handleChange} multiline rows={3} />

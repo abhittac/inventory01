@@ -55,79 +55,121 @@ export const pdfFinishedProduct = (Details) => {
 
         doc.autoTable({
             startY: currentY,
-            head: [['Job Name', 'Quantity', 'Order Price']],
-            body: [[
-                Details?.orderDetails?.jobName || 'N/A',
-                quantity || 'N/A',
-                `${subtotal.toFixed(2)}`
-            ]],
+            head: [
+                ['Job Name', 'Quantity', 'Order Price']
+            ],
+            body: [
+                [
+                    Details?.orderDetails?.jobName || 'N/A',
+                    quantity || 'N/A',
+                    `${subtotal.toFixed(2)}`
+                ]
+            ],
             theme: 'grid',
             headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
             bodyStyles: { fontSize: 9, halign: 'left' }
         });
 
-        let finalY = doc.lastAutoTable.finalY + 10;
+        let finalY = doc.lastAutoTable.finalY + 13;
 
         // === Bag Details Table ===
         doc.autoTable({
             startY: finalY,
-            head: [['Type', 'Size', 'Color', 'Print Color', 'GSM']],
-            body: [[
-                Details?.orderDetails?.bagDetails?.type || 'N/A',
-                Details?.orderDetails?.bagDetails?.size || 'N/A',
-                Details?.orderDetails?.bagDetails?.color || 'N/A',
-                Details?.orderDetails?.bagDetails?.printColor || 'N/A',
-                Details?.orderDetails?.bagDetails?.gsm || 'N/A'
-            ]],
+            head: [
+                ['Type', 'Size', 'Color', 'Print Color', 'GSM']
+            ],
+            body: [
+                [
+                    Details?.orderDetails?.bagDetails?.type || 'N/A',
+                    Details?.orderDetails?.bagDetails?.size || 'N/A',
+                    Details?.orderDetails?.bagDetails?.color || 'N/A',
+                    Details?.orderDetails?.bagDetails?.printColor || 'N/A',
+                    Details?.orderDetails?.bagDetails?.gsm || 'N/A'
+                ]
+            ],
             theme: 'grid'
         });
 
-        finalY = doc.lastAutoTable.finalY + 10;
+        finalY = doc.lastAutoTable.finalY + 13;
 
         // === Production Details Table ===
         doc.autoTable({
             startY: finalY,
-            head: [['Roll Size', 'Cylinder Size', 'Quantity (Kgs)', 'Progress']],
-            body: [[
-                Details?.productionManagerDetails?.production_details?.roll_size || 'N/A',
-                Details?.productionManagerDetails?.production_details?.cylinder_size || 'N/A',
-                Details?.productionManagerDetails?.production_details?.quantity_kgs || 'N/A',
-                Details?.productionManagerDetails?.production_details?.progress || 'N/A'
-            ]],
+            head: [
+                ['Roll Size', 'Cylinder Size', 'Quantity (Kgs)', 'Progress']
+            ],
+            body: [
+                [
+                    Details?.productionManagerDetails?.production_details?.roll_size || 'N/A',
+                    Details?.productionManagerDetails?.production_details?.cylinder_size || 'N/A',
+                    Details?.productionManagerDetails?.production_details?.quantity_kgs || 'N/A',
+                    Details?.productionManagerDetails?.production_details?.progress || 'N/A'
+                ]
+            ],
             theme: 'grid'
         });
 
-        finalY = doc.lastAutoTable.finalY + 10;
+        finalY = doc.lastAutoTable.finalY + 12;
+
+        // === Scrap Quantity Section ===
+        doc.autoTable({
+            startY: finalY,
+            head: [
+                ['Scrap Quantity']
+            ],
+            body: [
+                [Details?.productionDetails?.scrapQuantity || 'N/A']
+            ],
+            theme: 'grid',
+            headStyles: { fillColor: [241, 196, 15], textColor: 0, fontSize: 10, fontStyle: 'bold' },
+            bodyStyles: { fontSize: 9 }
+        });
+
+        finalY = doc.lastAutoTable.finalY + 12;
+
 
         // === Packaging Details Table ===
-        const packageData = Details?.packageDetails?.package_details?.map(pkg => ([
-            `${pkg.length}x${pkg.width}x${pkg.height} cm`,
-            `${pkg.weight} kg`
-        ])) || [['N/A', 'N/A']];
+        const packageData = (Details?.packageDetails?.package_details || [])
+            .filter(pkg => pkg.weight != null) // Only include rows with valid weight
+            .map(pkg => [
+                `${pkg.weight} kg`
+            ]);
+
+        // Fallback if no valid data found
+        const tableBody = packageData.length > 0 ? packageData : [
+            ['-']
+        ];
 
         doc.autoTable({
             startY: finalY,
-            head: [['Package Size', 'Weight']],
-            body: packageData,
+            head: [
+                ['Weight']
+            ], // Ensure this is a 2D array
+            body: tableBody,
             theme: 'grid'
         });
 
-        finalY = doc.lastAutoTable.finalY + 10;
+
+        finalY = doc.lastAutoTable.finalY + 15;
 
         // === Delivery Details Table ===
         doc.autoTable({
             startY: finalY,
-            head: [['Driver', 'Contact', 'Vehicle No', 'Delivery Date']],
-            body: [[
-                Details?.deliveryDetails?.driverName || 'N/A',
-                Details?.deliveryDetails?.driverContact || 'N/A',
-                Details?.deliveryDetails?.vehicleNo || 'N/A',
-                Details?.deliveryDetails?.deliveryDate ? new Date(Details?.deliveryDetails?.deliveryDate).toLocaleDateString() : 'N/A'
-            ]],
+            head: [
+                ['Driver', 'Contact', 'Vehicle No', 'Delivery Date']
+            ],
+            body: [
+                [
+                    Details?.deliveryDetails?.driverName || 'N/A',
+                    Details?.deliveryDetails?.driverContact || 'N/A',
+                    Details?.deliveryDetails?.vehicleNo || 'N/A',
+                    Details?.deliveryDetails?.deliveryDate ? new Date(Details?.deliveryDetails?.deliveryDate).toLocaleDateString() : 'N/A'
+                ]
+            ],
             theme: 'grid'
         });
 
-        finalY = doc.lastAutoTable.finalY + 10;
+        finalY = doc.lastAutoTable.finalY + 30;
 
         // === Subcategory Details Table ===
         const subcategoryData = Details?.productionDetails?.subcategoryIds?.map(sub => ([
@@ -136,11 +178,15 @@ export const pdfFinishedProduct = (Details) => {
             sub.gsm || 'N/A',
             sub.fabricQuality || 'N/A',
             sub.quantity || 'N/A'
-        ])) || [['N/A', 'N/A', 'N/A', 'N/A', 'N/A']];
+        ])) || [
+                ['N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+            ];
 
         doc.autoTable({
             startY: finalY,
-            head: [['Fabric Color', 'Roll Size', 'GSM', 'Fabric Quality', 'Quantity']],
+            head: [
+                ['Fabric Color', 'Roll Size', 'GSM', 'Fabric Quality', 'Quantity']
+            ],
             body: subcategoryData,
             theme: 'grid'
         });
@@ -150,13 +196,17 @@ export const pdfFinishedProduct = (Details) => {
         // === Unit Numbers Table ===
         doc.autoTable({
             startY: finalY,
-            head: [['Flexo', 'W-Cut', 'D-Cut', 'Offset']],
-            body: [[
-                Details?.unitNumbers?.flexo || 'N/A',
-                Details?.unitNumbers?.wcut || 'N/A',
-                Details?.unitNumbers?.dcut || 'N/A',
-                Details?.unitNumbers?.opsert || 'N/A'
-            ]],
+            head: [
+                ['Flexo', 'W-Cut', 'D-Cut', 'Offset']
+            ],
+            body: [
+                [
+                    Details?.unitNumbers?.flexo || 'N/A',
+                    Details?.unitNumbers?.wcut || 'N/A',
+                    Details?.unitNumbers?.dcut || 'N/A',
+                    Details?.unitNumbers?.opsert || 'N/A'
+                ]
+            ],
             theme: 'grid'
         });
 
@@ -167,12 +217,16 @@ export const pdfFinishedProduct = (Details) => {
         // Invoice Table
         doc.autoTable({
             startY: finalY,
-            head: [['Subtotal', 'GST (18%)', 'Total (R)']],
-            body: [[
-                `${subtotal.toFixed(2)}`,
-                `${gst.toFixed(2)}`,
-                `${total.toFixed(2)}`
-            ]],
+            head: [
+                ['Subtotal', 'GST (18%)', 'Total (R)']
+            ],
+            body: [
+                [
+                    `${subtotal.toFixed(2)}`,
+                    `${gst.toFixed(2)}`,
+                    `${total.toFixed(2)}`
+                ]
+            ],
             theme: 'grid',
             headStyles: { fillColor: [255, 87, 51], textColor: 255, fontSize: 10, fontStyle: 'bold' }
         });
