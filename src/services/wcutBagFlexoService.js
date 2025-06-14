@@ -45,7 +45,7 @@ const OrderService = {
     },
 
     // 4. Direct billing API
-    directBilling: async (orderId, scrapValue, bagType) => {
+    directBilling: async (orderId, bagType) => {
         try {
             // Include scrapValue in the body as well if backend expects it
             const response = await api.put(
@@ -53,7 +53,6 @@ const OrderService = {
                 {
                     billingStatus: 'completed',
                     type: bagType,
-                    scrapQuantity: scrapValue,   // <-- added scrapValue here
                 }
             );
             return response.data;
@@ -62,15 +61,9 @@ const OrderService = {
         }
     },
     // 5. Move to delivery API
-    moveToBagMaking: async (orderId, scrapValue) => {
+    moveToBagMaking: async (orderId) => {
         try {
-            // Send scrapValue in body if expected by backend
-            const response = await api.put(
-                `${API_BASE_URL}/${orderId}/bag_making`,
-                {
-                    scrapQuantity: scrapValue,  // <-- added scrapValue here
-                }
-            );
+            const response = await api.put(`${API_BASE_URL}/${orderId}/bag_making`);
             return response.data;
         } catch (error) {
             throw error.response ? error.response.data : error;

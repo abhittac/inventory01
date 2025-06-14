@@ -152,6 +152,8 @@ export default function DCutBagMakingPage() {
                   <TableCell>Color</TableCell>
                   <TableCell>Print Color</TableCell>
                   <TableCell>GSM</TableCell>
+
+                  <TableCell>Scrap Quantity</TableCell>
                   <TableCell>Status</TableCell>
                   {/* <TableCell>Actions</TableCell> */}
                 </TableRow>
@@ -169,6 +171,7 @@ export default function DCutBagMakingPage() {
                     <TableCell>{order.orderDetails.bagDetails.color}</TableCell>
                     <TableCell>{order.orderDetails.bagDetails.printColor}</TableCell>
                     <TableCell>{order.orderDetails.bagDetails.gsm}</TableCell>
+                    <TableCell>{order.scrapQuantity}</TableCell>
                     <TableCell>
                       <Chip
                         label={order.status.toUpperCase()}

@@ -403,12 +403,13 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
         const fabricColor = material.fabricColor?.toLowerCase() || "";
         const rollSize = material.rollSize?.toString().toLowerCase() || "";
         const quantity = material.quantity?.toString().toLowerCase() || "";
+        const MaterialId = material._id?.toString().toLowerCase() || "";
 
         return (
           gsm.includes(lowerSearch) ||
           fabricColor.includes(lowerSearch) ||
           rollSize.includes(lowerSearch) ||
-          quantity.includes(lowerSearch)
+          MaterialId.includes(lowerSearch)
         );
       });
     }, [searchTerm, requiredMaterials]);
@@ -421,12 +422,15 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
         fullWidth
         sx={{ minHeight: "80vh" }}
       >
+
         <DialogTitle>
           <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
             }}
           >
             <Typography>
@@ -435,22 +439,22 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
             <Typography>
               Total Quantity In Kg: <strong>{totalQuantity}</strong>
             </Typography>
+            {/* Search Input */}
+
+            <TextField
+              size="small"
+              variant="outlined"
+              label="Search Materials"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{ minWidth: 200 }}
+              placeholder="Search by GSM, Fabric Color, Roll Size, or Quantity"
+            />
           </Box>
         </DialogTitle>
 
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
-            {/* Search Input */}
-            <Grid item xs={12} sx={{ mb: 2 }}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Search Materials"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by GSM, Fabric Color, Roll Size, or Quantity"
-              />
-            </Grid>
 
             <TableContainer>
               <Table>

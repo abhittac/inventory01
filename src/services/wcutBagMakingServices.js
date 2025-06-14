@@ -21,14 +21,18 @@ const wcutBagMakingServices = {
         }
     },
 
-    moveToDelivery: async (orderId) => {
+    moveToDelivery: async (orderId, scrapQuantity) => {
         try {
-            const response = await api.post(`${API_BASE_URL}/orders/${orderId}/move-to-delivery`);
+            const response = await api.post(`${API_BASE_URL}/orders/${orderId}/move-to-delivery`, {
+                scrapQuantity,
+            });
             return response.data;
         } catch (error) {
-            throw new Error('Failed to move order to delivery');
+            console.error('Error in moveToDelivery:', error);
+            throw new Error(error?.response?.data?.message || 'Failed to move order to delivery');
         }
     },
+
     getRecords: async () => {
         const response = await api.get(`${API_BASE_URL}/production/records`);
         return response.data;

@@ -61,6 +61,21 @@ export const generateInvoicePDF = (invoiceData) => {
     ], marginLeft, currentY + 10);
 
     // Right side - Invoice Info
+
+    const bagType = invoiceData?.productionManagerDetails?.production_details?.type || ''; // "DCut" or "WCut"
+    const normalizedType = bagType.trim().toLowerCase();
+
+    const totalQty = Number(invoiceData?.orderDetails?.quantity || 0);
+
+    let scrapQty = 0;
+    if (normalizedType === 'wcut') {
+      scrapQty = Number(invoiceData?.scrapDetails?.wcutScrapQty || 0);
+    } else if (normalizedType === 'dcut') {
+      scrapQty = Number(invoiceData?.scrapDetails?.dcutScrapQty || 0);
+    }
+
+    const remainingQty = totalQty - scrapQty;
+
     doc.text([
       `Invoice No: ${invoiceData?.invoice_id || 'N/A'}`,
       `Order No: ${invoiceData?.order_id || 'N/A'}`,
@@ -70,12 +85,14 @@ export const generateInvoicePDF = (invoiceData) => {
 
     // Order Details Table
     currentY += 30;
-    const tableColumns = ['Job Name', 'Quantity', 'Order Price'];
+    const tableColumns = ['Job Name', 'Total Qty', 'Scrap Qty', 'Remaining Qty', 'Order Price'];
     const tableData = [
       [
         invoiceData?.orderDetails?.jobName || 'N/A',
-        invoiceData?.orderDetails?.quantity || 'N/A',
-        `${invoiceData?.orderDetails?.orderPrice || 'N/A'}`,
+        totalQty,
+        scrapQty,
+        remainingQty,
+        `${invoiceData?.orderDetails?.orderPrice || 'N/A'}`
       ]
     ];
 

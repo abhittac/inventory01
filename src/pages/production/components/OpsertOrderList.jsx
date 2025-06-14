@@ -75,11 +75,17 @@ export default function OpsertOrderList({ orders, status, noOrdersFound, onStatu
               <TableRow>
                 <TableCell>Order ID</TableCell>
                 <TableCell>Job Name</TableCell>
+                <TableCell>Roll Size</TableCell>
+                <TableCell>GSM</TableCell>
+                <TableCell>Bag Color</TableCell>
+                <TableCell>Print Color</TableCell>
+                <TableCell>Fabric Type</TableCell>
+                <TableCell>Fabric Quality</TableCell>
                 <TableCell>Bag Type</TableCell>
-                <TableCell>Bag Colour</TableCell>
-                <TableCell>Print Colour</TableCell>
                 <TableCell>Bag Size</TableCell>
+                <TableCell>Cylinder Size</TableCell>
                 <TableCell>Quantity</TableCell>
+                <TableCell>Remarks</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
@@ -96,13 +102,20 @@ export default function OpsertOrderList({ orders, status, noOrdersFound, onStatu
               ) : (
                 orders.map((order) => (
                   <TableRow key={order._id}>
+
                     <TableCell>{order.orderId}</TableCell>
                     <TableCell>{order.jobName}</TableCell>
-                    <TableCell>{order.bagDetails.type}</TableCell>
-                    <TableCell>{order.bagDetails.color}</TableCell>
-                    <TableCell>{order.bagDetails.printColor}</TableCell>
-                    <TableCell>{order.bagDetails.size}</TableCell>
+                    <TableCell>{order.productionManagers?.[0]?.production_details?.roll_size || '-'}</TableCell>
+                    <TableCell>{order.bagDetails?.gsm || '-'}</TableCell>
+                    <TableCell>{order.bagDetails?.color || '-'}</TableCell>
+                    <TableCell>{order.bagDetails?.printColor || '-'}</TableCell>
+                    <TableCell>{order.productionManagers?.[0]?.production_details?.type || '-'}</TableCell>
+                    <TableCell>{order.fabricQuality || '-'}</TableCell>
+                    <TableCell>{order.bagDetails?.type || '-'}</TableCell>
+                    <TableCell>{order.bagDetails?.size || '-'}</TableCell>
+                    <TableCell>{order.productionManagers?.[0]?.production_details?.cylinder_size || '-'}</TableCell>
                     <TableCell>{order.quantity}</TableCell>
+                    <TableCell>{order.productionManagers?.[0]?.production_details?.remarks || order.remarks || '-'}</TableCell>
                     <TableCell>
                       <Chip
                         label={order.opsertDetails[0].status.replace('_', ' ').toUpperCase()}

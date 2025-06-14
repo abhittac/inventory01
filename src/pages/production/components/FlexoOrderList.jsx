@@ -43,6 +43,7 @@ const modalStyle = {
 export default function FlexoOrderList({ status = 'pending', bagType }) {
   const [orders, setOrders] = useState([]);
   const [noOrdersFound, setNoOrdersFound] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [showScanner, setShowScanner] = useState(false); // Ensure this state controls the scanner visibility
   const [isOpen, setOpen] = useState(false);
   const [unitToUpdate, setUnitToUpdate] = useState('');
@@ -56,17 +57,9 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [updateScrapModalOpen, setUpdateScrapModalOpen] = useState(false);
-  const [scrapToUpdate, setScrapToUpdate] = useState('');
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [modalActionType, setModalActionType] = useState(''); // 'bag' or 'billing'
-
-  const [selectedOrderId, setSelectedOrderId] = useState(null);
-
-
   useEffect(() => {
     fetchOrders();
-  }, [status, selectedOrder]);
+  }, [status]);
 
   const fetchOrders = () => {
     OrderService.listOrders(status)
@@ -85,10 +78,6 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
         setNoOrdersFound(true);
       });
   };
-
-
-
-
   const handleVerifyOrder = async (orderId, materialId) => {
     // try {
     //   // Fetch row materials for the given order
@@ -196,72 +185,6 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
       });
   };
 
-  const handleScrapUpdate = () => {
-    if (!scrapToUpdate || scrapToUpdate <= 0) {
-      toast.error("Please enter a valid scrap amount.");
-      return;
-    }
-
-    OrderService.moveToBagMaking(selectedOrderId, scrapToUpdate)
-      .then(() => {
-        toast.success('Order moved to W-Cut Bag making successfully');
-        fetchOrders();
-        setUpdateScrapModalOpen(false);
-        setScrapToUpdate('');
-      })
-      .catch(() => {
-        toast.error('Order move to W-Cut Bag making failed');
-      });
-  };
-
-
-  const handleOpenScrapModal = (order, actionType) => {
-    console.log("Order received:", order);
-    console.log("Type of order:", typeof order); // should be object
-    console.log("Order ID:", order?.orderId);    // should be visible
-
-    setSelectedOrder(order);
-    setModalActionType(actionType);
-    setUpdateScrapModalOpen(true);
-  };
-
-  const handleScrapModalSubmit = () => {
-    if (!scrapToUpdate || scrapToUpdate <= 0) {
-      toast.error("Please enter a valid scrap amount.");
-      return;
-    }
-    console.log('scrapToUpdate', scrapToUpdate);
-    console.log('selectedOrder.orderId', selectedOrder.orderId);
-
-
-    if (modalActionType === 'bag') {
-      // Move to Bag Making
-      OrderService.moveToBagMaking(selectedOrder.orderId, scrapToUpdate)
-        .then(() => {
-          toast.success('Order moved to W-Cut Bag making successfully');
-          fetchOrders();
-          setUpdateScrapModalOpen(false);
-          setScrapToUpdate('');
-        })
-        .catch(() => {
-          toast.error('Failed to move to W-Cut Bag making');
-        });
-    } else if (modalActionType === 'billing') {
-      // Direct Billing
-      OrderService.directBilling(selectedOrder.orderId, scrapToUpdate, 'W-cut')
-        .then(() => {
-          toast.success('Order moved to billing successfully');
-          fetchOrders();
-          setUpdateScrapModalOpen(false);
-          setScrapToUpdate('');
-        })
-        .catch(() => {
-          toast.error('Failed to move to billing');
-        });
-    }
-  };
-
-
   const handleMoveToBagMaking = (orderId) => {
     OrderService.moveToBagMaking(orderId)
       .then(() => {
@@ -327,7 +250,7 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => handleOpenScrapModal(order, 'bag')}
+            onClick={() => handleMoveToBagMaking(order.orderId)}
           >
             Move to Bag Making
           </Button>
@@ -367,7 +290,7 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
               variant="contained"
               color="secondary"
               size="small"
-              onClick={() => handleOpenScrapModal(order, 'billing')}
+              onClick={() => handleBillingClick(order)}
             >
               Direct Billing
             </Button>
@@ -376,7 +299,7 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
               variant="contained"
               color="primary"
               size="small"
-              onClick={() => handleOpenScrapModal(order, 'bag')}
+              onClick={() => handleMoveToBagMaking(order.orderId)}
             >
               Move to Bag Making
             </Button>
@@ -503,8 +426,6 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
           <Table>
             <TableHead>
               <TableRow>
-
-
                 <TableCell>Order ID</TableCell>
                 <TableCell>Job Name</TableCell>
                 <TableCell> Roll Size</TableCell>
@@ -545,7 +466,6 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
                     <TableCell>{order.productionManagers?.[0]?.production_details?.cylinder_size || '-'}</TableCell>
                     <TableCell>{order.quantity}</TableCell>
                     <TableCell>{order.productionManagers?.[0]?.production_details?.remarks || order.remarks || '-'}</TableCell>
-
                     <TableCell>
                       <Chip
                         label={order.flexoDetails?.[0]?.status.replace('_', ' ').toUpperCase()}
@@ -595,35 +515,6 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
           </Box>
         </Box>
       </Modal>
-
-      <Modal
-        open={updateScrapModalOpen}
-        onClose={() => setUpdateScrapModalOpen(false)}
-      >
-        <Box sx={modalStyle}>
-          <Typography variant="h6" gutterBottom>
-            Enter Scrap Quantity for {modalActionType === 'bag' ? 'Bag Making' : 'Direct Billing'}
-          </Typography>
-          <TextField
-            fullWidth
-            sx={{ mt: 2 }}
-            label="Scrap Quantity"
-            type="number"
-            value={scrapToUpdate}
-            onChange={(e) => setScrapToUpdate(e.target.value)}
-            inputProps={{ min: 0 }}
-          />
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={() => setUpdateScrapModalOpen(false)} sx={{ mr: 1 }}>
-              Cancel
-            </Button>
-            <Button variant="contained" onClick={handleScrapModalSubmit}>
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-
 
       {/* QR Code Scanner Dialog */}
       <Dialog

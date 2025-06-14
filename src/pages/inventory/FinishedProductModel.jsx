@@ -238,15 +238,35 @@ export default function FinishedProductModel({ open, production, onClose }) {
                                                     </TableRow>
                                                 ))}
 
+
+                                                {/* Total Quantity */}
+                                                <TableRow>
+                                                    <TableCell colSpan={5} sx={{ fontWeight: 'bold' }}>
+                                                        Total Quantity
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontWeight: 'bold' }}>
+                                                        {productionData.totalQuantity ?? 0}
+                                                    </TableCell>
+                                                </TableRow>
                                                 {/* ✅ Row for Scrap Quantity */}
                                                 <TableRow>
                                                     <TableCell colSpan={5} sx={{ fontWeight: 'bold' }}>
                                                         Scrap Quantity
                                                     </TableCell>
                                                     <TableCell sx={{ fontWeight: 'bold' }}>
-                                                        {productionData.productionDetails?.scrapQuantity ?? 0}
+                                                        {productionData?.scrapQuantity ?? 0}
                                                     </TableCell>
                                                 </TableRow>
+                                                {/* Remaining Quantity */}
+                                                <TableRow>
+                                                    <TableCell colSpan={5} sx={{ fontWeight: 'bold' }}>
+                                                        Remaining Quantity
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontWeight: 'bold' }}>
+                                                        {productionData.remainingQuantity ?? 0}
+                                                    </TableCell>
+                                                </TableRow>
+
                                             </TableBody>
 
                                         </Table>

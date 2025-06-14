@@ -111,21 +111,33 @@ export const pdfFinishedProduct = (Details) => {
 
         finalY = doc.lastAutoTable.finalY + 12;
 
-        // === Scrap Quantity Section ===
+        // === Scrap, Total, and Remaining Quantity Section ===
         doc.autoTable({
             startY: finalY,
             head: [
-                ['Scrap Quantity']
+                ['Scrap Quantity', 'Total Quantity', 'Remaining Quantity']
             ],
             body: [
-                [Details?.productionDetails?.scrapQuantity || 'N/A']
+                [
+                    Details?.productionDetails?.scrapQuantity ?? 'N/A',
+                    Details?.totalQuantity ?? 'N/A',
+                    Details?.remainingQuantity ?? 'N/A'
+                ]
             ],
             theme: 'grid',
-            headStyles: { fillColor: [241, 196, 15], textColor: 0, fontSize: 10, fontStyle: 'bold' },
-            bodyStyles: { fontSize: 9 }
+            headStyles: {
+                fillColor: [241, 196, 15], // Yellowish header
+                textColor: 0,
+                fontSize: 10,
+                fontStyle: 'bold'
+            },
+            bodyStyles: {
+                fontSize: 9
+            }
         });
 
         finalY = doc.lastAutoTable.finalY + 12;
+
 
 
         // === Packaging Details Table ===
@@ -150,7 +162,7 @@ export const pdfFinishedProduct = (Details) => {
         });
 
 
-        finalY = doc.lastAutoTable.finalY + 15;
+        finalY = doc.lastAutoTable.finalY + 10;
 
         // === Delivery Details Table ===
         doc.autoTable({
@@ -169,7 +181,26 @@ export const pdfFinishedProduct = (Details) => {
             theme: 'grid'
         });
 
-        finalY = doc.lastAutoTable.finalY + 30;
+        finalY = doc.lastAutoTable.finalY + 10;
+        // === Unit Numbers Table ===
+        doc.autoTable({
+            startY: finalY,
+            head: [
+                ['Flexo', 'W-Cut', 'D-Cut', 'Offset']
+            ],
+            body: [
+                [
+                    Details?.unitNumbers?.flexo || 'N/A',
+                    Details?.unitNumbers?.wcut || 'N/A',
+                    Details?.unitNumbers?.dcut || 'N/A',
+                    Details?.unitNumbers?.opsert || 'N/A'
+                ]
+            ],
+            theme: 'grid'
+        });
+
+
+        finalY = doc.lastAutoTable.finalY + 13;
 
         // === Subcategory Details Table ===
         const subcategoryData = Details?.productionDetails?.subcategoryIds?.map(sub => ([
@@ -193,24 +224,7 @@ export const pdfFinishedProduct = (Details) => {
 
         finalY = doc.lastAutoTable.finalY + 10;
 
-        // === Unit Numbers Table ===
-        doc.autoTable({
-            startY: finalY,
-            head: [
-                ['Flexo', 'W-Cut', 'D-Cut', 'Offset']
-            ],
-            body: [
-                [
-                    Details?.unitNumbers?.flexo || 'N/A',
-                    Details?.unitNumbers?.wcut || 'N/A',
-                    Details?.unitNumbers?.dcut || 'N/A',
-                    Details?.unitNumbers?.opsert || 'N/A'
-                ]
-            ],
-            theme: 'grid'
-        });
 
-        finalY = doc.lastAutoTable.finalY + 10;
 
         // === Invoice Total Table (with Highlighted Style) ===
 

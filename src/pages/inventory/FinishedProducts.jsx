@@ -174,6 +174,8 @@ export default function FinishedProducts() {
                 <TableCell>Customer Name</TableCell>
                 <TableCell>jobName</TableCell>
                 <TableCell>Quantity</TableCell>
+                <TableCell>Bag Type</TableCell>
+
                 <TableCell>Order Price</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Actions</TableCell>
@@ -186,6 +188,7 @@ export default function FinishedProducts() {
                   <TableCell>{product.orderDetails?.customerName || 'N/A'}</TableCell>
                   <TableCell>{product.orderDetails?.jobName || 'N/A'}</TableCell>
                   <TableCell>{product.orderDetails?.quantity || 'N/A'}</TableCell>
+                  <TableCell>{product.productionManagerDetails?.production_details?.type || 'N/A'}</TableCell>
                   <TableCell>₹{product.orderDetails?.orderPrice || 'N/A'}</TableCell>
                   <TableCell>
                     <Chip label={product.status} color={getStatusColor(product.status)} size="small" />
