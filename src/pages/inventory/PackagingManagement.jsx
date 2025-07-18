@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Card,
   Table,
@@ -24,29 +24,32 @@ import {
   Select,
   MenuItem,
   TablePagination,
-} from '@mui/material';
-import { Add, Edit, Visibility } from '@mui/icons-material';
-import toast from 'react-hot-toast';
-import PackageService from '../../services/packageService';
-import { PictureAsPdf } from '@mui/icons-material';
+  CircularProgress,
+} from "@mui/material";
+import { Add, Edit, Visibility, Delete } from "@mui/icons-material";
+import toast from "react-hot-toast";
+import PackageService from "../../services/packageService";
+import { PictureAsPdf } from "@mui/icons-material";
 import QRCode from "qrcode";
-import COMPANY_LOGO from '../../assets/logo.jpg';
-import { jsPDF } from 'jspdf';
+import COMPANY_LOGO from "../../assets/logo.jpg";
+import { jsPDF } from "jspdf";
+
 import JsBarcode from "jsbarcode";
 import html2canvas from "html2canvas";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 const initialPackageState = {
-  length: '',
-  width: '',
-  height: '',
-  weight: ''
+  length: "",
+  width: "",
+  height: "",
+  weight: "",
 };
 const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
+  bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
 };
@@ -60,12 +63,12 @@ export default function PackagingManagement() {
   const [packages, setPackages] = useState([]);
   const [newPackage, setNewPackage] = useState(initialPackageState); // For editing package
   const [OrderPackageOpen, setOrderPackageOpen] = useState(false);
-  const [statusToUpdate, setStatusToUpdate] = useState('');
+  const [statusToUpdate, setStatusToUpdate] = useState("");
   const [deliveryToUpdate, setDeliveryToUpdate] = useState(null); // Added to manage the delivery being updated
   const [updateStatusModalOpen, setUpdateStatusModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [unitNumbers, setUnitNumbers] = useState({});
   // Pagination states
   const [page, setPage] = useState(0);
@@ -74,21 +77,22 @@ export default function PackagingManagement() {
   const fetchOrders = async () => {
     try {
       const orders = await PackageService.fetchOrders();
-      console.log('orders', orders.data);
+      console.log("orders", orders.data);
       setOrders(orders.data);
     } catch (error) {
-      toast.error('Failed to fetch orders.');
-      console.error('Error fetching orders:', error);
+      toast.error("Failed to fetch orders.");
+      console.error("Error fetching orders:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   useEffect(() => {
     fetchOrders(); // Fetch orders on mount
   }, []);
 
-
   // Filtered and searched orders
   const filteredOrders = orders
-    .filter(order => {
+    .filter((order) => {
       const customerName = order?.order?.customerName || ""; // Ensure safe access
       const jobName = order?.order?.jobName || ""; // Ensure safe access
       const orderId = order?.order_id?.toString() || ""; // Convert number to string safely
@@ -98,7 +102,7 @@ export default function PackagingManagement() {
         jobName.toLowerCase().includes(searchQuery.toLowerCase())
       );
     })
-    .filter(order => (statusFilter ? order?.status === statusFilter : true));
+    .filter((order) => (statusFilter ? order?.status === statusFilter : true));
 
   const handleStatusUpdateClick = (delivery) => {
     setDeliveryToUpdate(delivery); // Set the delivery to be updated
@@ -107,7 +111,7 @@ export default function PackagingManagement() {
   };
 
   const handleChangePage = (event, newPage) => setPage(newPage);
-  const handleChangeRowsPerPage = event => {
+  const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -122,15 +126,19 @@ export default function PackagingManagement() {
 
     try {
       // Make the API call
-      await PackageService.updateDeliveryStatus(deliveryToUpdate._id, statusToUpdate);
+      await PackageService.updateDeliveryStatus(
+        deliveryToUpdate._id,
+        statusToUpdate
+      );
       toast.success(`Package status updated to ${statusToUpdate}`);
       fetchOrders(); // Refresh the list after the update
       setUpdateStatusModalOpen(false); // Close the modal after successful update
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || "An error occurred");
+      toast.error(
+        error.response?.data?.message || error.message || "An error occurred"
+      );
     }
   };
-
 
   // Handle order selection
   const handleOrderChange = (e) => {
@@ -153,7 +161,7 @@ export default function PackagingManagement() {
     setPackages({
       ...packages,
       [selectedOrder.order_id]: [
-        ...(packages[selectedOrder.order_id] || []),  // Ensure packages exist for the order
+        ...(packages[selectedOrder.order_id] || []), // Ensure packages exist for the order
         { ...initialPackageState },
       ],
     });
@@ -170,7 +178,7 @@ export default function PackagingManagement() {
   // Save packages using the service
   const handleSavePackages = async () => {
     if (!selectedOrder) {
-      toast.error('Please select an order.');
+      toast.error("Please select an order.");
       return;
     }
 
@@ -186,30 +194,27 @@ export default function PackagingManagement() {
       };
 
       await PackageService.addPackage(payload);
-      toast.success('Packages saved successfully');
+      toast.success("Packages saved successfully");
       handleCancel();
     } catch (error) {
-      toast.error('Failed to save packages.');
-      console.error('Error saving packages:', error);
+      toast.error("Failed to save packages.");
+      console.error("Error saving packages:", error);
     }
   };
 
-
-
   // Handle order view and fetching packages
   const handleViewPackages = async (order) => {
-    console.log('order view', order);
     setSelectedOrder(order);
     setPackageListOpen(true);
 
     try {
-      const { packages, unitNumbers } = await PackageService.fetchPackagesByOrderId(order.order_id); // Ensure the API call uses the correct field
-      console.log('Fetched order packages:', packages);
+      const { packages, unitNumbers } =
+        await PackageService.fetchPackagesByOrderId(order.order_id); // Ensure the API call uses the correct field
+      console.log("Fetched order packages:", packages);
       setPackages(packages || []);
       setUnitNumbers(unitNumbers || {});
-
     } catch (error) {
-      console.error('Error fetching packages:', error);
+      console.error("Error fetching packages:", error);
     }
   };
 
@@ -224,11 +229,17 @@ export default function PackagingManagement() {
     });
     setEditPackageOpen(true);
   };
+  // Handle package delete
 
-
+  const handleDeletePackage = (index) => {
+    const updatedPackages = packages[selectedOrder.order_id].filter(
+      (pkg, i) => i !== index
+    );
+    setPackages({ ...packages, [selectedOrder.order_id]: updatedPackages });
+  };
   const handleUpdatePackage = async () => {
     if (!selectedPackage || !selectedOrder) {
-      toast.error('Please select a package and order to edit.');
+      toast.error("Please select a package and order to edit.");
       return;
     }
 
@@ -241,71 +252,77 @@ export default function PackagingManagement() {
     };
 
     // Update local state
-    const updatedPackages = packages.map(pkg =>
+    const updatedPackages = packages.map((pkg) =>
       pkg._id === selectedPackage._id ? updatedPackage : pkg
     );
     setPackages(updatedPackages);
 
     try {
-      await PackageService.updatePackage(selectedOrder.order_id, selectedPackage._id, updatedPackage);
-      const { packages, unitNumbers } = await PackageService.fetchPackagesByOrderId(selectedOrder.order_id);
-      console.log('Refresh Data Fetched order list', packages);
+      await PackageService.updatePackage(
+        selectedOrder.order_id,
+        selectedPackage._id,
+        updatedPackage
+      );
+      const { packages, unitNumbers } =
+        await PackageService.fetchPackagesByOrderId(selectedOrder.order_id);
+      console.log("Refresh Data Fetched order list", packages);
       setPackages(packages || []);
       setUnitNumbers(unitNumbers || {});
       fetchOrders();
-      toast.success('Package updated successfully');
+      toast.success("Package updated successfully");
       setEditPackageOpen(false);
     } catch (error) {
-      toast.error('Failed to update package.');
-      console.error('Error updating package:', error);
+      toast.error("Failed to update package.");
+      console.error("Error updating package:", error);
     }
   };
   // Create new package for the selected order
   const createPackages = async () => {
-    console.log('new package data', newPackage);
-    console.log('order id', selectedOrder.order_id);
+    console.log("new package data", newPackage);
+    console.log("order id", selectedOrder.order_id);
 
     // Prepare the payload to include the orderId and new package data
     const payload = {
       order_id: selectedOrder.order_id, // Correct order_id usage
-      package_details: [{
-        length: parseFloat(newPackage.length),
-        width: parseFloat(newPackage.width),
-        height: parseFloat(newPackage.height),
-        weight: parseFloat(newPackage.weight),
-      }],
+      package_details: [
+        {
+          length: parseFloat(newPackage.length),
+          width: parseFloat(newPackage.width),
+          height: parseFloat(newPackage.height),
+          weight: parseFloat(newPackage.weight),
+        },
+      ],
     };
-    console.log('payload', payload);
+    console.log("payload", payload);
     try {
       // Call the service method with the prepared payload
       const response = await PackageService.createPackage(payload);
-      console.log('Package added successfully:', response);
-      const { packages, unitNumbers } = await PackageService.fetchPackagesByOrderId(selectedOrder.order_id);
-      console.log('Refresh Data Fetched order list', packages);
+      console.log("Package added successfully:", response);
+      const { packages, unitNumbers } =
+        await PackageService.fetchPackagesByOrderId(selectedOrder.order_id);
+      console.log("Refresh Data Fetched order list", packages);
       setPackages(packages || []);
       setUnitNumbers(unitNumbers || {});
       fetchOrders();
-      handleCloseDialog();  // Close the dialog on success
+      handleCloseDialog(); // Close the dialog on success
     } catch (error) {
-      console.error('Failed to add package:', error);
-      toast.error(`Failed to add package: ${error.message || 'Unknown error'}`);
+      console.error("Failed to add package:", error);
+      toast.error(`Failed to add package: ${error.message || "Unknown error"}`);
     }
   };
-
 
   const handleCloseDialog = () => {
     setOrderPackageOpen(false);
     setNewPackage({
-      length: '',
-      width: '',
-      height: '',
-      weight: ''
+      length: "",
+      width: "",
+      height: "",
+      weight: "",
     });
   };
   const handleOpenDialog = () => {
     setOrderPackageOpen(true);
   };
-
 
   const handleCancel = () => {
     setSelectedOrder(null);
@@ -321,7 +338,8 @@ export default function PackagingManagement() {
 
     try {
       // Fetch package details
-      const { packages, unitNumbers } = await PackageService.fetchPackagesByOrderId(order.order_id);
+      const { packages, unitNumbers } =
+        await PackageService.fetchPackagesByOrderId(order.order_id);
       if (!packages || packages.length === 0) {
         toast.error("No packages found for this order");
         return;
@@ -336,7 +354,6 @@ export default function PackagingManagement() {
       toast.error("Error generating order PDF");
     }
   };
-
 
   const generatePackageLabel = async (pkg, salesOrder, unitNumbers) => {
     return new Promise(async (resolve) => {
@@ -363,9 +380,9 @@ export default function PackagingManagement() {
 
       // Custom PDF size: width 140mm x height 180mm
       const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: [180, 200]
+        orientation: "portrait",
+        unit: "mm",
+        format: [180, 200],
       });
 
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -377,7 +394,11 @@ export default function PackagingManagement() {
       doc.addImage(COMPANY_LOGO, "PNG", margin, currentY, logoSize, logoSize);
       doc.setFontSize(14);
       doc.setFont("helvetica", "bold");
-      doc.text("Manufacturer of Non Woven Bags", margin + logoSize + 5, currentY + 10);
+      doc.text(
+        "Manufacturer of Non Woven Bags",
+        margin + logoSize + 5,
+        currentY + 10
+      );
       currentY += logoSize + 8;
 
       // Divider
@@ -391,7 +412,7 @@ export default function PackagingManagement() {
         ["Package ID", pkg._id],
         ["Flexo Unit No.", unitNumbers?.flexo || "N/A"],
         ["Bag Size", bagDetails.size || `${pkg.length}x${pkg.width} cm`],
-        ["Print Colour", bagDetails.printColor || "N/A"]
+        ["Print Colour", bagDetails.printColor || "N/A"],
       ];
 
       const rightColumn = [
@@ -399,7 +420,7 @@ export default function PackagingManagement() {
         ["Bag Colour", bagDetails.color || "N/A"],
         ["Bag Type", bagDetails.type || "N/A"],
         ["Net Weight", `${pkg.weight} kg`],
-        ["Bag Making Unit No.", unitNumbers?.wcut || "N/A"]
+        ["Bag Making Unit No.", unitNumbers?.wcut || "N/A"],
       ];
 
       const leftX = margin;
@@ -436,7 +457,10 @@ export default function PackagingManagement() {
         doc.setFont("helvetica", "bold");
         doc.text(`${label}:`, margin, currentY);
         doc.setFont("helvetica", "normal");
-        const lines = doc.splitTextToSize(value || "N/A", pageWidth - margin * 2 - 30);
+        const lines = doc.splitTextToSize(
+          value || "N/A",
+          pageWidth - margin * 2 - 30
+        );
         doc.text(lines, margin + 30, currentY);
         currentY += lines.length * 6;
       };
@@ -456,7 +480,9 @@ export default function PackagingManagement() {
         const qrX = (pageWidth - qrSize) / 2;
         doc.addImage(qrCode, "PNG", qrX, currentY, qrSize, qrSize);
         doc.setFontSize(8);
-        doc.text("Scan for details", qrX + qrSize / 2, currentY + qrSize + 6, { align: "center" });
+        doc.text("Scan for details", qrX + qrSize / 2, currentY + qrSize + 6, {
+          align: "center",
+        });
       }
 
       // Save
@@ -465,7 +491,6 @@ export default function PackagingManagement() {
       resolve();
     });
   };
-
 
   return (
     <>
@@ -480,13 +505,13 @@ export default function PackagingManagement() {
                 variant="outlined"
                 size="small"
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
 
               {/* Status Filter */}
               <Select
                 value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
+                onChange={(e) => setStatusFilter(e.target.value)}
                 displayEmpty
                 size="small"
               >
@@ -514,72 +539,119 @@ export default function PackagingManagement() {
 
                   <TableCell>Bag Type</TableCell>
                   <TableCell>Job Name</TableCell>
-                  <TableCell>Number of Packages</TableCell>
+                  <TableCell
+                    sx={{
+                      width: "180px",
+                    }}
+                  >
+                    Number of Packages
+                  </TableCell>
 
-                  <TableCell>Bag Size</TableCell>
-                  <TableCell>Weight (kg)</TableCell>
+                  <TableCell
+                    sx={{
+                      width: "120px",
+                    }}
+                  >
+                    Bag Size
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      width: "120px",
+                    }}
+                  >
+                    Weight (kg)
+                  </TableCell>
                   <TableCell>Status</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell
+                    sx={{
+                      width: "120px",
+                    }}
+                  >
+                    Actions
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredOrders
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) // Use filteredOrders
-                  .map((order) => (
-                    <TableRow key={order._id}>
-                      <TableCell>{order?.order_id || 'N/A'}</TableCell>
-                      <TableCell>{order?.order?.customerName || 'N/A'}</TableCell>
+                {filteredOrders.length === 0 && !isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={9} align="center">
+                      No data available
+                    </TableCell>
+                  </TableRow>
+                ) : isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={9} align="center">
+                      <CircularProgress />
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredOrders
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) // Use filteredOrders
+                    .map((order) => (
+                      <TableRow key={order._id}>
+                        <TableCell>{order?.order_id || "N/A"}</TableCell>
+                        <TableCell>
+                          {formatSnakeCase(order?.order?.customerName) || "N/A"}
+                        </TableCell>
 
-                      <TableCell>{order?.order?.bagDetails?.type}</TableCell>
-                      <TableCell>{order?.order?.jobName || 'N/A'}</TableCell>
-                      <TableCell>{order?.package_details?.length || 0}</TableCell>
+                        <TableCell>
+                          {formatSnakeCase(order?.order?.bagDetails?.type)}
+                        </TableCell>
+                        <TableCell>
+                          {formatSnakeCase(order?.order?.jobName) || "N/A"}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            textAlign: "center",
+                          }}
+                        >
+                          {order?.package_details?.length || 0}
+                        </TableCell>
 
-                      <TableCell>
-                        {order?.order?.bagDetails?.size || 'N/A'}
-                      </TableCell>
-                      <TableCell>
-                        {order?.totalWeight || 'N/A'}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={order.status.toUpperCase()}
-                          color={
-                            order.status === 'pending'
-                              ? 'warning'
-                              : order.status === 'delivery'
-                                ? 'success'
-                                : order.status === 'cancelled'
-                                  ? 'error'
-                                  : 'default' // fallback color
-                          }
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleStatusUpdateClick(order)}
-                        >
-                          <Edit />
-                        </IconButton>
-                        <IconButton
-                          color="secondary"
-                          onClick={() => handleViewPackages(order)}
-                        >
-                          <Visibility />
-                        </IconButton>
-                        {/* <IconButton
+                        <TableCell>
+                          {order?.order?.bagDetails?.size || "N/A"}
+                        </TableCell>
+                        <TableCell>{order?.totalWeight || "N/A"}</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={formatSnakeCase(order.status)}
+                            color={
+                              order.status === "pending"
+                                ? "warning"
+                                : order.status === "delivery"
+                                ? "success"
+                                : order.status === "cancelled"
+                                ? "error"
+                                : "default" // fallback color
+                            }
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <IconButton
+                            color="primary"
+                            onClick={() => handleStatusUpdateClick(order)}
+                          >
+                            <Edit />
+                          </IconButton>
+                          <IconButton
+                            color="secondary"
+                            onClick={() => handleViewPackages(order)}
+                          >
+                            <Visibility />
+                          </IconButton>
+                          {/* <IconButton
                           color="primary"
                           onClick={() => generatePackageAllDetails(order)}
                         >
                           <PictureAsPdf />
                         </IconButton> */}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                )}
               </TableBody>
             </Table>
-
           </TableContainer>
         </Box>
 
@@ -597,13 +669,14 @@ export default function PackagingManagement() {
 
       <Dialog
         open={packageListOpen}
-        onClose={() => setPackageListOpen(false)}
+        onClose={() => {
+          setPackageListOpen(false);
+          setSelectedOrder(null);
+        }}
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>
-          Packages for Order {selectedOrder?.id}
-        </DialogTitle>
+        <DialogTitle>Packages for Order {selectedOrder?.id}</DialogTitle>
         <TableCell>
           <Button size="small" variant="outlined" onClick={handleOpenDialog}>
             Add New Packages
@@ -624,15 +697,28 @@ export default function PackagingManagement() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {packages.length > 0 ? (
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      <CircularProgress />
+                    </TableCell>
+                  </TableRow>
+                ) : packages.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      No data available
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  packages.length > 0 &&
                   packages.map((pkg) =>
                     pkg.package_details.map((pkgDetail) => (
                       <TableRow key={pkgDetail._id}>
                         <TableCell>{pkgDetail._id}</TableCell>
-                        <TableCell>{pkgDetail.length != null ? pkgDetail.length : 'N/A'}</TableCell>
-                        <TableCell>{pkgDetail.width != null ? pkgDetail.width : 'N/A'}</TableCell>
-                        <TableCell>{pkgDetail.height != null ? pkgDetail.height : 'N/A'}</TableCell>
-                        <TableCell>{pkgDetail.weight}</TableCell>
+                        <TableCell>{pkgDetail.length ?? ""}</TableCell>
+                        <TableCell>{pkgDetail.width ?? ""}</TableCell>
+                        <TableCell>{pkgDetail.height ?? ""}</TableCell>
+                        <TableCell>{pkgDetail.weight ?? ""}</TableCell>
                         <TableCell>
                           <IconButton
                             color="primary"
@@ -642,7 +728,13 @@ export default function PackagingManagement() {
                           </IconButton>
                           <IconButton
                             color="primary"
-                            onClick={() => generatePackageLabel(pkgDetail, selectedOrder, unitNumbers)}
+                            onClick={() =>
+                              generatePackageLabel(
+                                pkgDetail,
+                                selectedOrder,
+                                unitNumbers
+                              )
+                            }
                           >
                             <PictureAsPdf />
                           </IconButton>
@@ -650,13 +742,8 @@ export default function PackagingManagement() {
                       </TableRow>
                     ))
                   )
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6}>No packages found</TableCell>
-                  </TableRow>
                 )}
               </TableBody>
-
             </Table>
           </TableContainer>
         </DialogContent>
@@ -664,7 +751,6 @@ export default function PackagingManagement() {
           <Button onClick={() => setPackageListOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
-
 
       {/* Update Status Modal */}
       <Modal
@@ -687,8 +773,11 @@ export default function PackagingManagement() {
               <MenuItem value="cancelled">Cancelled</MenuItem>
             </Select>
           </FormControl>
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={() => setUpdateStatusModalOpen(false)} sx={{ mr: 1 }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              onClick={() => setUpdateStatusModalOpen(false)}
+              sx={{ mr: 1 }}
+            >
               Cancel
             </Button>
             <Button variant="contained" onClick={handleStatusUpdate}>
@@ -697,7 +786,6 @@ export default function PackagingManagement() {
           </Box>
         </Box>
       </Modal>
-
 
       {/* Add Package Dimensions Dialog */}
       <Dialog open={OrderPackageOpen} onClose={handleCloseDialog}>
@@ -709,7 +797,9 @@ export default function PackagingManagement() {
                 label="Length (cm)"
                 type="number"
                 value={newPackage.length}
-                onChange={(e) => setNewPackage({ ...newPackage, length: e.target.value })}
+                onChange={(e) =>
+                  setNewPackage({ ...newPackage, length: e.target.value })
+                }
                 fullWidth
               />
             </Grid>
@@ -718,7 +808,9 @@ export default function PackagingManagement() {
                 label="Width (cm)"
                 type="number"
                 value={newPackage.width}
-                onChange={(e) => setNewPackage({ ...newPackage, width: e.target.value })}
+                onChange={(e) =>
+                  setNewPackage({ ...newPackage, width: e.target.value })
+                }
                 fullWidth
               />
             </Grid>
@@ -727,7 +819,9 @@ export default function PackagingManagement() {
                 label="Height (cm)"
                 type="number"
                 value={newPackage.height}
-                onChange={(e) => setNewPackage({ ...newPackage, height: e.target.value })}
+                onChange={(e) =>
+                  setNewPackage({ ...newPackage, height: e.target.value })
+                }
                 fullWidth
               />
             </Grid>
@@ -736,7 +830,9 @@ export default function PackagingManagement() {
                 label="Weight (kg)"
                 type="number"
                 value={newPackage.weight}
-                onChange={(e) => setNewPackage({ ...newPackage, weight: e.target.value })}
+                onChange={(e) =>
+                  setNewPackage({ ...newPackage, weight: e.target.value })
+                }
                 fullWidth
               />
             </Grid>
@@ -750,12 +846,8 @@ export default function PackagingManagement() {
         </DialogActions>
       </Dialog>
 
-
-      { /* Edit Package Dimensions */}
-      <Dialog
-        open={editPackageOpen}
-        onClose={() => setEditPackageOpen(false)}
-      >
+      {/* Edit Package Dimensions */}
+      <Dialog open={editPackageOpen} onClose={() => setEditPackageOpen(false)}>
         <DialogTitle>Edit Package Dimensions</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -764,7 +856,9 @@ export default function PackagingManagement() {
                 label="Length (cm)"
                 type="number"
                 value={newPackage.length}
-                onChange={(e) => setNewPackage({ ...newPackage, length: e.target.value })}
+                onChange={(e) =>
+                  setNewPackage({ ...newPackage, length: e.target.value })
+                }
                 fullWidth
               />
             </Grid>
@@ -773,7 +867,9 @@ export default function PackagingManagement() {
                 label="Width (cm)"
                 type="number"
                 value={newPackage.width}
-                onChange={(e) => setNewPackage({ ...newPackage, width: e.target.value })}
+                onChange={(e) =>
+                  setNewPackage({ ...newPackage, width: e.target.value })
+                }
                 fullWidth
               />
             </Grid>
@@ -782,7 +878,9 @@ export default function PackagingManagement() {
                 label="Height (cm)"
                 type="number"
                 value={newPackage.height}
-                onChange={(e) => setNewPackage({ ...newPackage, height: e.target.value })}
+                onChange={(e) =>
+                  setNewPackage({ ...newPackage, height: e.target.value })
+                }
                 fullWidth
               />
             </Grid>
@@ -791,7 +889,9 @@ export default function PackagingManagement() {
                 label="Weight (kg)"
                 type="number"
                 value={newPackage.weight}
-                onChange={(e) => setNewPackage({ ...newPackage, weight: e.target.value })}
+                onChange={(e) =>
+                  setNewPackage({ ...newPackage, weight: e.target.value })
+                }
                 fullWidth
               />
             </Grid>
@@ -799,23 +899,11 @@ export default function PackagingManagement() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditPackageOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleUpdatePackage}>Update Package</Button>
+          <Button variant="contained" onClick={handleUpdatePackage}>
+            Update Package
+          </Button>
         </DialogActions>
       </Dialog>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       {/* Add Package Modal */}
       <Dialog
@@ -831,88 +919,152 @@ export default function PackagingManagement() {
             <Grid item xs={12}>
               <TextField
                 select
-                label="Select Order"
+                // label="Select Order"
                 fullWidth
-                value={selectedOrder?.order_id || ''}  // Make sure it matches 'order_id'
+                value={selectedOrder?.order_id || ""} // Make sure it matches 'order_id'
                 onChange={handleOrderChange}
                 SelectProps={{
                   native: true,
                 }}
               >
                 <option value="">Select an order</option>
-                {orders.map((order) => (
-                  order.order && (  // Check if 'order' exists
-                    <option key={order._id} value={order.order_id}>
-                      {order.order_id} - {order.order.customerName}
-                    </option>
-                  )
-                ))}
+                {orders.map(
+                  (order) =>
+                    order.order && ( // Check if 'order' exists
+                      <option key={order._id} value={order.order_id}>
+                        {order.order_id} - {order.order.customerName}
+                      </option>
+                    )
+                )}
               </TextField>
             </Grid>
 
             {/* Selected Order Details */}
             {selectedOrder && (
               <Grid item xs={12}>
-                <Box sx={{ mb: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+                <Box
+                  sx={{
+                    mb: 2,
+                    p: 2,
+                    bgcolor: "background.paper",
+                    borderRadius: 1,
+                  }}
+                >
                   <Typography variant="subtitle2" gutterBottom>
                     Order Details
                   </Typography>
-                  <Typography variant="body2">Customer: {selectedOrder?.order?.customerName || 'N/A'}</Typography>
-                  <Typography variant="body2">Dimensions: {selectedOrder?.order?.totalDimensions || 'N/A'}</Typography>
-                  <Typography variant="body2">Weight: {selectedOrder?.totalWeight || 'N/A'} kg</Typography>
-
+                  <Typography variant="body2">
+                    Customer: {selectedOrder?.order?.customerName || "N/A"}
+                  </Typography>
+                  <Typography variant="body2">
+                    Dimensions: {selectedOrder?.order?.totalDimensions || "N/A"}
+                  </Typography>
+                  <Typography variant="body2">
+                    Weight: {selectedOrder?.totalWeight || "N/A"} kg
+                  </Typography>
                 </Box>
               </Grid>
             )}
 
             {/* Package List for Selected Order */}
-            {selectedOrder && packages[selectedOrder.order_id] && packages[selectedOrder.order_id].map((pkg, index) => (
-              <Grid item xs={12} key={index}>
-                <Box sx={{ border: '1px solid #ddd', p: 2, borderRadius: 1 }}>
-                  <Typography variant="h6" gutterBottom>
-                    Package {index + 1}
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Length (cm)"
-                        value={pkg.length}
-                        onChange={(e) => handlePackageChange(selectedOrder.order_id, index, 'length', e.target.value)}
-                        fullWidth
-                      />
+            {selectedOrder &&
+              packages[selectedOrder.order_id] &&
+              packages[selectedOrder.order_id].map((pkg, index) => (
+                <Grid item xs={12} key={index}>
+                  <Box sx={{ border: "1px solid #ddd", p: 2, borderRadius: 1 }}>
+                    <Grid container spacing={2}>
+                      <Grid
+                        item
+                        xs={12}
+                        sx={{
+                          justifyContent: "space-between",
+                          display: "flex",
+                        }}
+                      >
+                        <Typography variant="h6" gutterBottom>
+                          Package {index + 1}
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          onClick={() => handleDeletePackage(index)}
+                        >
+                          <Delete />
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField
+                          label="Length (cm)"
+                          value={pkg.length}
+                          onChange={(e) =>
+                            handlePackageChange(
+                              selectedOrder.order_id,
+                              index,
+                              "length",
+                              e.target.value
+                            )
+                          }
+                          fullWidth
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField
+                          label="Width (cm)"
+                          value={pkg.width}
+                          onChange={(e) =>
+                            handlePackageChange(
+                              selectedOrder.order_id,
+                              index,
+                              "width",
+                              e.target.value
+                            )
+                          }
+                          fullWidth
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField
+                          label="Height (cm)"
+                          value={pkg.height}
+                          onChange={(e) =>
+                            handlePackageChange(
+                              selectedOrder.order_id,
+                              index,
+                              "height",
+                              e.target.value
+                            )
+                          }
+                          fullWidth
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField
+                          label="Weight (kg)"
+                          value={pkg.weight}
+                          onChange={(e) =>
+                            handlePackageChange(
+                              selectedOrder.order_id,
+                              index,
+                              "weight",
+                              e.target.value
+                            )
+                          }
+                          fullWidth
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Width (cm)"
-                        value={pkg.width}
-                        onChange={(e) => handlePackageChange(selectedOrder.order_id, index, 'width', e.target.value)}
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Height (cm)"
-                        value={pkg.height}
-                        onChange={(e) => handlePackageChange(selectedOrder.order_id, index, 'height', e.target.value)}
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Weight (kg)"
-                        value={pkg.weight}
-                        onChange={(e) => handlePackageChange(selectedOrder.order_id, index, 'weight', e.target.value)}
-                        fullWidth
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Grid>
-            ))}
+                  </Box>
+                </Grid>
+              ))}
 
             {/* Add New Package Button */}
             <Grid item xs={12}>
-              <Button variant="outlined" onClick={handleAddPackage} fullWidth>
+              <Button
+                variant="outlined"
+                sx={{ py: 1 }}
+                onClick={handleAddPackage}
+                fullWidth
+              >
                 Add Another Package
               </Button>
             </Grid>

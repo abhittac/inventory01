@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Card,
   Table,
@@ -17,20 +17,21 @@ import {
   MenuItem,
   Box,
   Stack,
-} from '@mui/material';
-import { Add, Edit, Delete, QrCode, Download } from '@mui/icons-material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import OrderForm from './OrderForm';
-import QRCodeDialog from './QRCodeDialog';
-import DeleteConfirmDialog from '../../common/DeleteConfirmDialog';
-import { getStatusColor } from '../../../utils/statusColors';
-import toast from 'react-hot-toast';
-import orderService from '/src/services/orderService.js';
-import * as XLSX from 'xlsx';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+} from "@mui/material";
+import { Add, Edit, Delete, QrCode, Download } from "@mui/icons-material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import OrderForm from "./OrderForm";
+import QRCodeDialog from "./QRCodeDialog";
+import DeleteConfirmDialog from "../../common/DeleteConfirmDialog";
+import { getStatusColor } from "../../../utils/statusColors";
+import toast from "react-hot-toast";
+import orderService from "/src/services/orderService.js";
+import * as XLSX from "xlsx";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import { formatSnakeCase } from "../../../utils/formatSnakeCase";
 
 export default function OrderList({ orders, refreshOrders }) {
   const [formOpen, setFormOpen] = useState(false);
@@ -41,8 +42,8 @@ export default function OrderList({ orders, refreshOrders }) {
   const [selectedQrOrder, setSelectedQrOrder] = useState(null);
 
   // Search and filter states
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -51,26 +52,25 @@ export default function OrderList({ orders, refreshOrders }) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // Filtered and searched orders
-  const filteredOrders = orders
-    .filter(order => {
-      const matchesSearch =
-        order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.jobName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.orderId.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch =
+      order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.jobName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.orderId.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesStatus = statusFilter ? order.status === statusFilter : true;
+    const matchesStatus = statusFilter ? order.status === statusFilter : true;
 
-      const orderDate = new Date(order.createdAt);
-      const matchesDateRange =
-        (!startDate || orderDate >= startDate) &&
-        (!endDate || orderDate <= endDate);
+    const orderDate = new Date(order.createdAt);
+    const matchesDateRange =
+      (!startDate || orderDate >= startDate) &&
+      (!endDate || orderDate <= endDate);
 
-      return matchesSearch && matchesStatus && matchesDateRange;
-    });
+    return matchesSearch && matchesStatus && matchesDateRange;
+  });
 
   // Pagination handlers
   const handleChangePage = (event, newPage) => setPage(newPage);
-  const handleChangeRowsPerPage = event => {
+  const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -107,51 +107,62 @@ export default function OrderList({ orders, refreshOrders }) {
   const handleDeleteConfirm = async () => {
     try {
       await orderService.deleteOrder(orderToDelete._id);
-      toast.success('Order deleted successfully');
+      toast.success("Order deleted successfully");
       setDeleteDialogOpen(false);
       await refreshOrders();
     } catch (error) {
-      toast.error(error.message || 'Failed to delete order');
+      toast.error(error.message || "Failed to delete order");
     }
   };
 
   // Export to Excel
   const exportToExcel = () => {
-    const dataToExport = filteredOrders.map(order => ({
-      'Order ID': order.orderId,
-      'Customer Name': order.customerName,
-      'Job Name': order.jobName,
-      'Bag Type': order.bagDetails.type,
-      'Quantity': order.quantity,
-      'Order Value': order.orderPrice,
-      'Status': order.status.toUpperCase(),
-      'Order Date': new Date(order.createdAt).toLocaleDateString(),
-      'Mobile Number': order.mobileNumber,
-      'Email': order.email
+    const dataToExport = filteredOrders.map((order) => ({
+      "Order ID": order.orderId,
+      "Customer Name": order.customerName,
+      "Job Name": order.jobName,
+      "Bag Type": order.bagDetails.type,
+      Quantity: order.quantity,
+      "Order Value": order.orderPrice,
+      Status: order.status.toUpperCase(),
+      "Order Date": new Date(order.createdAt).toLocaleDateString(),
+      "Mobile Number": order.mobileNumber,
+      Email: order.email,
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Orders');
-    XLSX.writeFile(workbook, `orders_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+    XLSX.writeFile(
+      workbook,
+      `orders_${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
   };
 
   // Export to PDF
   const exportToPDF = () => {
     const doc = new jsPDF();
-    const title = 'Orders Report';
+    const title = "Orders Report";
     const headers = [
-      ['Order ID', 'Customer Name', 'Job Name', 'Bag Type', 'Quantity', 'Order Value', 'Status']
+      [
+        "Order ID",
+        "Customer Name",
+        "Job Name",
+        "Bag Type",
+        "Quantity",
+        "Order Value",
+        "Status",
+      ],
     ];
 
-    const data = filteredOrders.map(order => [
+    const data = filteredOrders.map((order) => [
       order.orderId,
       order.customerName,
       order.jobName,
       order.bagDetails.type,
       order.quantity,
       order.orderPrice,
-      order.status.toUpperCase()
+      order.status.toUpperCase(),
     ]);
 
     doc.text(title, 14, 15);
@@ -160,7 +171,7 @@ export default function OrderList({ orders, refreshOrders }) {
       body: data,
       startY: 20,
       styles: { fontSize: 8 },
-      headStyles: { fillColor: [41, 128, 185] }
+      headStyles: { fillColor: [41, 128, 185] },
     });
 
     doc.save(`orders_${new Date().toISOString().slice(0, 10)}.pdf`);
@@ -168,8 +179,8 @@ export default function OrderList({ orders, refreshOrders }) {
 
   // Clear all filters
   const clearFilters = () => {
-    setSearchQuery('');
-    setStatusFilter('');
+    setSearchQuery("");
+    setStatusFilter("");
     setStartDate(null);
     setEndDate(null);
   };
@@ -196,29 +207,39 @@ export default function OrderList({ orders, refreshOrders }) {
             >
               PDF
             </Button>
-            <Button variant="contained" color="primary" startIcon={<Add />} onClick={handleAdd}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<Add />}
+              onClick={handleAdd}
+            >
               Add Order
             </Button>
           </div>
         </div>
 
         {/* Filters Section */}
-        <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-          <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
+        <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            flexWrap="wrap"
+          >
             {/* Search Box */}
             <TextField
               label="Search Orders"
               variant="outlined"
               size="small"
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               sx={{ minWidth: 200 }}
             />
 
             {/* Status Filter */}
             <Select
               value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
+              onChange={(e) => setStatusFilter(e.target.value)}
               displayEmpty
               size="small"
               sx={{ minWidth: 150 }}
@@ -230,19 +251,26 @@ export default function OrderList({ orders, refreshOrders }) {
             </Select>
 
             {/* Date Range Picker */}
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <LocalizationProvider
+              className="dates-input"
+              dateAdapter={AdapterDateFns}
+            >
               <DatePicker
                 label="Start Date"
                 value={startDate}
                 onChange={setStartDate}
-                renderInput={(params) => <TextField {...params} size="small" sx={{ minWidth: 150 }} />}
+                renderInput={(params) => (
+                  <TextField {...params} size="small" sx={{ minWidth: 150 }} />
+                )}
               />
               <DatePicker
                 label="End Date"
                 value={endDate}
                 onChange={setEndDate}
                 minDate={startDate}
-                renderInput={(params) => <TextField {...params} size="small" sx={{ minWidth: 150 }} />}
+                renderInput={(params) => (
+                  <TextField {...params} size="small" sx={{ minWidth: 150 }} />
+                )}
               />
             </LocalizationProvider>
 
@@ -250,7 +278,7 @@ export default function OrderList({ orders, refreshOrders }) {
               variant="outlined"
               color="inherit"
               onClick={clearFilters}
-              size="small"
+              size="medium"
             >
               Clear Filters
             </Button>
@@ -278,14 +306,16 @@ export default function OrderList({ orders, refreshOrders }) {
                 .map((order) => (
                   <TableRow key={order._id}>
                     <TableCell>{order.orderId}</TableCell>
-                    <TableCell>{order.customerName}</TableCell>
-                    <TableCell>{order.jobName}</TableCell>
-                    <TableCell>{order.bagDetails.type}</TableCell>
+                    <TableCell>{formatSnakeCase(order.customerName)}</TableCell>
+                    <TableCell>{formatSnakeCase(order.jobName)}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.bagDetails.type)}
+                    </TableCell>
                     <TableCell>{order.quantity}</TableCell>
                     <TableCell>{order.orderPrice}</TableCell>
                     <TableCell>
                       <Chip
-                        label={order.status.toUpperCase()}
+                        label={formatSnakeCase(order.status)}
                         color={getStatusColor(order.status)}
                         size="small"
                       />
@@ -294,10 +324,18 @@ export default function OrderList({ orders, refreshOrders }) {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <IconButton size="small" color="primary" onClick={() => handleEdit(order)}>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleEdit(order)}
+                      >
                         <Edit />
                       </IconButton>
-                      <IconButton size="small" color="error" onClick={() => handleDelete(order)}>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(order)}
+                      >
                         <Delete />
                       </IconButton>
                     </TableCell>

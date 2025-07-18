@@ -24,7 +24,10 @@ import {
   InputLabel,
   Modal,
   TablePagination,
+  CircularProgress,
+  Divider,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Add,
   Edit,
@@ -39,13 +42,13 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { API_BASE_URL } from "../../config/constants";
 
-import orderService from '/src/services/orderService.js';
-import FormSelect from '../../components/common/FormSelect';
+import orderService from "/src/services/orderService.js";
+import FormSelect from "../../components/common/FormSelect";
 import authService from "../../services/authService";
 import QRCodeDialog from "../../components/sales/orders/QRCodeDialog";
 import { QRCodeCanvas } from "qrcode.react";
 import QRCode from "qrcode";
-import COMPANY_LOGO from '../../assets/logo.jpg';
+import COMPANY_LOGO from "../../assets/logo.jpg";
 const categoryOptions = [
   { value: "fabric", label: "Fabric" },
   { value: "handle", label: "Handle" },
@@ -54,16 +57,15 @@ const categoryOptions = [
 ];
 
 const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
+  bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
 };
-
 
 export default function RawMaterials() {
   const [categories, setCategories] = useState([]);
@@ -73,20 +75,21 @@ export default function RawMaterials() {
   const [selectedQrOrder, setSelectedQrOrder] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [viewSubcategoriesOpen, setViewSubcategoriesOpen] = useState(false);
-  const [addSubcategoryDialogOpen, setAddSubcategoryDialogOpen] = useState(false);
+  const [addSubcategoryDialogOpen, setAddSubcategoryDialogOpen] =
+    useState(false);
   const [updateStatusModalOpen, setUpdateStatusModalOpen] = useState(false);
   const [updateQuantityModalOpen, setUpdateQuantityModalOpen] = useState(false);
-
-  const [unitToUpdate, setQuantityToUpdate] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [unitToUpdate, setQuantityToUpdate] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   const [bagAttributes, setBagAttributes] = useState({
     "bag-color": [],
     "fabric-quality": [],
-    "gsm": [],
-    "size": [],
+    gsm: [],
+    size: [],
     "handle-color": [],
-    "roll-size": []
+    "roll-size": [],
   });
 
   const [newCategory, setNewCategory] = useState({
@@ -109,7 +112,7 @@ export default function RawMaterials() {
 
   // quantity_kgs: newCategory.quantity,
   const handleAddCategory = async () => {
-    console.log('calling api');
+    console.log("calling api");
     try {
       const token = authService.getToken();
       if (!token) {
@@ -148,18 +151,19 @@ export default function RawMaterials() {
       fetchCategories();
       toast.success("Category added successfully");
     } catch (error) {
-      console.log('errors is category', error);
+      console.log("errors is category", error);
       // Extract server error message if available
       const errorMessage =
         error.response && error.response.data && error.response.data.message
           ? error.response.data.message
-          : error.message || 'Error adding category';
+          : error.message || "Error adding category";
       toast.error(errorMessage);
     }
   };
 
   // Fetch categories
   const fetchCategories = async () => {
+    setIsLoading(true); // set isLoading to true when fetching starts
     try {
       const token = authService.getToken();
       if (!token) {
@@ -180,8 +184,10 @@ export default function RawMaterials() {
       setCategories(response.data.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
-      const errorMessage = error?.message || 'Error fetching categories';
+      const errorMessage = error?.message || "Error fetching categories";
       toast.error(errorMessage);
+    } finally {
+      setIsLoading(false); // set isLoading to false when fetching is complete
     }
   };
 
@@ -207,7 +213,7 @@ export default function RawMaterials() {
       toast.success("Category deleted successfully");
       fetchCategories();
     } catch (error) {
-      const errorMessage = error?.message || 'Error delete category';
+      const errorMessage = error?.message || "Error delete category";
       toast.error(errorMessage);
     }
   };
@@ -235,29 +241,28 @@ export default function RawMaterials() {
     } catch (error) {
       console.error("Error deleting category:", error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
   const handleViewSubcategories = (category) => {
-    console.log('category', category);
+    console.log("category", category);
     setSelectedCategory(category);
     setViewSubcategoriesOpen(true);
   };
 
   const handleOpenModal = (category) => {
     setSelectedOrderId(category._id);
-    console.log('category is', category)
+    console.log("category is", category);
     setQuantityToUpdate(category.quantity_kgs);
     setUpdateQuantityModalOpen(true);
   };
 
-
   const handleQuantityUpdate = async () => {
     if (!unitToUpdate) {
-      toast.error('Please Enter Quantity');
+      toast.error("Please Enter Quantity");
       return;
     }
 
@@ -283,15 +288,13 @@ export default function RawMaterials() {
 
       toast.success("Row Material Updated successfully");
       setUpdateQuantityModalOpen(false); // Close modal
-      setQuantityToUpdate(''); // Reset input field
+      setQuantityToUpdate(""); // Reset input field
       fetchCategories();
     } catch (error) {
       console.error("Error updating category:", error);
       toast.error("Failed to update quantity");
     }
   };
-
-
 
   // Download category PDF file
   const handleDownloadData = async (category) => {
@@ -308,7 +311,7 @@ export default function RawMaterials() {
       );
 
       const subcategories = response.data.data || [];
-      console.log('subcategories', subcategories)
+      console.log("subcategories", subcategories);
       // console.log('subcategories', subcategories);
 
       const doc = new jsPDF();
@@ -322,7 +325,14 @@ export default function RawMaterials() {
       const logoSize = 30; // Set smaller size
       const marginTop = 15;
       currentY = marginTop;
-      doc.addImage(COMPANY_LOGO, "PNG", marginLeft, currentY, logoSize, logoSize);
+      doc.addImage(
+        COMPANY_LOGO,
+        "PNG",
+        marginLeft,
+        currentY,
+        logoSize,
+        logoSize
+      );
       doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
       doc.text("Thailiwale Industries Private Limited", textX, currentY + 5);
@@ -330,7 +340,11 @@ export default function RawMaterials() {
       doc.setFont("helvetica", "normal");
 
       // Address (properly spaced)
-      doc.text("201/1/4, SR Compound, Lasudiya Mori, Lasudia, Indore 453771", textX, currentY + 12);
+      doc.text(
+        "201/1/4, SR Compound, Lasudiya Mori, Lasudia, Indore 453771",
+        textX,
+        currentY + 12
+      );
       doc.text("Email: info@thailiwale.com", textX, currentY + 19);
       doc.text("Phone: +917999857050, +918989788532", textX, currentY + 26);
 
@@ -352,7 +366,10 @@ export default function RawMaterials() {
         ["GSM", category.gsm],
         ["Fabric Quality", category.fabric_quality],
         ["Quantity", `${category.quantity_kgs} kg`],
-        ["Total Rolls", Array.isArray(subcategories) ? subcategories.length : 0],
+        [
+          "Total Rolls",
+          Array.isArray(subcategories) ? subcategories.length : 0,
+        ],
       ];
 
       doc.autoTable({
@@ -361,7 +378,11 @@ export default function RawMaterials() {
         body: details,
         theme: "grid",
         styles: { fontSize: 10 },
-        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: "bold" },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontStyle: "bold",
+        },
         columnStyles: {
           0: { cellWidth: 50, fontStyle: "bold" },
           1: { cellWidth: 100 },
@@ -437,18 +458,25 @@ export default function RawMaterials() {
           },
 
           didDrawCell: (data) => {
-            if (data.column.index === 6 && data.row.section === "body") {  // QR Code column
+            if (data.column.index === 6 && data.row.section === "body") {
+              // QR Code column
               const qrSize = 18;
               const xPos = data.cell.x + (data.cell.width - qrSize) / 2;
               const yPos = data.cell.y + (data.cell.height - qrSize) / 2;
 
               const subcategoryIndex = data.row.index;
               if (subcategoryIndex < qrCodes.length) {
-                doc.addImage(qrCodes[subcategoryIndex], "PNG", xPos, yPos, qrSize, qrSize);
+                doc.addImage(
+                  qrCodes[subcategoryIndex],
+                  "PNG",
+                  xPos,
+                  yPos,
+                  qrSize,
+                  qrSize
+                );
               }
             }
-          }
-
+          },
         });
 
         currentY = doc.autoTable.previous.finalY + 10;
@@ -463,7 +491,11 @@ export default function RawMaterials() {
         const pageHeight = doc.internal.pageSize.getHeight();
 
         doc.setFontSize(10);
-        doc.text(`Generated on: ${new Date().toLocaleDateString()}  Page ${i} of ${pageCount}`, pageWidth - 80, pageHeight - 10);
+        doc.text(
+          `Generated on: ${new Date().toLocaleDateString()}  Page ${i} of ${pageCount}`,
+          pageWidth - 80,
+          pageHeight - 10
+        );
       }
       // **Save the PDF**
       doc.save(`${category.category_name}-details.pdf`);
@@ -476,12 +508,10 @@ export default function RawMaterials() {
 
   // add sub category
   const handleAddNewSubcategory = async () => {
-    console.log("selected category : ", selectedCategory);
-    if (!selectedCategory) {
-      toast.error("Please select a category before adding a subcategory.");
+    if (!newSubcategory.quantity || newSubcategory.quantity <= 0) {
+      toast.error("Quantity must be greater than 0");
       return;
     }
-
     // Ensure all required fields are filled
     try {
       const token = authService.getToken();
@@ -490,12 +520,11 @@ export default function RawMaterials() {
         throw new Error("Unauthorized: No token provided");
       }
 
-
       // Attach category ID to subcategory data
       const requestData = {
-        fabricColor: selectedCategory.fabric_color,  // 🔹 Use selectedCategory
-        rollSize: selectedCategory.roll_size,        // 🔹 Use selectedCategory
-        gsm: selectedCategory.gsm,                  // 🔹 Use selectedCategory
+        fabricColor: selectedCategory.fabric_color, // 🔹 Use selectedCategory
+        rollSize: selectedCategory.roll_size, // 🔹 Use selectedCategory
+        gsm: selectedCategory.gsm, // 🔹 Use selectedCategory
         fabricQuality: selectedCategory.fabric_quality, // 🔹 Use selectedCategory
         quantity: newSubcategory.quantity, // ✅ Allow user input for quantity
         category: selectedCategory._id, // ✅ Attach category ID
@@ -530,7 +559,7 @@ export default function RawMaterials() {
       fetchCategories();
     } catch (error) {
       // Extract error message from API response
-      console.log('error msg', error.response.data.message)
+      console.log("error msg", error.response.data.message);
       let errorMessage = "Error adding subcategory.";
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
@@ -571,16 +600,14 @@ export default function RawMaterials() {
   const fetchBagAttributes = async () => {
     try {
       const response = await orderService.getBagAttributes();
-      console.log('response', response.data.gsm)
+      console.log("response", response.data.gsm);
       if (response.success) {
         setBagAttributes(response.data);
       }
     } catch (error) {
-      toast.error('Error fetching bag attributes');
+      toast.error("Error fetching bag attributes");
     }
   };
-
-
 
   const renderAddCategoryDialog = () => (
     <Dialog
@@ -589,7 +616,21 @@ export default function RawMaterials() {
       maxWidth="sm"
       fullWidth
     >
-      <DialogTitle>Add Category</DialogTitle>
+      <DialogTitle>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h6">Add Category</Typography>
+          <IconButton onClick={() => setFormOpen(false)}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+      <Divider />
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12}>
@@ -615,13 +656,16 @@ export default function RawMaterials() {
             <FormControl fullWidth>
               <InputLabel>Fabric Color</InputLabel>
               <Select
-                value={newCategory.fabricColor || ''}
+                value={newCategory.fabricColor || ""}
                 label="Fabric Color"
                 onChange={(e) =>
-                  setNewCategory({ ...newCategory, fabricColor: e.target.value })
+                  setNewCategory({
+                    ...newCategory,
+                    fabricColor: e.target.value,
+                  })
                 }
               >
-                {bagAttributes['bag-color'].map((option) => (
+                {bagAttributes["bag-color"].map((option) => (
                   <MenuItem key={option} value={option}>
                     {option}
                   </MenuItem>
@@ -633,13 +677,13 @@ export default function RawMaterials() {
             <FormControl fullWidth>
               <InputLabel>Roll Size</InputLabel>
               <Select
-                value={newCategory.rollSize || ''}
+                value={newCategory.rollSize || ""}
                 label="Roll Size"
                 onChange={(e) =>
                   setNewCategory({ ...newCategory, rollSize: e.target.value })
                 }
               >
-                {bagAttributes['roll-size'].map((option) => (
+                {bagAttributes["roll-size"].map((option) => (
                   <MenuItem key={option} value={option}>
                     {option}
                   </MenuItem>
@@ -651,7 +695,7 @@ export default function RawMaterials() {
             <FormControl fullWidth>
               <InputLabel>GSM</InputLabel>
               <Select
-                value={newCategory.gsm || ''}
+                value={newCategory.gsm || ""}
                 label="GSM"
                 onChange={(e) =>
                   setNewCategory({ ...newCategory, gsm: e.target.value })
@@ -669,13 +713,16 @@ export default function RawMaterials() {
             <FormControl fullWidth>
               <InputLabel>Fabric Quality</InputLabel>
               <Select
-                value={newCategory.fabricQuality || ''}
+                value={newCategory.fabricQuality || ""}
                 label="Fabric Quality"
                 onChange={(e) =>
-                  setNewCategory({ ...newCategory, fabricQuality: e.target.value })
+                  setNewCategory({
+                    ...newCategory,
+                    fabricQuality: e.target.value,
+                  })
                 }
               >
-                {bagAttributes['fabric-quality'].map((option) => (
+                {bagAttributes["fabric-quality"].map((option) => (
                   <MenuItem key={option} value={option}>
                     {option}
                   </MenuItem>
@@ -694,10 +741,9 @@ export default function RawMaterials() {
               }
             />
           </Grid>
-
         </Grid>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ justifyContent: "space-between" }}>
         <Button onClick={() => setFormOpen(false)}>Cancel</Button>
         <Button onClick={handleAddCategory} variant="contained" color="primary">
           Add Category
@@ -760,7 +806,7 @@ export default function RawMaterials() {
                 (opt) => opt.value === selectedCategory?.category
               )?.label
             }{" "}
-            - Roll List
+            Roll List
           </Typography>
           <Button
             variant="contained"
@@ -779,45 +825,57 @@ export default function RawMaterials() {
               <TableRow>
                 <TableCell>ID</TableCell>
                 <TableCell>Fabric Color</TableCell>
-                <TableCell>Roll Size  (Inch)</TableCell>
+                <TableCell>Roll Size (Inch)</TableCell>
                 <TableCell>GSM</TableCell>
                 <TableCell>Fabric Quality</TableCell>
                 <TableCell>Quantity (kg)</TableCell>
                 <TableCell>QR Code</TableCell>
                 <TableCell>Action</TableCell>
-
               </TableRow>
             </TableHead>
             <TableBody>
-              {subCategories.map((subcategory, subIndex) => (
-                <TableRow key={subIndex}>
-                  <TableCell>{subcategory._id}</TableCell>
-                  <TableCell>{subcategory.fabricColor}</TableCell>
-                  <TableCell>{subcategory.rollSize}</TableCell>
-                  <TableCell>{subcategory.gsm}</TableCell>
-                  <TableCell>{subcategory.fabricQuality}</TableCell>
-                  <TableCell>{subcategory.quantity}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={() => handleShowQR(subcategory)}
-                    >
-                      <QrCode />
-                    </IconButton>
-
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleDeleteSubCategory(subcategory)}
-                    >
-                      <Delete />
-                    </IconButton>
+              {subCategories.length === 0 && !isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    No data available
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                subCategories.map((subcategory, subIndex) => (
+                  <TableRow key={subIndex}>
+                    <TableCell>{subcategory._id}</TableCell>
+                    <TableCell>{subcategory.fabricColor}</TableCell>
+                    <TableCell>{subcategory.rollSize}</TableCell>
+                    <TableCell>{subcategory.gsm}</TableCell>
+                    <TableCell>{subcategory.fabricQuality}</TableCell>
+                    <TableCell>{subcategory.quantity}</TableCell>
+                    <TableCell>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleShowQR(subcategory)}
+                      >
+                        <QrCode />
+                      </IconButton>
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteSubCategory(subcategory)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -877,17 +935,20 @@ export default function RawMaterials() {
               type="number"
               fullWidth
               value={newSubcategory.quantity}
-              onChange={(e) =>
-                setNewSubcategory({
-                  ...newSubcategory,
-                  quantity: e.target.value,
-                })
-              }
+              onChange={(e) => {
+                const quantity = e.target.value;
+                if (quantity <= 0) {
+                  setNewSubcategory({ ...newSubcategory, quantity: "" });
+                  toast.error("Quantity must be greater than 0");
+                } else {
+                  setNewSubcategory({ ...newSubcategory, quantity });
+                }
+              }}
             />
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ justifyContent: "space-between" }}>
         <Button onClick={() => setAddSubcategoryDialogOpen(false)}>
           Cancel
         </Button>
@@ -902,7 +963,6 @@ export default function RawMaterials() {
     </Dialog>
   );
 
-
   // handle qr open
   const handleShowQR = (order) => {
     setSelectedQrOrder(order);
@@ -911,7 +971,7 @@ export default function RawMaterials() {
 
   return (
     <>
-      <Card>
+      <Card sx={{ mb: 2, p: 3 }}>
         <Box
           sx={{
             p: 2,
@@ -944,23 +1004,37 @@ export default function RawMaterials() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {categories?.map((category) => (
-                <TableRow key={category._id}>
-                  <TableCell>
-                    {
-                      categoryOptions.find(
-                        (opt) => opt.value === category.category_name
-                      )?.label
-                    }
+              {categories.length === 0 && !isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    No data available
                   </TableCell>
-                  <TableCell>{category.fabric_color}</TableCell>
-                  <TableCell>{category.roll_size}</TableCell>
-                  <TableCell>{category.gsm}</TableCell>
-                  <TableCell>{category.fabric_quality}</TableCell>
-                  <TableCell>{category?.totalSubcategoryQuantity}</TableCell>
-                  <TableCell>{renderActions(category)}</TableCell>
                 </TableRow>
-              ))}
+              ) : isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                categories?.map((category) => (
+                  <TableRow key={category._id}>
+                    <TableCell>
+                      {
+                        categoryOptions.find(
+                          (opt) => opt.value === category.category_name
+                        )?.label
+                      }
+                    </TableCell>
+                    <TableCell>{category.fabric_color}</TableCell>
+                    <TableCell>{category.roll_size}</TableCell>
+                    <TableCell>{category.gsm}</TableCell>
+                    <TableCell>{category.fabric_quality}</TableCell>
+                    <TableCell>{category?.totalSubcategoryQuantity}</TableCell>
+                    <TableCell>{renderActions(category)}</TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -985,8 +1059,11 @@ export default function RawMaterials() {
               />
             </Grid>
           </FormControl>
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={() => setUpdateQuantityModalOpen(false)} sx={{ mr: 1 }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              onClick={() => setUpdateQuantityModalOpen(false)}
+              sx={{ mr: 1 }}
+            >
               Cancel
             </Button>
             <Button variant="contained" onClick={handleQuantityUpdate}>

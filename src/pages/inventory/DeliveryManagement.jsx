@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Card,
   Table,
@@ -22,25 +22,27 @@ import {
   Select,
   TablePagination,
   FormControl,
-  InputLabel
-} from '@mui/material';
-import toast from 'react-hot-toast';
-import deliveryService from '../../services/deliveryService';
+  InputLabel,
+} from "@mui/material";
+import toast from "react-hot-toast";
+import deliveryService from "../../services/deliveryService";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
+import { Edit } from "@mui/icons-material";
 
 export default function DeliveryManagement() {
   const [deliveries, setDeliveries] = useState([]);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [deliveryDetails, setDeliveryDetails] = useState({
-    vehicleNo: '',
-    driverName: '',
-    driverContact: '',
-    deliveryDate: '',
-    status: '' // Added status field
+    vehicleNo: "",
+    driverName: "",
+    driverContact: "",
+    deliveryDate: "",
+    status: "", // Added status field
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -52,7 +54,7 @@ export default function DeliveryManagement() {
       console.log(response.data);
       setDeliveries(response.data || []);
     } catch (error) {
-      toast.error('Error fetching deliveries: ' + error.message);
+      toast.error("Error fetching deliveries: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -66,23 +68,23 @@ export default function DeliveryManagement() {
     if (!delivery) return;
     setSelectedDelivery(delivery); // Store the selected delivery
     setDeliveryDetails({
-      _id: delivery._id || '', // Ensure the _id is stored in the state
-      vehicleNo: delivery.vehicleNo || '',
-      driverName: delivery.driverName || '',
-      driverContact: delivery.driverContact || '',
-      deliveryDate: delivery.deliveryDate || '',
-      status: delivery.status || '' // Ensure the status is also set
+      _id: delivery._id || "", // Ensure the _id is stored in the state
+      vehicleNo: delivery.vehicleNo || "",
+      driverName: delivery.driverName || "",
+      driverContact: delivery.driverContact || "",
+      deliveryDate: delivery.deliveryDate || "",
+      status: delivery.status || "", // Ensure the status is also set
     });
   };
 
   // Apply filters
   const filteredOrders = deliveries
     .filter((delivery) => {
-      const customerName = delivery?.orderDetails?.customerName || '';
-      const jobName = delivery?.orderDetails?.jobName || '';
-      const mobileNumber = delivery?.orderDetails?.mobileNumber || '';
-      const agent = delivery?.orderDetails?.agent || '';
-      const orderId = delivery?.orderId?.toString() || '';
+      const customerName = delivery?.orderDetails?.customerName || "";
+      const jobName = delivery?.orderDetails?.jobName || "";
+      const mobileNumber = delivery?.orderDetails?.mobileNumber || "";
+      const agent = delivery?.orderDetails?.agent || "";
+      const orderId = delivery?.orderId?.toString() || "";
       return (
         customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         jobName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -91,10 +93,12 @@ export default function DeliveryManagement() {
         agent.toLowerCase().includes(searchQuery.toLowerCase())
       );
     })
-    .filter((delivery) => (statusFilter ? delivery.status === statusFilter : true));
+    .filter((delivery) =>
+      statusFilter ? delivery.status === statusFilter : true
+    );
 
   const handleChangePage = (event, newPage) => setPage(newPage);
-  const handleChangeRowsPerPage = event => {
+  const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -103,15 +107,22 @@ export default function DeliveryManagement() {
     const { name, value } = e.target;
     setDeliveryDetails((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const validateForm = () => {
     // Add basic form validation here
-    const { vehicleNo, driverName, driverContact, deliveryDate, status } = deliveryDetails;
-    if (!vehicleNo || !driverName || !driverContact || !deliveryDate || !status) {
-      toast.error('All fields are required');
+    const { vehicleNo, driverName, driverContact, deliveryDate, status } =
+      deliveryDetails;
+    if (
+      !vehicleNo ||
+      !driverName ||
+      !driverContact ||
+      !deliveryDate ||
+      !status
+    ) {
+      toast.error("All fields are required");
       return false;
     }
     return true;
@@ -122,23 +133,27 @@ export default function DeliveryManagement() {
       setSaving(true);
       const { _id, ...updatedDetails } = deliveryDetails; // Destructure '_id' from the state
 
-      console.log('Updated data without ID:', updatedDetails); // Log the updated details without the '_id'
+      console.log("Updated data without ID:", updatedDetails); // Log the updated details without the '_id'
 
       // Now pass the ID separately and exclude it from the payload
       await deliveryService.updateDelivery(_id, updatedDetails); // Pass _id as a URL parameter or as part of the request
 
-      toast.success('Delivery details updated successfully');
+      toast.success("Delivery details updated successfully");
       setSelectedDelivery(null);
       fetchDeliveries(); // Refetch deliveries after update
     } catch (error) {
-      console.log('errors', error)
-      const errorMessage = error?.response?.data?.message || 'Failed to updated';
+      console.log("errors", error);
+      const errorMessage =
+        error?.response?.data?.message || "Failed to updated";
       toast.error(errorMessage);
     } finally {
       setSaving(false);
     }
   };
-  const paginatedOrders = filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedOrders = filteredOrders.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
     <>
@@ -153,13 +168,13 @@ export default function DeliveryManagement() {
                 variant="outlined"
                 size="small"
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
 
               {/* Status Filter */}
               <Select
                 value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
+                onChange={(e) => setStatusFilter(e.target.value)}
                 displayEmpty
                 size="small"
               >
@@ -169,57 +184,93 @@ export default function DeliveryManagement() {
               </Select>
             </div>
           </div>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-              <CircularProgress />
-            </Box>
-          ) : deliveries.length === 0 ? (
-            <Typography variant="body1" color="textSecondary" align="center">
-              No deliveries available.
-            </Typography>
-          ) : (
-            <TableContainer>
-              <Table>
-                <TableHead>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      width: "150px",
+                    }}
+                  >
+                    Order ID
+                  </TableCell>
+                  <TableCell>Agent Name</TableCell>
+                  <TableCell
+                    sx={{
+                      width: "150px",
+                    }}
+                  >
+                    Customer Name
+                  </TableCell>
+                  <TableCell>Job Name</TableCell>
+                  <TableCell>Address</TableCell>
+                  <TableCell>Mobile No.</TableCell>
+                  <TableCell
+                    sx={{
+                      width: "150px",
+                    }}
+                  >
+                    Delivery Date
+                  </TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell sx={{ width: "50px" }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedOrders.length === 0 && !loading ? (
                   <TableRow>
-                    <TableCell>Order ID</TableCell>
-                    <TableCell>Agent Name</TableCell>
-                    <TableCell>Customer Name</TableCell>
-                    <TableCell>Job Name</TableCell>
-                    <TableCell>Address</TableCell>
-                    <TableCell>Mobile No.</TableCell>
-                    <TableCell>Delivery Date</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Actions</TableCell>
+                    <TableCell colSpan={8} align="center">
+                      No data available
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedOrders.map((delivery) => (
+                ) : loading ? (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center">
+                      <CircularProgress />
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  paginatedOrders.map((delivery) => (
                     <TableRow key={delivery._id}>
-                      <TableCell>{delivery.orderId || 'N/A'}</TableCell>
-                      <TableCell>{delivery.orderDetails?.agent || 'N/A'}</TableCell>
-                      <TableCell>{delivery.orderDetails?.customerName || 'N/A'}</TableCell>
-                      <TableCell>{delivery.orderDetails?.jobName || 'N/A'}</TableCell>
-                      <TableCell>{delivery.orderDetails?.address || 'N/A'}</TableCell>
-                      <TableCell>{delivery.orderDetails?.mobileNumber || 'N/A'}</TableCell>
+                      <TableCell>{formatSnakeCase(delivery.orderId)}</TableCell>
                       <TableCell>
-                        {delivery?.deliveryDate
-                          ? new Date(delivery.deliveryDate).toISOString().split('T')[0]
-                          : 'N/A'}
+                        {formatSnakeCase(delivery.orderDetails?.agent)}
+                      </TableCell>
+                      <TableCell>
+                        {formatSnakeCase(delivery.orderDetails?.customerName)}
+                      </TableCell>
+                      <TableCell>
+                        {formatSnakeCase(delivery.orderDetails?.jobName)}
+                      </TableCell>
+                      <TableCell>
+                        {formatSnakeCase(delivery.orderDetails?.address)}
+                      </TableCell>
+                      <TableCell>
+                        {formatSnakeCase(delivery.orderDetails?.mobileNumber)}
                       </TableCell>
 
+                      <TableCell>
+                        {delivery?.deliveryDate
+                          ? new Date(delivery.deliveryDate)
+                              .toISOString()
+                              .split("T")[0]
+                          : "N/A"}
+                      </TableCell>
 
                       <TableCell>
                         <Chip
-                          label={delivery.status?.toUpperCase() || 'UNKNOWN'}
+                          label={formatSnakeCase(delivery.status) || "UNKNOWN"}
                           color={
-                            delivery.status === 'done'
-                              ? 'success'
-                              : delivery.status === 'pending'
-                                ? 'warning'
-                                : delivery.status === 'cancelled'
-                                  ? 'error'
-                                  : 'default'
+                            delivery.status === "delivered"
+                              ? "success"
+                              : delivery.status === "pending"
+                              ? "warning"
+                              : delivery.status === "done"
+                              ? "success"
+                              : delivery.status === "in_transit"
+                              ? "info"
+                              : "default"
                           }
                           size="small"
                         />
@@ -227,18 +278,18 @@ export default function DeliveryManagement() {
                       <TableCell>
                         <Button
                           size="small"
-                          variant="contained"
+                          // variant="contained"
                           onClick={() => handleEdit(delivery)}
                         >
-                          Update Details
+                          <Edit />
                         </Button>
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
         {/* Pagination */}
         <TablePagination
@@ -296,7 +347,6 @@ export default function DeliveryManagement() {
               />
             </Grid>
 
-
             <Grid item xs={12}>
               <TextField
                 label="Delivery Date"
@@ -304,8 +354,10 @@ export default function DeliveryManagement() {
                 type="date"
                 value={
                   deliveryDetails.deliveryDate
-                    ? new Date(deliveryDetails.deliveryDate).toISOString().split('T')[0]
-                    : new Date().toISOString().split('T')[0]
+                    ? new Date(deliveryDetails.deliveryDate)
+                        .toISOString()
+                        .split("T")[0]
+                    : new Date().toISOString().split("T")[0]
                 }
                 onChange={handleChange}
                 fullWidth
@@ -314,7 +366,7 @@ export default function DeliveryManagement() {
                   shrink: true,
                 }}
                 inputProps={{
-                  min: new Date().toISOString().split('T')[0], // allow today and future
+                  min: new Date().toISOString().split("T")[0], // allow today and future
                 }}
               />
             </Grid>
@@ -348,7 +400,7 @@ export default function DeliveryManagement() {
             onClick={handleSave}
             disabled={saving}
           >
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saving ? "Saving..." : "Save Changes"}
           </Button>
         </DialogActions>
       </Dialog>

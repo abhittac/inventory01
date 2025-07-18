@@ -11,19 +11,19 @@ import {
   Typography,
   Divider,
   IconButton,
-} from '@mui/material';
-import * as Icons from '@mui/icons-material';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { menuConfigs } from './SidebarConfig';
-import { useColorMode } from '../../contexts/ColorModeContext';
-import { Brightness4, Brightness7, ExitToApp } from '@mui/icons-material';
-import logo from '../../assets/logo.jpg';
+} from "@mui/material";
+import * as Icons from "@mui/icons-material";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { menuConfigs } from "./SidebarConfig";
+import { useColorMode } from "../../contexts/ColorModeContext";
+import { Brightness4, Brightness7, ExitToApp } from "@mui/icons-material";
+import logo from "../../assets/logo.jpg";
 const DRAWER_WIDTH = 240;
 
 export default function Sidebar({ open, onClose }) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -33,11 +33,11 @@ export default function Sidebar({ open, onClose }) {
     const currentUser = user || {};
 
     if (!currentUser.registrationType) {
-      console.warn('Missing registrationType or operatorType');
+      console.warn("Missing registrationType or operatorType");
       return [];
     }
 
-    if (user.registrationType === 'production') {
+    if (user.registrationType === "production") {
       const operatorMenus = {
         flexo_printing: menuConfigs.production.flexo_printing,
         opsert_printing: menuConfigs.production.opsert_printing,
@@ -45,11 +45,11 @@ export default function Sidebar({ open, onClose }) {
         d_cut_bagmaking: menuConfigs.production.d_cut_bagmaking,
       };
 
-      if (user.operatorType === 'bag_making') {
-        if (user.bagType === 'w_cut') {
+      if (user.operatorType === "bag_making") {
+        if (user.bagType === "w_cut") {
           return operatorMenus.w_cut_bagmaking || [];
         }
-        if (user.bagType === 'd_cut') {
+        if (user.bagType === "d_cut") {
           return operatorMenus.d_cut_bagmaking || [];
         }
       }
@@ -72,35 +72,44 @@ export default function Sidebar({ open, onClose }) {
 
   return (
     <Drawer
-      variant={isMobile ? 'temporary' : 'permanent'}
+      variant={isMobile ? "temporary" : "permanent"}
       open={open}
       onClose={onClose}
       sx={{
         width: DRAWER_WIDTH,
         flexShrink: 0,
-        '& .MuiDrawer-paper': {
+        "& .MuiDrawer-paper": {
           width: DRAWER_WIDTH,
-          boxSizing: 'border-box',
+          boxSizing: "border-box",
         },
       }}
     >
       <Box
         sx={{
+          height: "20vh", // fill full screen height
+          display: "flex",
+          justifyContent: "center", // center horizontally
+          alignItems: "center", // center vertically
+          bgcolor: "background.default",
+          textAlign: "center",
           p: 2,
-          display: 'block',
-          gap: 2,
-          bgcolor: 'background.default',
-          borderRadius: 1,
         }}
       >
-        <Box sx={{ display: 'block', alignItems: 'center', gap: 2, }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
           <img
             src={logo}
             alt="Company Logo"
             style={{
               height: "102px",
-              objectFit: "contain",
-              borderRadius: "100%"
+              width: "102px",
+              objectFit: "cover",
+              borderRadius: "50%", // perfect circle
             }}
           />
           <Typography
@@ -108,14 +117,14 @@ export default function Sidebar({ open, onClose }) {
             color="text.secondary"
             sx={{
               fontWeight: 500,
-              textTransform: 'capitalize',
-              whiteSpace: 'nowrap',
+              textTransform: "capitalize",
+              mt: 2,
             }}
           >
             {user?.registrationType
-              ?.split('_')
-              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(' ')}{' '}
+              ?.split("_")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")}{" "}
             Dashboard
           </Typography>
         </Box>
@@ -146,9 +155,17 @@ export default function Sidebar({ open, onClose }) {
             <ListItem>
               <ListItemButton onClick={toggleColorMode}>
                 <ListItemIcon>
-                  {theme.palette.mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
+                  {theme.palette.mode === "dark" ? (
+                    <Brightness7 />
+                  ) : (
+                    <Brightness4 />
+                  )}
                 </ListItemIcon>
-                <ListItemText primary={`${theme.palette.mode === 'dark' ? 'Light' : 'Dark'} Mode`} />
+                <ListItemText
+                  primary={`${
+                    theme.palette.mode === "dark" ? "Light" : "Dark"
+                  } Mode`}
+                />
               </ListItemButton>
             </ListItem>
             <ListItem>
