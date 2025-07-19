@@ -48,6 +48,7 @@ const modalStyle = {
 };
 export default function BagMakingOrderList({ status = "pending", bagType }) {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [noOrdersFound, setNoOrdersFound] = useState(false);
   const [showScanner, setShowScanner] = useState(false); // State to control QR Code scanner dialog
   const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -91,6 +92,9 @@ export default function BagMakingOrderList({ status = "pending", bagType }) {
         toast.error("Failed to fetch orders");
         setOrders([]);
         setNoOrdersFound(true);
+      })
+      .then(() => {
+        setLoading(false);
       });
   };
 

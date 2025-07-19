@@ -11,6 +11,7 @@ import {
   TableRow,
   Chip,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import flexoService from "../../services/flexoService.js";
 import OrderService from "../../services/productionManagerService.js";
@@ -20,7 +21,7 @@ import { formatSnakeCase } from "../../utils/formatSnakeCase.js";
 export default function ProductionOverview() {
   const [productionData, setProductionData] = useState([]);
   const [error, setError] = useState(null);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchProductionData = async () => {
       try {
@@ -129,6 +130,8 @@ export default function ProductionOverview() {
         setProductionData(updatedData);
       } catch (err) {
         setError("Failed to fetch production data");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -157,7 +160,7 @@ export default function ProductionOverview() {
                 {loading ? (
                   <TableRow>
                     <TableCell colSpan={5} align="center">
-                      <Typography>Loading...</Typography>
+                      <CircularProgress />
                     </TableCell>
                   </TableRow>
                 ) : productionData.length === 0 ? (

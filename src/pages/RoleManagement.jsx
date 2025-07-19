@@ -37,30 +37,16 @@ export default function RoleManagement() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={2} align="center">
-                  <CircularProgress />
+            {roles.map((role) => (
+              <TableRow key={role.id}>
+                <TableCell>{role.name}</TableCell>
+                <TableCell>
+                  {Array.isArray(role.permissions)
+                    ? role.permissions.map(formatSnakeCase).join(", ")
+                    : formatSnakeCase(role.permissions || "N/A")}
                 </TableCell>
               </TableRow>
-            ) : roles.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={2} align="center">
-                  <Typography>No roles found.</Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              roles.map((role) => (
-                <TableRow key={role.id}>
-                  <TableCell>{role.name}</TableCell>
-                  <TableCell>
-                    {Array.isArray(role.permissions)
-                      ? role.permissions.map(formatSnakeCase).join(", ")
-                      : formatSnakeCase(role.permissions || "N/A")}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
+            ))}
           </TableBody>
         </Table>
       </TableContainer>

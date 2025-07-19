@@ -22,7 +22,7 @@ import { formatSnakeCase } from "../../utils/formatSnakeCase.js";
 export default function InventoryOverview() {
   const [inventoryData, setInventoryData] = useState([]);
   const [error, setError] = useState(null);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchInventoryData = async () => {
       try {
@@ -77,6 +77,8 @@ export default function InventoryOverview() {
       } catch (err) {
         console.error("Error fetching inventory data:", err);
         setError("Failed to fetch inventory data");
+      } finally {
+        setLoading(false);
       }
     };
 

@@ -56,3 +56,6 @@ tr.MuiTableRow-root.MuiTableRow-head {
 .dates-input .MuiInputLabel-root {
   margin-top: -5px;
 }
+td {
+  text-transform: capitalize !important;
+}
