@@ -196,7 +196,7 @@ const InvoiceManagement = () => {
             >
               <MenuItem value="">All Status</MenuItem>
               <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="done">Completed</MenuItem>
+              <MenuItem value="paid">Paid</MenuItem>
             </Select>
           </div>
         </div>

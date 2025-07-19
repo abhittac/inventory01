@@ -1,23 +1,27 @@
-import { useState } from 'react';
-import { Grid } from '@mui/material';
-import SummaryCard from '../../../components/dashboard/SummaryCard';
-import OpsertOrderList from '../../production/components/OpsertOrderList';
-import { useAdminData } from '../../../hooks/useAdminData';
+import { useState } from "react";
+import { Grid } from "@mui/material";
+import SummaryCard from "../../../components/dashboard/SummaryCard";
+import OpsertOrderList from "../../production/components/OpsertOrderList";
+import { useAdminData } from "../../../hooks/useAdminData";
+import Loader from "../../../utils/Loader";
 
 export default function AdminOpsertOverview() {
   const [filters, setFilters] = useState({
-    status: '',
-    date: ''
+    status: "",
+    date: "",
   });
 
-  const { data, loading, updateParams } = useAdminData('getDCutOpsert', filters);
+  const { data, loading, updateParams } = useAdminData(
+    "getDCutOpsert",
+    filters
+  );
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
     updateParams(newFilters);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loader />;
 
   return (
     <Grid container spacing={3}>

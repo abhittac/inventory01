@@ -9,38 +9,39 @@ import {
   Chip,
   Card,
   Box,
-} from '@mui/material';
-import { Print, Update, LocalShipping } from '@mui/icons-material';
-import FilterBar from '../../common/FilterBar';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
-import adminService from '../../../services/adminService';
+} from "@mui/material";
+import { Print, Update, LocalShipping } from "@mui/icons-material";
+import FilterBar from "../../common/FilterBar";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import adminService from "../../../services/adminService";
+import { formatSnakeCase } from "../../../utils/formatSnakeCase";
 
 export default function OpsertOrderList({ orders, onFilterChange, filters }) {
   const handleStartPrinting = async (orderId) => {
     try {
       await adminService.startOpsertPrinting(orderId);
-      toast.success('Printing process started');
+      toast.success("Printing process started");
     } catch (error) {
-      toast.error('Failed to start printing');
+      toast.error("Failed to start printing");
     }
   };
 
   const handleUpdateStatus = async (orderId) => {
     try {
-      await adminService.updateOpsertStatus(orderId, 'completed');
-      toast.success('Order completed successfully');
+      await adminService.updateOpsertStatus(orderId, "completed");
+      toast.success("Order completed successfully");
     } catch (error) {
-      toast.error('Failed to update status');
+      toast.error("Failed to update status");
     }
   };
 
   const handleMoveToDelivery = async (orderId) => {
     try {
       await adminService.moveOpsertToDelivery(orderId);
-      toast.success('Order moved to Delivery');
+      toast.success("Order moved to Delivery");
     } catch (error) {
-      toast.error('Failed to move order');
+      toast.error("Failed to move order");
     }
   };
 
@@ -51,7 +52,7 @@ export default function OpsertOrderList({ orders, onFilterChange, filters }) {
           filters={filters}
           onFilterChange={onFilterChange}
           filterOptions={{
-            status: ['Pending', 'In Progress', 'Completed']
+            status: ["Pending", "In Progress", "Completed"],
           }}
         />
       </Box>
@@ -75,7 +76,7 @@ export default function OpsertOrderList({ orders, onFilterChange, filters }) {
               <TableRow key={order._id}>
                 <TableCell>{order.orderId}</TableCell>
                 <TableCell>{order.jobName}</TableCell>
-                <TableCell>{order.bagType}</TableCell>
+                <TableCell>{formatSnakeCase(order.bagType)}</TableCell>
                 <TableCell>{order.printType}</TableCell>
                 <TableCell>{order.printColor}</TableCell>
                 <TableCell>{order.quantity}</TableCell>
@@ -83,14 +84,17 @@ export default function OpsertOrderList({ orders, onFilterChange, filters }) {
                   <Chip
                     label={order.status}
                     color={
-                      order.status === 'completed' ? 'success' :
-                        order.status === 'in_progress' ? 'warning' : 'default'
+                      order.status === "completed"
+                        ? "success"
+                        : order.status === "in_progress"
+                        ? "warning"
+                        : "default"
                     }
                     size="small"
                   />
                 </TableCell>
                 <TableCell>
-                  {order.status === 'pending' && (
+                  {order.status === "pending" && (
                     <Button
                       startIcon={<Print />}
                       variant="contained"
@@ -101,7 +105,7 @@ export default function OpsertOrderList({ orders, onFilterChange, filters }) {
                       Start Printing
                     </Button>
                   )}
-                  {order.status === 'in_progress' && (
+                  {order.status === "in_progress" && (
                     <Button
                       startIcon={<Update />}
                       variant="contained"
@@ -112,7 +116,7 @@ export default function OpsertOrderList({ orders, onFilterChange, filters }) {
                       Complete
                     </Button>
                   )}
-                  {order.status === 'completed' && (
+                  {order.status === "completed" && (
                     <Button
                       startIcon={<LocalShipping />}
                       variant="contained"

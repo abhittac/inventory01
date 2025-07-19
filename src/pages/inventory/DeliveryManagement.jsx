@@ -218,16 +218,16 @@ export default function DeliveryManagement() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedOrders.length === 0 && !loading ? (
+                {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
-                      No data available
+                    <TableCell colSpan={9} align="center">
+                      <CircularProgress />
                     </TableCell>
                   </TableRow>
-                ) : loading ? (
+                ) : paginatedOrders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
-                      <CircularProgress />
+                    <TableCell colSpan={9} align="center">
+                      No data available
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -249,25 +249,21 @@ export default function DeliveryManagement() {
                       <TableCell>
                         {formatSnakeCase(delivery.orderDetails?.mobileNumber)}
                       </TableCell>
-
                       <TableCell>
-                        {delivery?.deliveryDate
+                        {delivery.deliveryDate
                           ? new Date(delivery.deliveryDate)
                               .toISOString()
                               .split("T")[0]
                           : "N/A"}
                       </TableCell>
-
                       <TableCell>
                         <Chip
-                          label={formatSnakeCase(delivery.status) || "UNKNOWN"}
+                          label={formatSnakeCase(delivery.status || "unknown")}
                           color={
                             delivery.status === "delivered"
                               ? "success"
                               : delivery.status === "pending"
                               ? "warning"
-                              : delivery.status === "done"
-                              ? "success"
                               : delivery.status === "in_transit"
                               ? "info"
                               : "default"
@@ -276,13 +272,12 @@ export default function DeliveryManagement() {
                         />
                       </TableCell>
                       <TableCell>
-                        <Button
+                        <IconButton
                           size="small"
-                          // variant="contained"
                           onClick={() => handleEdit(delivery)}
                         >
                           <Edit />
-                        </Button>
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))

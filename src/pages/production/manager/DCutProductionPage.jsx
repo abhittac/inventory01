@@ -16,11 +16,13 @@ import {
   TextField,
   Select,
   MenuItem,
+  Card,
 } from "@mui/material";
 import { Edit, Visibility } from "@mui/icons-material";
 import orderService from "/src/services/productionManagerService.js";
 import UpdateDetailsDialog from "./UpdateDetailsDialog";
 import FullDetailsDialog from "./FullDetailsDialog";
+import { formatSnakeCase } from "../../../utils/formatSnakeCase";
 
 export default function DCutProductionPage() {
   function ProductionTable({ type }) {
@@ -130,40 +132,38 @@ export default function DCutProductionPage() {
     };
 
     return (
-      <Box>
-        <div className="flex justify-between items-center p-4">
-          <Typography variant="h6" gutterBottom>
-            {type} Production Records
-          </Typography>
+      <Card sx={{ mb: 2, p: 2 }}>
+        <Box>
+          <div className="flex justify-between items-center p-4">
+            <Typography variant="h6" gutterBottom>
+              {type} Production Records
+            </Typography>
 
-          <div className="flex gap-3">
-            {/* Search Box */}
-            <TextField
-              label="Search Orders"
-              variant="outlined"
-              size="small"
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
+            <div className="flex gap-3">
+              {/* Search Box */}
+              <TextField
+                label="Search Orders"
+                variant="outlined"
+                size="small"
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
 
-            {/* Status Filter */}
-            <Select
-              value={statusFilter}
-              onChange={handleStatusFilterChange}
-              displayEmpty
-              size="small"
-            >
-              <MenuItem value="">All Status</MenuItem>
-              <MenuItem value="completed">Completed</MenuItem>
-              <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="cancelled">Cancelled</MenuItem>
-            </Select>
+              {/* Status Filter */}
+              <Select
+                value={statusFilter}
+                onChange={handleStatusFilterChange}
+                displayEmpty
+                size="small"
+              >
+                <MenuItem value="">All Status</MenuItem>
+                <MenuItem value="completed">Completed</MenuItem>
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="cancelled">Cancelled</MenuItem>
+              </Select>
+            </div>
           </div>
-        </div>
 
-        {loading ? (
-          <CircularProgress />
-        ) : (
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -180,57 +180,83 @@ export default function DCutProductionPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredRecords
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((record) => (
-                    <TableRow key={record.id}>
-                      <TableCell>{record.orderId}</TableCell>
-                      <TableCell>{record.jobName || "N/A"}</TableCell>
-                      <TableCell>{record.bagDetails?.type || "N/A"}</TableCell>
-                      <TableCell>{record.bagDetails?.size || "N/A"}</TableCell>
-                      <TableCell>{record.bagDetails?.gsm || "N/A"}</TableCell>
-                      <TableCell>{record.quantity}</TableCell>
-                      <TableCell>{record.bagDetails?.color || "N/A"}</TableCell>
-                      <TableCell>
-                        <Chip
-                          label={record?.productionManager?.status || "N/A"}
-                          color={
-                            record?.productionManager?.status === "completed"
-                              ? "success"
-                              : record?.productionManager?.status === "pending"
-                              ? "warning"
-                              : record?.productionManager?.status ===
-                                "in_progress"
-                              ? "info"
-                              : record?.productionManager?.status ===
-                                "cancelled"
-                              ? "error"
-                              : "default"
-                          }
-                          size="small"
-                        />
-                      </TableCell>
-
-                      <TableCell>
-                        <IconButton
-                          color="primary"
-                          size="small"
-                          onClick={() =>
-                            handleUpdate(record.orderId, record.quantity)
-                          }
-                        >
-                          <Edit />
-                        </IconButton>
-                        <IconButton
-                          color="secondary"
-                          size="small"
-                          onClick={() => handleViewFullDetails(record.orderId)}
-                        >
-                          <Visibility />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={9} align="center">
+                      <CircularProgress />
+                    </TableCell>
+                  </TableRow>
+                ) : filteredRecords.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} align="center">
+                      No records found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredRecords
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((record) => (
+                      <TableRow key={record.id}>
+                        <TableCell>{formatSnakeCase(record.orderId)}</TableCell>
+                        <TableCell>{formatSnakeCase(record.jobName)}</TableCell>
+                        <TableCell>
+                          {formatSnakeCase(record.bagDetails?.type)}
+                        </TableCell>
+                        <TableCell>
+                          {formatSnakeCase(record.bagDetails?.size)}
+                        </TableCell>
+                        <TableCell>
+                          {formatSnakeCase(record.bagDetails?.gsm)}
+                        </TableCell>
+                        <TableCell>{record.quantity ?? "N/A"}</TableCell>
+                        <TableCell>
+                          {formatSnakeCase(record.bagDetails?.color)}
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={formatSnakeCase(
+                              record?.productionManager?.status
+                            )}
+                            color={
+                              record?.productionManager?.status === "completed"
+                                ? "success"
+                                : record?.productionManager?.status ===
+                                  "pending"
+                                ? "warning"
+                                : record?.productionManager?.status ===
+                                  "in_progress"
+                                ? "info"
+                                : record?.productionManager?.status ===
+                                  "cancelled"
+                                ? "error"
+                                : "default"
+                            }
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <IconButton
+                            color="primary"
+                            size="small"
+                            onClick={() =>
+                              handleUpdate(record.orderId, record.quantity)
+                            }
+                          >
+                            <Edit />
+                          </IconButton>
+                          <IconButton
+                            color="secondary"
+                            size="small"
+                            onClick={() =>
+                              handleViewFullDetails(record.orderId)
+                            }
+                          >
+                            <Visibility />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                )}
               </TableBody>
             </Table>
             <TablePagination
@@ -243,23 +269,23 @@ export default function DCutProductionPage() {
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </TableContainer>
-        )}
 
-        <UpdateDetailsDialog
-          open={dialogOpen}
-          onClose={() => setDialogOpen(false)}
-          record={selectedRecord}
-          quantityKg={selectedQuantityKg}
-          type={type}
-          orderId={orderIdForDialog}
-          fetchRecords={fetchRecords}
-        />
-        <FullDetailsDialog
-          open={fullDetailsDialogOpen}
-          onClose={() => setFullDetailsDialogOpen(false)}
-          record={selectedRecord}
-        />
-      </Box>
+          <UpdateDetailsDialog
+            open={dialogOpen}
+            onClose={() => setDialogOpen(false)}
+            record={selectedRecord}
+            quantityKg={selectedQuantityKg}
+            type={type}
+            orderId={orderIdForDialog}
+            fetchRecords={fetchRecords}
+          />
+          <FullDetailsDialog
+            open={fullDetailsDialogOpen}
+            onClose={() => setFullDetailsDialogOpen(false)}
+            record={selectedRecord}
+          />
+        </Box>
+      </Card>
     );
   }
 

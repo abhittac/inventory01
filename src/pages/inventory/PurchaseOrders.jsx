@@ -19,6 +19,7 @@ import PurchaseOrderForm from "../../components/inventory/forms/PurchaseOrderFor
 import DeleteConfirmDialog from "../../components/common/DeleteConfirmDialog";
 import toast from "react-hot-toast";
 import purchaseOrderService from "../../services/purchaseOrderService"; // Assumed service file for API calls
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 export default function PurchaseOrders() {
   const [orders, setOrders] = useState([]);
@@ -140,16 +141,16 @@ export default function PurchaseOrders() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.length === 0 && !loading ? (
-                <TableRow>
-                  <TableCell colSpan={8} align="center">
-                    No data available
-                  </TableCell>
-                </TableRow>
-              ) : loading ? (
+              {loading ? (
                 <TableRow>
                   <TableCell colSpan={8} align="center">
                     <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : orders.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    No data available
                   </TableCell>
                 </TableRow>
               ) : (
@@ -157,7 +158,7 @@ export default function PurchaseOrders() {
                   <TableRow key={order.id}>
                     <TableCell>{order.order_number}</TableCell>
                     <TableCell>{order.supplier}</TableCell>
-                    <TableCell>{order.materialType}</TableCell>
+                    <TableCell>{formatSnakeCase(order.materialType)}</TableCell>
                     <TableCell>{order.quantity}</TableCell>
                     <TableCell>₹{order.totalAmount}</TableCell>
                     <TableCell>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Card,
   Table,
@@ -11,34 +11,36 @@ import {
   Typography,
   Button,
   Chip,
-} from '@mui/material';
-import { Edit, Delete, Add, Download } from '@mui/icons-material';
-import ReportForm from '../components/reports/ReportForm';
-import DeleteConfirmDialog from '../components/common/DeleteConfirmDialog';
-import toast from 'react-hot-toast';
+  CircularProgress,
+} from "@mui/material";
+import { Edit, Delete, Add, Download } from "@mui/icons-material";
+import ReportForm from "../components/reports/ReportForm";
+import DeleteConfirmDialog from "../components/common/DeleteConfirmDialog";
+import toast from "react-hot-toast";
+import { formatSnakeCase } from "../utils/formatSnakeCase";
 
 const mockReports = [
   {
     id: 1,
-    title: 'Monthly Sales Report - January',
-    dateRange: 'Jan 2024',
-    status: 'completed',
-    createdAt: '2024-01-31',
+    title: "Monthly Sales Report - January",
+    dateRange: "Jan 2024",
+    status: "completed",
+    createdAt: "2024-01-31",
   },
   {
     id: 2,
-    title: 'Monthly Sales Report - February',
-    dateRange: 'Feb 2024',
-    status: 'draft',
-    createdAt: '2024-02-15',
+    title: "Monthly Sales Report - February",
+    dateRange: "Feb 2024",
+    status: "draft",
+    createdAt: "2024-02-15",
   },
   {
     id: 3,
-    title: 'Q1 Sales Analysis',
-    dateRange: 'Jan 2024 - Mar 2024',
-    status: 'in_progress',
-    createdAt: '2024-02-20',
-  }
+    title: "Q1 Sales Analysis",
+    dateRange: "Jan 2024 - Mar 2024",
+    status: "in_progress",
+    createdAt: "2024-02-20",
+  },
 ];
 
 export default function Reports() {
@@ -63,22 +65,26 @@ export default function Reports() {
   };
 
   const handleFormSubmit = (formData) => {
-    toast.success(selectedReport ? 'Report updated successfully' : 'Report created successfully');
+    toast.success(
+      selectedReport
+        ? "Report updated successfully"
+        : "Report created successfully"
+    );
     setFormOpen(false);
   };
 
   const handleDeleteConfirm = () => {
-    toast.success('Report deleted successfully');
+    toast.success("Report deleted successfully");
     setDeleteDialogOpen(false);
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      completed: 'success',
-      draft: 'warning',
-      in_progress: 'info',
+      completed: "success",
+      draft: "warning",
+      in_progress: "info",
     };
-    return colors[status] || 'default';
+    return colors[status] || "default";
   };
 
   return (
@@ -107,45 +113,61 @@ export default function Reports() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockReports.map((report) => (
-                <TableRow key={report.id}>
-                  <TableCell>{report.title}</TableCell>
-                  <TableCell>{report.dateRange}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={report.status.charAt(0).toUpperCase() + report.status.slice(1)}
-                      color={getStatusColor(report.status)}
-                      size="small"
-                    />
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    <CircularProgress />
                   </TableCell>
-                  <TableCell>{report.createdAt}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={() => handleEdit(report)}
-                    >
-                      <Edit />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleDelete(report)}
-                    >
-                      <Delete />
-                    </IconButton>
-                    {report.status === 'completed' && (
+                </TableRow>
+              ) : mockReports.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    <Typography>No reports found.</Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                mockReports.map((report) => (
+                  <TableRow key={report.id}>
+                    <TableCell>{report.title}</TableCell>
+                    <TableCell>{report.dateRange}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={formatSnakeCase(report.status)}
+                        color={getStatusColor(report.status)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>{report.createdAt}</TableCell>
+                    <TableCell>
                       <IconButton
                         size="small"
                         color="primary"
-                        onClick={() => toast.success('Report downloaded successfully')}
+                        onClick={() => handleEdit(report)}
                       >
-                        <Download />
+                        <Edit />
                       </IconButton>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(report)}
+                      >
+                        <Delete />
+                      </IconButton>
+                      {report.status === "completed" && (
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() =>
+                            toast.success("Report downloaded successfully")
+                          }
+                        >
+                          <Download />
+                        </IconButton>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>

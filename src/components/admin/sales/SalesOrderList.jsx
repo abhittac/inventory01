@@ -87,35 +87,59 @@ export default function SalesOrderList({ onFilterChange }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.map((order) => (
-              <TableRow key={order._id}>
-                <TableCell>{order.orderId}</TableCell>
-                <TableCell>{order.customerName}</TableCell>
-                <TableCell>{order.jobName}</TableCell>
-                <TableCell> {formatSnakeCase(order.bagDetails.type)}</TableCell>
-                <TableCell>{order.quantity}</TableCell>
-                <TableCell>₹{order.totalAmount}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={order.status}
-                    color={order.status === "Completed" ? "success" : "warning"}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => handleDelete(order._id)}
-                  >
-                    <Delete />
-                  </IconButton>
-                  <IconButton size="small" color="primary">
-                    <QrCode />
-                  </IconButton>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={8} align="center">
+                  <CircularProgress />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : data?.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} align="center">
+                  <Typography>No orders found</Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((order) => (
+                <TableRow key={order._id}>
+                  <TableCell>
+                    {formatSnakeCase(order.orderId || "N/A")}
+                  </TableCell>
+                  <TableCell>
+                    {formatSnakeCase(order.customerName || "N/A")}
+                  </TableCell>
+                  <TableCell>
+                    {formatSnakeCase(order.jobName || "N/A")}
+                  </TableCell>
+                  <TableCell>
+                    {formatSnakeCase(order.bagDetails?.type || "N/A")}
+                  </TableCell>
+                  <TableCell>{order.quantity}</TableCell>
+                  <TableCell>₹{order.totalAmount}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={formatSnakeCase(order.status)}
+                      color={
+                        order.status === "Completed" ? "success" : "warning"
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDelete(order._id)}
+                    >
+                      <Delete />
+                    </IconButton>
+                    <IconButton size="small" color="primary">
+                      <QrCode />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

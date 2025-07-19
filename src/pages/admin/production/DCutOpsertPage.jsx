@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Grid,
   Card,
@@ -15,20 +15,27 @@ import {
   IconButton,
   Box,
   MenuItem,
-} from '@mui/material';
+  CircularProgress,
+} from "@mui/material";
 
-
-import { Print, Update, LocalShipping, Search, Delete } from '@mui/icons-material';
-import adminService from '../../../services/adminService';
-import toast from 'react-hot-toast';
+import {
+  Print,
+  Update,
+  LocalShipping,
+  Search,
+  Delete,
+} from "@mui/icons-material";
+import adminService from "../../../services/adminService";
+import toast from "react-hot-toast";
+import { formatSnakeCase } from "../../../utils/formatSnakeCase";
 export default function DCutOpsertPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
-    search: '',
-    status: '',
+    search: "",
+    status: "",
     page: 1,
-    limit: 15
+    limit: 15,
   });
 
   const fetchOrders = async () => {
@@ -50,23 +57,27 @@ export default function DCutOpsertPage() {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       [name]: value,
-      page: 1
+      page: 1,
     }));
   };
 
   const handleReset = () => {
     setFilters({
-      search: '',
-      type: '',
+      search: "",
+      type: "",
     });
   };
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
-      await adminService.updateProductionStatus('d-cut-opsert', orderId, newStatus);
-      toast.success('Status updated successfully');
+      await adminService.updateProductionStatus(
+        "d-cut-opsert",
+        orderId,
+        newStatus
+      );
+      toast.success("Status updated successfully");
       fetchOrders();
     } catch (error) {
       toast.error(error.message);
@@ -75,8 +86,8 @@ export default function DCutOpsertPage() {
 
   const handleMoveToDelivery = async (orderId) => {
     try {
-      await adminService.moveToNextStage('d-cut-opsert', orderId, 'delivery');
-      toast.success('Order moved to Delivery');
+      await adminService.moveToNextStage("d-cut-opsert", orderId, "delivery");
+      toast.success("Order moved to Delivery");
       fetchOrders();
     } catch (error) {
       toast.error(error.message);
@@ -85,8 +96,7 @@ export default function DCutOpsertPage() {
 
   return (
     <Box sx={{ p: 3 }}>
-
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 3 }}>
+      <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 3 }}>
         <TextField
           size="small"
           placeholder="Search..."
@@ -94,7 +104,7 @@ export default function DCutOpsertPage() {
           value={filters.search}
           onChange={handleFilterChange}
           InputProps={{
-            startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />,
+            startAdornment: <Search sx={{ color: "text.secondary", mr: 1 }} />,
           }}
         />
         <TextField
@@ -107,7 +117,7 @@ export default function DCutOpsertPage() {
           SelectProps={{
             displayEmpty: true,
             renderValue: (selected) => {
-              if (selected === '') {
+              if (selected === "") {
                 return <em>All Statuses</em>;
               }
               return selected;
@@ -127,80 +137,104 @@ export default function DCutOpsertPage() {
         </Button>
       </Box>
 
-
       <Card>
         <TableContainer>
-          {loading ? (
-            <Box sx={{ p: 2, textAlign: 'center' }}>
-              <Typography>Loading...</Typography>
-            </Box>
-          ) : orders.length === 0 ? (
-            <Box sx={{ p: 2, textAlign: 'center' }}>
-              <Typography>No orders found</Typography>
-            </Box>
-          ) : (
-            <Table>
-              <TableHead>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Order ID</TableCell>
+                <TableCell>Job Name</TableCell>
+                <TableCell>Quantity</TableCell>
+                <TableCell>Customer Name</TableCell>
+                <TableCell>Bag Type</TableCell>
+                <TableCell>Handle Color</TableCell>
+                <TableCell>Size</TableCell>
+                <TableCell>Color</TableCell>
+                <TableCell>Print Color</TableCell>
+                <TableCell>GSM</TableCell>
+                <TableCell>Status</TableCell>
+                {/* <TableCell>Actions</TableCell> */}
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {loading ? (
                 <TableRow>
-                  <TableCell>Order ID</TableCell>
-                  <TableCell>Job Name</TableCell>
-                  <TableCell>Quantity</TableCell>
-                  <TableCell>Customer Name</TableCell>
-                  <TableCell>Bag Type</TableCell>
-                  <TableCell>Handle Color</TableCell>
-                  <TableCell>Size</TableCell>
-                  <TableCell>Color</TableCell>
-                  <TableCell>Print Color</TableCell>
-                  <TableCell>GSM</TableCell>
-                  <TableCell>Status</TableCell>
-                  {/* <TableCell>Actions</TableCell> */}
+                  <TableCell colSpan={11} align="center">
+                    <CircularProgress />
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {orders.map((order) => (
+              ) : orders.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={11} align="center">
+                    <Typography>No orders found</Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                orders.map((order) => (
                   <TableRow key={order._id || order.id}>
-                    <TableCell>{order.order_id}</TableCell>
-                    <TableCell>{order.orderDetails.jobName}</TableCell>
-                    <TableCell>{order.orderDetails.quantity}</TableCell>
-                    <TableCell>{order.orderDetails.customerName}</TableCell>
-                    <TableCell>{order.orderDetails.bagDetails.type}</TableCell>
-                    <TableCell>{order.orderDetails.bagDetails.handleColor}</TableCell>
-                    <TableCell>{order.orderDetails.bagDetails.size}</TableCell>
-                    <TableCell>{order.orderDetails.bagDetails.color}</TableCell>
-                    <TableCell>{order.orderDetails.bagDetails.printColor}</TableCell>
-                    <TableCell>{order.orderDetails.bagDetails.gsm}</TableCell>
+                    <TableCell>{formatSnakeCase(order.order_id)}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.orderDetails?.jobName)}
+                    </TableCell>
+                    <TableCell>{order.orderDetails?.quantity}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.orderDetails?.customerName)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.orderDetails?.bagDetails?.type)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(
+                        order.orderDetails?.bagDetails?.handleColor
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.orderDetails?.bagDetails?.size)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.orderDetails?.bagDetails?.color)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(
+                        order.orderDetails?.bagDetails?.printColor
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.orderDetails?.bagDetails?.gsm)}
+                    </TableCell>
                     <TableCell>
                       <Chip
-                        label={order.status.toUpperCase()}
+                        label={formatSnakeCase(order.status)}
                         color={
-                          order.status === 'completed'
-                            ? 'success'
-                            : order.status === 'in_progress'
-                              ? 'warning'
-                              : 'default'
+                          order.status === "completed"
+                            ? "success"
+                            : order.status === "in_progress"
+                            ? "warning"
+                            : "default"
                         }
                         size="small"
                       />
                     </TableCell>
                     {/* <TableCell>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => {
-                          setOrderToDelete(order);
-                          setDeleteDialogOpen(true);
-                        }}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </TableCell> */}
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => {
+                  setOrderToDelete(order);
+                  setDeleteDialogOpen(true);
+                }}
+              >
+                <Delete />
+              </IconButton>
+            </TableCell> */}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+                ))
+              )}
+            </TableBody>
+          </Table>
         </TableContainer>
       </Card>
-    </Box >
+    </Box>
   );
 }

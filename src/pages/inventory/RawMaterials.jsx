@@ -49,6 +49,7 @@ import QRCodeDialog from "../../components/sales/orders/QRCodeDialog";
 import { QRCodeCanvas } from "qrcode.react";
 import QRCode from "qrcode";
 import COMPANY_LOGO from "../../assets/logo.jpg";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 const categoryOptions = [
   { value: "fabric", label: "Fabric" },
   { value: "handle", label: "Handle" },
@@ -834,26 +835,32 @@ export default function RawMaterials() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {subCategories.length === 0 && !isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={8} align="center">
-                    No data available
-                  </TableCell>
-                </TableRow>
-              ) : isLoading ? (
+              {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={8} align="center">
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
+              ) : subCategories.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    No data available
+                  </TableCell>
+                </TableRow>
               ) : (
-                subCategories.map((subcategory, subIndex) => (
-                  <TableRow key={subIndex}>
+                subCategories.map((subcategory) => (
+                  <TableRow key={subcategory._id}>
                     <TableCell>{subcategory._id}</TableCell>
-                    <TableCell>{subcategory.fabricColor}</TableCell>
-                    <TableCell>{subcategory.rollSize}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(subcategory.fabricColor)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(subcategory.rollSize)}
+                    </TableCell>
                     <TableCell>{subcategory.gsm}</TableCell>
-                    <TableCell>{subcategory.fabricQuality}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(subcategory.fabricQuality)}
+                    </TableCell>
                     <TableCell>{subcategory.quantity}</TableCell>
                     <TableCell>
                       <IconButton
@@ -1004,33 +1011,37 @@ export default function RawMaterials() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {categories.length === 0 && !isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={8} align="center">
-                    No data available
-                  </TableCell>
-                </TableRow>
-              ) : isLoading ? (
+              {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={8} align="center">
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
+              ) : categories.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    No data available
+                  </TableCell>
+                </TableRow>
               ) : (
-                categories?.map((category) => (
+                categories.map((category) => (
                   <TableRow key={category._id}>
                     <TableCell>
-                      {
-                        categoryOptions.find(
-                          (opt) => opt.value === category.category_name
-                        )?.label
-                      }
+                      {categoryOptions.find(
+                        (opt) => opt.value === category.category_name
+                      )?.label || formatSnakeCase(category.category_name)}
                     </TableCell>
-                    <TableCell>{category.fabric_color}</TableCell>
-                    <TableCell>{category.roll_size}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(category.fabric_color)}
+                    </TableCell>
+                    <TableCell>{formatSnakeCase(category.roll_size)}</TableCell>
                     <TableCell>{category.gsm}</TableCell>
-                    <TableCell>{category.fabric_quality}</TableCell>
-                    <TableCell>{category?.totalSubcategoryQuantity}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(category.fabric_quality)}
+                    </TableCell>
+                    <TableCell>
+                      {category.totalSubcategoryQuantity ?? 0}
+                    </TableCell>
                     <TableCell>{renderActions(category)}</TableCell>
                   </TableRow>
                 ))

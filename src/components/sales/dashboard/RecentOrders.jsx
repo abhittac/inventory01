@@ -85,7 +85,7 @@ export default function RecentOrders() {
   }, []);
 
   return (
-    <Card>
+    <Card sx={{ mb: 2, p: 2 }}>
       <div className="flex justify-between items-center p-4">
         <Typography variant="h6">Recent Orders</Typography>
         <Button

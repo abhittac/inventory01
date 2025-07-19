@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Card,
   Table,
@@ -11,29 +11,31 @@ import {
   Typography,
   Button,
   Chip,
-} from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
-import DeleteConfirmDialog from '../../components/common/DeleteConfirmDialog';
-import toast from 'react-hot-toast';
+  CircularProgress,
+} from "@mui/material";
+import { Add, Edit, Delete } from "@mui/icons-material";
+import DeleteConfirmDialog from "../../components/common/DeleteConfirmDialog";
+import toast from "react-hot-toast";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 const mockStock = [
   {
     id: 1,
-    itemName: 'Non-woven Fabric',
-    category: 'Raw Material',
+    itemName: "Non-woven Fabric",
+    category: "Raw Material",
     quantity: 1500,
-    unit: 'meters',
+    unit: "meters",
     reorderPoint: 500,
-    status: 'In Stock',
+    status: "In Stock",
   },
   {
     id: 2,
-    itemName: 'Handle Rope',
-    category: 'Raw Material',
+    itemName: "Handle Rope",
+    category: "Raw Material",
     quantity: 300,
-    unit: 'rolls',
+    unit: "rolls",
     reorderPoint: 100,
-    status: 'Low Stock',
+    status: "Low Stock",
   },
 ];
 
@@ -47,7 +49,7 @@ export default function StockManagement() {
   };
 
   const handleDeleteConfirm = () => {
-    toast.success('Item deleted successfully');
+    toast.success("Item deleted successfully");
     setDeleteDialogOpen(false);
   };
 
@@ -56,11 +58,7 @@ export default function StockManagement() {
       <Card>
         <div className="flex justify-between items-center p-4">
           <Typography variant="h6">Stock Management</Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Add />}
-          >
+          <Button variant="contained" color="primary" startIcon={<Add />}>
             Add Item
           </Button>
         </div>
@@ -78,34 +76,50 @@ export default function StockManagement() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockStock.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.itemName}</TableCell>
-                  <TableCell>{item.category}</TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>{item.unit}</TableCell>
-                  <TableCell>{item.reorderPoint}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={item.status}
-                      color={item.status === 'In Stock' ? 'success' : 'warning'}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton size="small" color="primary">
-                      <Edit />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleDelete(item)}
-                    >
-                      <Delete />
-                    </IconButton>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : mockStock.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    No stock items found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                mockStock.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.itemName}</TableCell>
+                    <TableCell>{formatSnakeCase(item.category)}</TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>{formatSnakeCase(item.unit)}</TableCell>
+                    <TableCell>{item.reorderPoint}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={item.status}
+                        color={
+                          item.status === "In Stock" ? "success" : "warning"
+                        }
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton size="small" color="primary">
+                        <Edit />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(item)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>

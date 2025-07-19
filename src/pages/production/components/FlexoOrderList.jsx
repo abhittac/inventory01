@@ -22,33 +22,42 @@ import {
   Grid,
   TextField,
   TablePagination,
-} from '@mui/material';
-import { QrCodeScanner, Update, LocalShipping, Receipt } from '@mui/icons-material';
-import toast from 'react-hot-toast';
-import { useState, useEffect, useMemo } from 'react';
-import OrderService from '../../../services/wcutBagFlexoService';
-import QRCodeScanner from '../../../components/QRCodeScanner';
+  CircularProgress,
+} from "@mui/material";
+import {
+  QrCodeScanner,
+  Update,
+  LocalShipping,
+  Receipt,
+} from "@mui/icons-material";
+import toast from "react-hot-toast";
+import { useState, useEffect, useMemo } from "react";
+import OrderService from "../../../services/wcutBagFlexoService";
+import QRCodeScanner from "../../../components/QRCodeScanner";
+import { formatSnakeCase } from "../../../utils/formatSnakeCase";
 
 const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
+  bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
 };
 
-export default function FlexoOrderList({ status = 'pending', bagType }) {
+export default function FlexoOrderList({ status = "pending", bagType }) {
   const [orders, setOrders] = useState([]);
   const [noOrdersFound, setNoOrdersFound] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [showScanner, setShowScanner] = useState(false); // Ensure this state controls the scanner visibility
   const [isOpen, setOpen] = useState(false);
-  const [unitToUpdate, setUnitToUpdate] = useState('');
+  const [unitToUpdate, setUnitToUpdate] = useState("");
   const [updateStatusModalOpen, setUpdateStatusModalOpen] = useState(false);
-  const [addSubcategoryDialogOpen, setAddSubcategoryDialogOpen] = useState(false);
+  const [addSubcategoryDialogOpen, setAddSubcategoryDialogOpen] =
+    useState(false);
   const [selectedMaterialId, setSelectedMaterialId] = useState(false);
   // Row matirial list
   const [requiredMaterials, setRequiredMaterials] = useState([]);
@@ -64,7 +73,12 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
   const fetchOrders = () => {
     OrderService.listOrders(status)
       .then((data) => {
-        if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
+        if (
+          data.success &&
+          data.data &&
+          Array.isArray(data.data) &&
+          data.data.length > 0
+        ) {
           setOrders(data.data);
           setNoOrdersFound(false);
         } else {
@@ -73,10 +87,11 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
         }
       })
       .catch((error) => {
-        toast.error('Failed to fetch orders');
+        toast.error("Failed to fetch orders");
         setOrders([]);
         setNoOrdersFound(true);
-      });
+      })
+      .finally(() => setLoading(false));
   };
   const handleVerifyOrder = async (orderId, materialId) => {
     // try {
@@ -117,9 +132,9 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
         setSelectedOrderId(null); // Reset selected order ID
         setAddSubcategoryDialogOpen(false);
       } else {
-        console.log('response data is', response);
+        console.log("response data is", response);
 
-        console.log('response.totalQuantity ', response.totalQuantity);
+        console.log("response.totalQuantity ", response.totalQuantity);
         // No active job, proceed with verification
         setSelectedOrderId(orderId);
         setTotalQuantity(response.totalQuantity || 0);
@@ -133,7 +148,8 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
       // setSelectedOrderId(orderId);
       // setShowScanner(true);
     } catch (error) {
-      const errorMessage = error?.message || 'Error checking active jobs. Please try again.';
+      const errorMessage =
+        error?.message || "Error checking active jobs. Please try again.";
       toast.error(errorMessage);
     }
   };
@@ -143,19 +159,22 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
   };
 
   const handleScanSuccess = async (scannedData) => {
-
-    console.log('scannedData', scannedData);
+    console.log("scannedData", scannedData);
     try {
       if (!selectedOrderId) {
-        toast.error('No order selected for verification');
+        toast.error("No order selected for verification");
         return;
       }
-      await OrderService.verifyOrder(selectedOrderId, selectedMaterialId, scannedData);
-      toast.success('Order verified successfully');
+      await OrderService.verifyOrder(
+        selectedOrderId,
+        selectedMaterialId,
+        scannedData
+      );
+      toast.success("Order verified successfully");
       handleVerify(selectedOrderId); // Refresh orders
       setShowScanner(false); // Close scanner dialog
     } catch (error) {
-      const errorMessage = error?.message || 'Failed to verify order';
+      const errorMessage = error?.message || "Failed to verify order";
       toast.error(errorMessage);
     }
   };
@@ -166,59 +185,64 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
 
   const handleStatusUpdate = () => {
     if (!unitToUpdate) {
-      toast.error('Please select a unit number');
+      toast.error("Please select a unit number");
       return;
     }
 
-    const status = 'completed';
+    const status = "completed";
     const remarks = `Updated status after inspection with Unit ${unitToUpdate}`;
 
-    OrderService.updateOrderStatus(selectedOrderId, status, remarks, unitToUpdate)
+    OrderService.updateOrderStatus(
+      selectedOrderId,
+      status,
+      remarks,
+      unitToUpdate
+    )
       .then(() => {
-        toast.success('Order completed successfully');
+        toast.success("Order completed successfully");
         fetchOrders();
         setUpdateStatusModalOpen(false); // Close modal
-        setUnitToUpdate(''); // Reset unit selection
+        setUnitToUpdate(""); // Reset unit selection
       })
       .catch((error) => {
-        toast.error('Failed to complete order');
+        toast.error("Failed to complete order");
       });
   };
 
   const handleMoveToBagMaking = (orderId) => {
     OrderService.moveToBagMaking(orderId)
       .then(() => {
-        toast.success('Order moved to W-Cut Bag making successfully');
+        toast.success("Order moved to W-Cut Bag making successfully");
         fetchOrders();
       })
       .catch((error) => {
-        toast.error(' Order moved to W-Cut Bag making Failed');
+        toast.error(" Order moved to W-Cut Bag making Failed");
       });
   };
 
   const handleBillingClick = (order) => {
-    OrderService.directBilling(order.orderId, 'W-cut')
+    OrderService.directBilling(order.orderId, "W-cut")
       .then(() => {
-        toast.success('Order moved to billing successfully');
+        toast.success("Order moved to billing successfully");
         fetchOrders();
       })
       .catch((error) => {
-        toast.error('Failed to move to billing');
+        toast.error("Failed to move to billing");
       });
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: 'warning',
-      in_progress: 'info',
-      completed: 'success',
+      pending: "warning",
+      in_progress: "info",
+      completed: "success",
     };
-    return colors[status] || 'default';
+    return colors[status] || "default";
   };
 
   const renderActions = (order) => {
-    if (bagType === 'wcut') {
-      if (order.flexoDetails?.[0]?.status === 'pending') {
+    if (bagType === "wcut") {
+      if (order.flexoDetails?.[0]?.status === "pending") {
         return (
           <Button
             startIcon={<QrCodeScanner />}
@@ -230,7 +254,7 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
           </Button>
         );
       }
-      if (order.flexoDetails?.[0]?.status === 'in_progress') {
+      if (order.flexoDetails?.[0]?.status === "in_progress") {
         return (
           <Button
             startIcon={<Update />}
@@ -243,7 +267,7 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
           </Button>
         );
       }
-      if (order.flexoDetails?.[0]?.status === 'completed') {
+      if (order.flexoDetails?.[0]?.status === "completed") {
         return (
           <Button
             startIcon={<LocalShipping />}
@@ -257,7 +281,7 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
         );
       }
     } else {
-      if (order.flexoDetails[0].status === 'pending') {
+      if (order.flexoDetails[0].status === "pending") {
         return (
           <Button
             startIcon={<QrCodeScanner />}
@@ -269,7 +293,7 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
           </Button>
         );
       }
-      if (order.flexoDetails[0].status === 'in_progress') {
+      if (order.flexoDetails[0].status === "in_progress") {
         return (
           <Button
             startIcon={<Update />}
@@ -282,9 +306,9 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
           </Button>
         );
       }
-      if (order.flexoDetails[0].status === 'completed') {
+      if (order.flexoDetails[0].status === "completed") {
         return (
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: "flex", gap: 1 }}>
             <Button
               startIcon={<Receipt />}
               variant="contained"
@@ -311,7 +335,6 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
   };
 
   const renderAddSubcategoryDialog = () => {
-
     const filteredMaterials = useMemo(() => {
       if (!searchTerm) return requiredMaterials;
 
@@ -320,7 +343,10 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
         return (
           material.gsm.toString().toLowerCase().includes(searchLower) ||
           material.fabricColor.toLowerCase().includes(searchLower) ||
-          (material.rollSize ? material.rollSize.toString().toLowerCase() : "").includes(searchLower) ||
+          (material.rollSize
+            ? material.rollSize.toString().toLowerCase()
+            : ""
+          ).includes(searchLower) ||
           material.quantity.toString().toLowerCase().includes(searchLower)
         );
       });
@@ -377,22 +403,30 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredMaterials.length === 0 ? (
+                  {loading ? (
                     <TableRow>
                       <TableCell colSpan={8} align="center">
-                        <Typography>No records found for this order.</Typography>
+                        <CircularProgress />
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredMaterials.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} align="center">
+                        <Typography>
+                          No records found for this order.
+                        </Typography>
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredMaterials.map((material) => (
                       <TableRow key={material._id}>
                         <TableCell>{selectedOrderId}</TableCell>
-                        <TableCell>{material.gsm}</TableCell>
+                        <TableCell>{formatSnakeCase(material.gsm)}</TableCell>
                         <TableCell style={{ filter: "blur(5px)" }}>
-                          {material.fabricColor}
+                          {formatSnakeCase(material.fabricColor)}
                         </TableCell>
                         <TableCell style={{ filter: "blur(5px)" }}>
-                          {material.rollSize}
+                          {formatSnakeCase(material.rollSize)}
                         </TableCell>
                         <TableCell>{material.quantity}</TableCell>
                         <TableCell>
@@ -400,7 +434,9 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
                             variant="outlined"
                             color="primary"
                             size="small"
-                            onClick={() => handleVerifyOrder(selectedOrderId, material._id)}
+                            onClick={() =>
+                              handleVerifyOrder(selectedOrderId, material._id)
+                            }
                           >
                             Scanner
                           </Button>
@@ -416,8 +452,6 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
       </Dialog>
     );
   };
-
-
 
   return (
     <>
@@ -444,38 +478,76 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {noOrdersFound ? (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={11} align="center">
+                  <TableCell colSpan={15} align="center">
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : noOrdersFound ? (
+                <TableRow>
+                  <TableCell colSpan={15} align="center">
                     <Typography>No records found for this status</Typography>
                   </TableCell>
                 </TableRow>
               ) : (
                 orders.map((order) => (
                   <TableRow key={order._id}>
-                    <TableCell>{order.orderId}</TableCell>
-                    <TableCell>{order.jobName}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.roll_size || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.gsm || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.color || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.printColor || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.type || '-'}</TableCell>
-                    <TableCell>{order.fabricQuality || '-'}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.type || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.size || '-'}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.cylinder_size || '-'}</TableCell>
-                    <TableCell>{order.quantity}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.remarks || order.remarks || '-'}</TableCell>
+                    <TableCell>{formatSnakeCase(order.orderId)}</TableCell>
+                    <TableCell>{formatSnakeCase(order.jobName)}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(
+                        order.productionManagers?.[0]?.production_details
+                          ?.roll_size
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.bagDetails?.gsm)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.bagDetails?.color)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.bagDetails?.printColor)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.bagDetails?.type)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.fabricQuality)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(
+                        order.productionManagers?.[0]?.production_details?.type
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.bagDetails?.size)}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(
+                        order.productionManagers?.[0]?.production_details
+                          ?.cylinder_size
+                      )}
+                    </TableCell>
+                    <TableCell>{order.quantity ?? "-"}</TableCell>
+                    <TableCell>
+                      {order.productionManagers?.[0]?.production_details
+                        ?.remarks ||
+                        order.remarks ||
+                        "N/A"}
+                    </TableCell>
                     <TableCell>
                       <Chip
-                        label={order.flexoDetails?.[0]?.status.replace('_', ' ').toUpperCase()}
+                        label={formatSnakeCase(
+                          order.flexoDetails?.[0]?.status?.replace("_", " ") ||
+                            "-"
+                        )}
                         color={getStatusColor(order.flexoDetails?.[0]?.status)}
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>
-                      {renderActions(order)}
-                    </TableCell>
+                    <TableCell>{renderActions(order)}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -505,8 +577,11 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
               <MenuItem value="2">2</MenuItem>
             </Select>
           </FormControl>
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={() => setUpdateStatusModalOpen(false)} sx={{ mr: 1 }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              onClick={() => setUpdateStatusModalOpen(false)}
+              sx={{ mr: 1 }}
+            >
               Cancel
             </Button>
             <Button variant="contained" onClick={handleStatusUpdate}>
@@ -522,28 +597,35 @@ export default function FlexoOrderList({ status = 'pending', bagType }) {
         onClose={() => setShowScanner(false)}
         fullWidth
         sx={{
-          '& .MuiDialog-paper': {
-            minHeight: '600px', // Ensure enough height
-            padding: '20px',
-            borderRadius: '10px',
-            overflow: 'hidden' // Prevent unwanted scrolling
-          }
+          "& .MuiDialog-paper": {
+            minHeight: "600px", // Ensure enough height
+            padding: "20px",
+            borderRadius: "10px",
+            overflow: "hidden", // Prevent unwanted scrolling
+          },
         }}
       >
-        <DialogTitle sx={{ textAlign: 'center' }}>QR Code Verification</DialogTitle>
+        <DialogTitle sx={{ textAlign: "center" }}>
+          QR Code Verification
+        </DialogTitle>
         <DialogContent sx={{ overflowY: "hidden" }}>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px' }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "150px",
+            }}
+          >
             <QRCodeScanner onScanSuccess={handleScanSuccess} />
           </Box>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center' }}>
+        <DialogActions sx={{ justifyContent: "center" }}>
           <Button onClick={() => setShowScanner(false)} color="secondary">
             Cancel
           </Button>
         </DialogActions>
       </Dialog>
-
-
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Card,
   Table,
@@ -11,31 +11,33 @@ import {
   Typography,
   Button,
   Chip,
-} from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
-import DeleteConfirmDialog from '../../components/common/DeleteConfirmDialog';
-import toast from 'react-hot-toast';
+  CircularProgress,
+} from "@mui/material";
+import { Add, Edit, Delete } from "@mui/icons-material";
+import DeleteConfirmDialog from "../../components/common/DeleteConfirmDialog";
+import toast from "react-hot-toast";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 const mockVehicles = [
   {
     id: 1,
-    vehicleNumber: 'MH-12-AB-1234',
-    type: 'Truck',
-    capacity: '1000 kg',
-    driver: 'John Doe',
-    status: 'Available',
-    lastMaintenance: '2024-02-01',
-    nextService: '2024-03-01',
+    vehicleNumber: "MH-12-AB-1234",
+    type: "Truck",
+    capacity: "1000 kg",
+    driver: "John Doe",
+    status: "Available",
+    lastMaintenance: "2024-02-01",
+    nextService: "2024-03-01",
   },
   {
     id: 2,
-    vehicleNumber: 'MH-12-CD-5678',
-    type: 'Van',
-    capacity: '500 kg',
-    driver: 'Jane Smith',
-    status: 'On Delivery',
-    lastMaintenance: '2024-01-15',
-    nextService: '2024-02-15',
+    vehicleNumber: "MH-12-CD-5678",
+    type: "Van",
+    capacity: "500 kg",
+    driver: "Jane Smith",
+    status: "On Delivery",
+    lastMaintenance: "2024-01-15",
+    nextService: "2024-02-15",
   },
 ];
 
@@ -49,7 +51,7 @@ export default function VehicleManagement() {
   };
 
   const handleDeleteConfirm = () => {
-    toast.success('Vehicle deleted successfully');
+    toast.success("Vehicle deleted successfully");
     setDeleteDialogOpen(false);
   };
 
@@ -58,11 +60,7 @@ export default function VehicleManagement() {
       <Card>
         <div className="flex justify-between items-center p-4">
           <Typography variant="h6">Vehicle Management</Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Add />}
-          >
+          <Button variant="contained" color="primary" startIcon={<Add />}>
             Add Vehicle
           </Button>
         </div>
@@ -81,35 +79,51 @@ export default function VehicleManagement() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockVehicles.map((vehicle) => (
-                <TableRow key={vehicle.id}>
-                  <TableCell>{vehicle.vehicleNumber}</TableCell>
-                  <TableCell>{vehicle.type}</TableCell>
-                  <TableCell>{vehicle.capacity}</TableCell>
-                  <TableCell>{vehicle.driver}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={vehicle.status}
-                      color={vehicle.status === 'Available' ? 'success' : 'warning'}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>{vehicle.lastMaintenance}</TableCell>
-                  <TableCell>{vehicle.nextService}</TableCell>
-                  <TableCell>
-                    <IconButton size="small" color="primary">
-                      <Edit />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleDelete(vehicle)}
-                    >
-                      <Delete />
-                    </IconButton>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : mockVehicles.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    No vehicles found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                mockVehicles.map((vehicle) => (
+                  <TableRow key={vehicle.id}>
+                    <TableCell>{vehicle.vehicleNumber}</TableCell>
+                    <TableCell>{formatSnakeCase(vehicle.type)}</TableCell>
+                    <TableCell>{vehicle.capacity}</TableCell>
+                    <TableCell>{vehicle.driver}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={vehicle.status}
+                        color={
+                          vehicle.status === "Available" ? "success" : "warning"
+                        }
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>{vehicle.lastMaintenance}</TableCell>
+                    <TableCell>{vehicle.nextService}</TableCell>
+                    <TableCell>
+                      <IconButton size="small" color="primary">
+                        <Edit />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(vehicle)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>

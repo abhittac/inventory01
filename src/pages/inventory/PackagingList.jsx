@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Card,
   Table,
@@ -16,46 +16,48 @@ import {
   DialogActions,
   TextField,
   Grid,
-} from '@mui/material';
-import { Edit, Save } from '@mui/icons-material';
-import toast from 'react-hot-toast';
+  CircularProgress,
+} from "@mui/material";
+import { Edit, Save } from "@mui/icons-material";
+import toast from "react-hot-toast";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 const mockPackages = [
   {
-    id: 'PKG-001',
-    orderId: 'ORD-001',
-    customerName: 'John Doe',
-    jobName: 'Premium Shopping Bags',
+    id: "PKG-001",
+    orderId: "ORD-001",
+    customerName: "John Doe",
+    jobName: "Premium Shopping Bags",
     dimensions: {
       length: 30,
       width: 20,
       height: 15,
-      weight: 2.5
+      weight: 2.5,
     },
-    status: 'pending'
+    status: "pending",
   },
   {
-    id: 'PKG-002',
-    orderId: 'ORD-002',
-    customerName: 'Jane Smith',
-    jobName: 'Eco Friendly Bags',
+    id: "PKG-002",
+    orderId: "ORD-002",
+    customerName: "Jane Smith",
+    jobName: "Eco Friendly Bags",
     dimensions: {
       length: 25,
       width: 15,
       height: 10,
-      weight: 1.8
+      weight: 1.8,
     },
-    status: 'ready'
-  }
+    status: "ready",
+  },
 ];
 
 export default function PackagingList() {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [dimensions, setDimensions] = useState({
-    length: '',
-    width: '',
-    height: '',
-    weight: ''
+    length: "",
+    width: "",
+    height: "",
+    weight: "",
   });
 
   const handleEdit = (pkg) => {
@@ -65,14 +67,14 @@ export default function PackagingList() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setDimensions(prev => ({
+    setDimensions((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSave = () => {
-    toast.success('Package dimensions updated successfully');
+    toast.success("Package dimensions updated successfully");
     setSelectedPackage(null);
   };
 
@@ -96,27 +98,43 @@ export default function PackagingList() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockPackages.map((pkg) => (
-                <TableRow key={pkg.id}>
-                  <TableCell>{pkg.id}</TableCell>
-                  <TableCell>{pkg.orderId}</TableCell>
-                  <TableCell>{pkg.customerName}</TableCell>
-                  <TableCell>{pkg.jobName}</TableCell>
-                  <TableCell>
-                    {`${pkg.dimensions.length}x${pkg.dimensions.width}x${pkg.dimensions.height}`}
-                  </TableCell>
-                  <TableCell>{pkg.dimensions.weight}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={() => handleEdit(pkg)}
-                    >
-                      <Edit />
-                    </IconButton>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : mockPackages.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    No packages found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                mockPackages.map((pkg) => (
+                  <TableRow key={pkg.id}>
+                    <TableCell>{pkg.id}</TableCell>
+                    <TableCell>{pkg.orderId}</TableCell>
+                    <TableCell>{pkg.customerName}</TableCell>
+                    <TableCell>{formatSnakeCase(pkg.jobName)}</TableCell>
+                    <TableCell>
+                      {pkg.dimensions
+                        ? `${pkg.dimensions.length}x${pkg.dimensions.width}x${pkg.dimensions.height}`
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell>{pkg.dimensions?.weight ?? "N/A"}</TableCell>
+                    <TableCell>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleEdit(pkg)}
+                      >
+                        <Edit />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -171,11 +189,7 @@ export default function PackagingList() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSelectedPackage(null)}>Cancel</Button>
-          <Button
-            variant="contained"
-            startIcon={<Save />}
-            onClick={handleSave}
-          >
+          <Button variant="contained" startIcon={<Save />} onClick={handleSave}>
             Save Changes
           </Button>
         </DialogActions>

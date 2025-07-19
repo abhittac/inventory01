@@ -22,32 +22,39 @@ import {
   TablePagination,
   Grid,
   TextField,
-} from '@mui/material';
+  CircularProgress,
+} from "@mui/material";
 
-import { QrCodeScanner, Update, LocalShipping, Receipt } from '@mui/icons-material';
-import toast from 'react-hot-toast';
-import { useState, useEffect, useMemo } from 'react';
-import OrderService from '../../../services/dcutBagMakingService';
-import QRCodeScanner from '../../../components/QRCodeScanner'; // Assuming this is your QRCodeScanner component
-
+import {
+  QrCodeScanner,
+  Update,
+  LocalShipping,
+  Receipt,
+} from "@mui/icons-material";
+import toast from "react-hot-toast";
+import { useState, useEffect, useMemo } from "react";
+import OrderService from "../../../services/dcutBagMakingService";
+import QRCodeScanner from "../../../components/QRCodeScanner"; // Assuming this is your QRCodeScanner component
+import { formatSnakeCase } from "../../../utils/formatSnakeCase";
 const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
+  bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
 };
-export default function BagMakingOrderList({ status = 'pending', bagType }) {
+export default function BagMakingOrderList({ status = "pending", bagType }) {
   const [orders, setOrders] = useState([]);
   const [noOrdersFound, setNoOrdersFound] = useState(false);
-  const [showScanner, setShowScanner] = useState(false);  // State to control QR Code scanner dialog
+  const [showScanner, setShowScanner] = useState(false); // State to control QR Code scanner dialog
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [unitToUpdate, setUnitToUpdate] = useState('');
+  const [unitToUpdate, setUnitToUpdate] = useState("");
   const [updateStatusModalOpen, setUpdateStatusModalOpen] = useState(false);
-  const [addSubcategoryDialogOpen, setAddSubcategoryDialogOpen] = useState(false);
+  const [addSubcategoryDialogOpen, setAddSubcategoryDialogOpen] =
+    useState(false);
   const [selectedMaterialId, setSelectedMaterialId] = useState(false);
 
   // Row matirial list
@@ -56,10 +63,9 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
   const [rollSize, setRollSize] = useState(0);
 
   const [updateScrapModalOpen, setUpdateScrapModalOpen] = useState(false);
-  const [scrapToUpdate, setScrapToUpdate] = useState('');
+  const [scrapToUpdate, setScrapToUpdate] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [modalActionType, setModalActionType] = useState(''); // 'bag' or 'billing'
-
+  const [modalActionType, setModalActionType] = useState(""); // 'bag' or 'billing'
 
   useEffect(() => {
     fetchOrders();
@@ -68,7 +74,12 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
   const fetchOrders = () => {
     OrderService.listOrders(status)
       .then((data) => {
-        if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
+        if (
+          data.success &&
+          data.data &&
+          Array.isArray(data.data) &&
+          data.data.length > 0
+        ) {
           setOrders(data.data);
           setNoOrdersFound(false);
         } else {
@@ -77,7 +88,7 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
         }
       })
       .catch((error) => {
-        toast.error('Failed to fetch orders');
+        toast.error("Failed to fetch orders");
         setOrders([]);
         setNoOrdersFound(true);
       });
@@ -139,9 +150,9 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
         setSelectedOrderId(null); // Reset selected order ID
         setAddSubcategoryDialogOpen(false);
       } else {
-        console.log('response data is', response);
+        console.log("response data is", response);
 
-        console.log('response.totalQuantity ', response.totalQuantity);
+        console.log("response.totalQuantity ", response.totalQuantity);
         // No active job, proceed with verification
         setSelectedOrderId(orderId);
         setTotalQuantity(response.totalQuantity || 0);
@@ -155,8 +166,9 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
       // setSelectedOrderId(orderId);
       // setShowScanner(true);
     } catch (error) {
-      console.log('error is', error)
-      const errorMessage = error?.message || 'Error checking active jobs. Please try again.';
+      console.log("error is", error);
+      const errorMessage =
+        error?.message || "Error checking active jobs. Please try again.";
       toast.error(errorMessage);
     }
   };
@@ -166,54 +178,61 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
     setUpdateStatusModalOpen(true); // Open modal
   };
   const handleScanSuccess = async (scannedData) => {
-    console.log('scannedData', scannedData);
+    console.log("scannedData", scannedData);
     try {
       if (!selectedOrderId) {
-        toast.error('No order selected for verification');
+        toast.error("No order selected for verification");
         return;
       }
-      await OrderService.verifyOrder(selectedOrderId, selectedMaterialId, scannedData);
-      toast.success('Order verified successfully');
+      await OrderService.verifyOrder(
+        selectedOrderId,
+        selectedMaterialId,
+        scannedData
+      );
+      toast.success("Order verified successfully");
       handleVerify(selectedOrderId); // Refresh orders
       setShowScanner(false); // Close scanner dialog
     } catch (error) {
-      const errorMessage = error?.message || 'Failed to verify order';
+      const errorMessage = error?.message || "Failed to verify order";
       toast.error(errorMessage);
     }
   };
 
   const handleStatusUpdate = () => {
     if (!unitToUpdate) {
-      toast.error('Please select a unit number');
+      toast.error("Please select a unit number");
       return;
     }
 
-    const status = 'completed';
+    const status = "completed";
     const remarks = `Updated status after inspection with Unit ${unitToUpdate}`;
 
-    OrderService.updateOrderStatus(selectedOrderId, status, unitToUpdate, remarks)
+    OrderService.updateOrderStatus(
+      selectedOrderId,
+      status,
+      unitToUpdate,
+      remarks
+    )
       .then(() => {
-        toast.success('Order completed successfully');
+        toast.success("Order completed successfully");
         fetchOrders();
         setUpdateStatusModalOpen(false); // Close modal
-        setUnitToUpdate(''); // Reset unit selection
+        setUnitToUpdate(""); // Reset unit selection
       })
       .catch((error) => {
-        toast.error('Failed to complete order');
+        toast.error("Failed to complete order");
       });
   };
-
 
   const handleOpenScrapModal = (order, actionType) => {
     console.log("Order received:", order);
     console.log("Type of order:", typeof order); // should be object
-    console.log("Order ID:", order?.orderId);    // should be visible
+    console.log("Order ID:", order?.orderId); // should be visible
 
     setSelectedOrder(order);
     setModalActionType(actionType);
     setUpdateScrapModalOpen(true);
   };
-
 
   const handleScrapModalSubmit = () => {
     if (!scrapToUpdate || scrapToUpdate <= 0) {
@@ -227,66 +246,62 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
       return;
     }
 
-    console.log('scrapToUpdate', scrapToUpdate);
-    console.log('Order ID:', orderId);
+    console.log("scrapToUpdate", scrapToUpdate);
+    console.log("Order ID:", orderId);
 
-    if (modalActionType === 'opsert') {
+    if (modalActionType === "opsert") {
       OrderService.handleMoveToOpsert(orderId, scrapToUpdate)
         .then(() => {
-          toast.success('Order moved to Offset');
+          toast.success("Order moved to Offset");
           fetchOrders();
           setUpdateScrapModalOpen(false);
-          setScrapToUpdate('');
+          setScrapToUpdate("");
         })
         .catch((error) => {
-          toast.error('Failed to move to Offset');
+          toast.error("Failed to move to Offset");
         });
-
-    } else if (modalActionType === 'billing') {
-      OrderService.directBilling(orderId, scrapToUpdate, 'W-cut')
+    } else if (modalActionType === "billing") {
+      OrderService.directBilling(orderId, scrapToUpdate, "W-cut")
         .then(() => {
-          toast.success('Order moved to billing successfully');
+          toast.success("Order moved to billing successfully");
           fetchOrders();
           setUpdateScrapModalOpen(false);
-          setScrapToUpdate('');
+          setScrapToUpdate("");
         })
         .catch((error) => {
-          toast.error('Failed to move to billing');
+          toast.error("Failed to move to billing");
         });
     }
   };
-
-
-
 
   const handleMoveToOpsert = (orderId) => {
     // API call to move order to delivery
     OrderService.handleMoveToOpsert(orderId, bagType)
       .then(() => {
-        toast.success('Order moved to Offset');
+        toast.success("Order moved to Offset");
         fetchOrders();
       })
       .catch((error) => {
-        toast.error('Failed to move to Offset');
+        toast.error("Failed to move to Offset");
       });
   };
 
   const handleBillingClick = (order) => {
     // API call to directly bill the order
-    console.log('vv', bagType)
+    console.log("vv", bagType);
     OrderService.directBilling(order.orderId, bagType)
       .then(() => {
-        toast.success('Order moved to billing successfully');
+        toast.success("Order moved to billing successfully");
         fetchOrders();
       })
       .catch((error) => {
-        toast.error('Failed to move to billing');
+        toast.error("Failed to move to billing");
       });
   };
 
   const renderActions = (order) => {
-    if (bagType === 'wcut') {
-      if (order.status === 'pending') {
+    if (bagType === "wcut") {
+      if (order.status === "pending") {
         return (
           <Button
             startIcon={<QrCodeScanner />}
@@ -298,7 +313,7 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
           </Button>
         );
       }
-      if (order.status === 'in_progress') {
+      if (order.status === "in_progress") {
         return (
           <Button
             startIcon={<Update />}
@@ -311,21 +326,21 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
           </Button>
         );
       }
-      if (order.status === 'completed') {
+      if (order.status === "completed") {
         return (
           <Button
             startIcon={<LocalShipping />}
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => handleOpenScrapModal(order._id, 'opsert')}
+            onClick={() => handleOpenScrapModal(order._id, "opsert")}
           >
             Move to Delivery
           </Button>
         );
       }
     } else {
-      if (order.dcutbagmakingDetails[0].status === 'pending') {
+      if (order.dcutbagmakingDetails[0].status === "pending") {
         return (
           <Button
             startIcon={<QrCodeScanner />}
@@ -337,7 +352,7 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
           </Button>
         );
       }
-      if (order.dcutbagmakingDetails[0].status === 'in_progress') {
+      if (order.dcutbagmakingDetails[0].status === "in_progress") {
         return (
           <Button
             startIcon={<Update />}
@@ -350,15 +365,15 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
           </Button>
         );
       }
-      if (order.dcutbagmakingDetails[0].status === 'completed') {
+      if (order.dcutbagmakingDetails[0].status === "completed") {
         return (
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: "flex", gap: 1 }}>
             <Button
               startIcon={<Receipt />}
               variant="contained"
               color="secondary"
               size="small"
-              onClick={() => handleOpenScrapModal(order, 'billing')}
+              onClick={() => handleOpenScrapModal(order, "billing")}
             >
               Direct Billing
             </Button>
@@ -367,7 +382,7 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
               variant="contained"
               color="primary"
               size="small"
-              onClick={() => handleOpenScrapModal(order, 'opsert')}
+              onClick={() => handleOpenScrapModal(order, "opsert")}
             >
               Move to Offset
             </Button>
@@ -381,11 +396,11 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: 'warning',
-      in_progress: 'info',
-      completed: 'success',
+      pending: "warning",
+      in_progress: "info",
+      completed: "success",
     };
-    return colors[status] || 'default';
+    return colors[status] || "default";
   };
 
   const renderAddSubcategoryDialog = () => {
@@ -422,7 +437,6 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
         fullWidth
         sx={{ minHeight: "80vh" }}
       >
-
         <DialogTitle>
           <Box
             sx={{
@@ -455,7 +469,6 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
 
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
-
             <TableContainer>
               <Table>
                 <TableHead>
@@ -471,10 +484,18 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
                 </TableHead>
 
                 <TableBody>
-                  {noOrdersFound || filteredMaterials.length === 0 ? (
+                  {loading ? (
                     <TableRow>
                       <TableCell colSpan={7} align="center">
-                        <Typography>No records found for this order.</Typography>
+                        <CircularProgress />
+                      </TableCell>
+                    </TableRow>
+                  ) : noOrdersFound || filteredMaterials.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">
+                        <Typography>
+                          No records found for this order.
+                        </Typography>
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -482,12 +503,12 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
                       <TableRow key={material._id}>
                         <TableCell>{material._id}</TableCell>
                         <TableCell>{selectedOrderId}</TableCell>
-                        <TableCell>{material.gsm}</TableCell>
+                        <TableCell>{formatSnakeCase(material.gsm)}</TableCell>
                         <TableCell style={{ filter: "blur(5px)" }}>
-                          {material.fabricColor}
+                          {formatSnakeCase(material.fabricColor)}
                         </TableCell>
                         <TableCell style={{ filter: "blur(5px)" }}>
-                          {material.rollSize}
+                          {formatSnakeCase(material.rollSize)}
                         </TableCell>
                         <TableCell>{material.quantity}</TableCell>
                         <TableCell>
@@ -520,7 +541,6 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
           <Table>
             <TableHead>
               <TableRow>
-
                 <TableCell>Order ID</TableCell>
                 <TableCell>Job Name</TableCell>
                 <TableCell> Roll Size</TableCell>
@@ -539,9 +559,15 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {noOrdersFound ? (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={11} align="center">
+                  <TableCell colSpan={15} align="center">
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : noOrdersFound ? (
+                <TableRow>
+                  <TableCell colSpan={15} align="center">
                     <Typography>No records found for this status</Typography>
                   </TableCell>
                 </TableRow>
@@ -550,27 +576,51 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
                   <TableRow key={order._id}>
                     <TableCell>{order.orderId}</TableCell>
                     <TableCell>{order.jobName}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.roll_size || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.gsm || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.color || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.printColor || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.type || '-'}</TableCell>
-                    <TableCell>{order.fabricQuality || '-'}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.type || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.size || '-'}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.cylinder_size || '-'}</TableCell>
+                    <TableCell>
+                      {order.productionManagers?.[0]?.production_details
+                        ?.roll_size || "-"}
+                    </TableCell>
+                    <TableCell>{order.bagDetails?.gsm || "-"}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.bagDetails?.color || "-")}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.bagDetails?.printColor || "-")}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.bagDetails?.type || "-")}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.fabricQuality || "-")}
+                    </TableCell>
+                    <TableCell>
+                      {formatSnakeCase(
+                        order.productionManagers?.[0]?.production_details
+                          ?.type || "-"
+                      )}
+                    </TableCell>
+                    <TableCell>{order.bagDetails?.size || "-"}</TableCell>
+                    <TableCell>
+                      {order.productionManagers?.[0]?.production_details
+                        ?.cylinder_size || "-"}
+                    </TableCell>
                     <TableCell>{order.quantity}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.remarks || order.remarks || '-'}</TableCell>
+                    <TableCell>
+                      {order.productionManagers?.[0]?.production_details
+                        ?.remarks ||
+                        order.remarks ||
+                        "-"}
+                    </TableCell>
                     <TableCell>
                       <Chip
-                        label={order.dcutbagmakingDetails?.[0]?.status}
-                        color={getStatusColor(order.dcutbagmakingDetails?.[0]?.status)}
+                        label={order.dcutbagmakingDetails?.[0]?.status || "N/A"}
+                        color={getStatusColor(
+                          order.dcutbagmakingDetails?.[0]?.status || "default"
+                        )}
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>
-                      {renderActions(order)}
-                    </TableCell>
+                    <TableCell>{renderActions(order)}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -578,7 +628,6 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
           </Table>
         </TableContainer>
       </Card>
-
 
       {renderAddSubcategoryDialog()}
       <Modal
@@ -601,8 +650,11 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
               <MenuItem value="3">3</MenuItem>
             </Select>
           </FormControl>
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={() => setUpdateStatusModalOpen(false)} sx={{ mr: 1 }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              onClick={() => setUpdateStatusModalOpen(false)}
+              sx={{ mr: 1 }}
+            >
               Cancel
             </Button>
             <Button variant="contained" onClick={handleStatusUpdate}>
@@ -612,8 +664,6 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
         </Box>
       </Modal>
 
-
-
       <Modal
         open={updateScrapModalOpen}
         onClose={() => setUpdateScrapModalOpen(false)}
@@ -621,13 +671,13 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
         <Box sx={modalStyle}>
           <Typography variant="h6" gutterBottom>
             Enter Scrap Quantity for{" "}
-            {modalActionType === 'bag'
-              ? 'Bag Making'
-              : modalActionType === 'billing'
-                ? 'Direct Billing'
-                : modalActionType === 'opsert'
-                  ? 'Offset'
-                  : ''}
+            {modalActionType === "bag"
+              ? "Bag Making"
+              : modalActionType === "billing"
+              ? "Direct Billing"
+              : modalActionType === "opsert"
+              ? "Offset"
+              : ""}
           </Typography>
 
           <TextField
@@ -639,8 +689,11 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
             onChange={(e) => setScrapToUpdate(e.target.value)}
             inputProps={{ min: 0 }}
           />
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={() => setUpdateScrapModalOpen(false)} sx={{ mr: 1 }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              onClick={() => setUpdateScrapModalOpen(false)}
+              sx={{ mr: 1 }}
+            >
               Cancel
             </Button>
             <Button variant="contained" onClick={handleScrapModalSubmit}>
@@ -656,28 +709,35 @@ export default function BagMakingOrderList({ status = 'pending', bagType }) {
         onClose={() => setShowScanner(false)}
         fullWidth
         sx={{
-          '& .MuiDialog-paper': {
-            minHeight: '600px', // Ensure enough height
-            padding: '20px',
-            borderRadius: '10px',
-            overflow: 'hidden' // Prevent unwanted scrolling
-          }
+          "& .MuiDialog-paper": {
+            minHeight: "600px", // Ensure enough height
+            padding: "20px",
+            borderRadius: "10px",
+            overflow: "hidden", // Prevent unwanted scrolling
+          },
         }}
       >
-        <DialogTitle sx={{ textAlign: 'center' }}>QR Code Verification</DialogTitle>
+        <DialogTitle sx={{ textAlign: "center" }}>
+          QR Code Verification
+        </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px' }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "150px",
+            }}
+          >
             <QRCodeScanner onScanSuccess={handleScanSuccess} />
           </Box>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center' }}>
+        <DialogActions sx={{ justifyContent: "center" }}>
           <Button onClick={() => setShowScanner(false)} color="secondary">
             Cancel
           </Button>
         </DialogActions>
       </Dialog>
-
-
     </>
   );
 }

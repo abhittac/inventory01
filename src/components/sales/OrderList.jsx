@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Card,
   Table,
@@ -11,13 +11,25 @@ import {
   Typography,
   Button,
   Chip,
-} from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
-import DeleteConfirmDialog from '../common/DeleteConfirmDialog';
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
 
 const mockOrders = [
-  { id: 1, customer: 'John Doe', amount: '$1,200', status: 'Pending', date: '2024-02-10' },
-  { id: 2, customer: 'Jane Smith', amount: '$850', status: 'Completed', date: '2024-02-09' },
+  {
+    id: 1,
+    customer: "John Doe",
+    amount: "$1,200",
+    status: "Pending",
+    date: "2024-02-10",
+  },
+  {
+    id: 2,
+    customer: "Jane Smith",
+    amount: "$850",
+    status: "Completed",
+    date: "2024-02-09",
+  },
 ];
 
 export default function OrderList() {
@@ -30,10 +42,12 @@ export default function OrderList() {
   };
 
   return (
-    <Card>
+    <Card sx={{ mb: 2, p: 2 }}>
       <div className="flex justify-between items-center p-4">
         <Typography variant="h6">Orders</Typography>
-        <Button variant="contained" color="primary">Add Order</Button>
+        <Button variant="contained" color="primary">
+          Add Order
+        </Button>
       </div>
       <TableContainer>
         <Table>
@@ -54,7 +68,7 @@ export default function OrderList() {
                 <TableCell>
                   <Chip
                     label={order.status}
-                    color={order.status === 'Completed' ? 'success' : 'warning'}
+                    color={order.status === "Completed" ? "success" : "warning"}
                     size="small"
                   />
                 </TableCell>

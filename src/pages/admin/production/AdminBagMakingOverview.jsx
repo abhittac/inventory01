@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import { Grid } from '@mui/material';
-import SummaryCard from '../../../components/dashboard/SummaryCard';
-import BagMakingOrderList from '../../production/components/BagMakingOrderList';
-import { useAdminData } from '../../../hooks/useAdminData';
+import { useState } from "react";
+import { Grid } from "@mui/material";
+import SummaryCard from "../../../components/dashboard/SummaryCard";
+import BagMakingOrderList from "../../production/components/BagMakingOrderList";
+import { useAdminData } from "../../../hooks/useAdminData";
+import Loader from "../../../utils/Loader";
 
 export default function AdminBagMakingOverview({ type }) {
   const [filters, setFilters] = useState({
-    operator_name: '',
-    quantity: ''
+    operator_name: "",
+    quantity: "",
   });
 
-  const endpoint = type === 'wcut' ? 'getWCutBagMaking' : 'getDCutBagMaking';
+  const endpoint = type === "wcut" ? "getWCutBagMaking" : "getDCutBagMaking";
   const { data, loading, updateParams } = useAdminData(endpoint, filters);
 
   const handleFilterChange = (newFilters) => {
@@ -18,9 +19,9 @@ export default function AdminBagMakingOverview({ type }) {
     updateParams(newFilters);
   };
 
-  const bagType = type === 'wcut' ? 'W-Cut' : 'D-Cut';
+  const bagType = type === "wcut" ? "W-Cut" : "D-Cut";
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loader />;
 
   return (
     <Grid container spacing={3}>
@@ -57,7 +58,7 @@ export default function AdminBagMakingOverview({ type }) {
         />
       </Grid>
       <Grid item xs={12}>
-        <BagMakingOrderList 
+        <BagMakingOrderList
           bagType={type}
           orders={data.orders}
           onFilterChange={handleFilterChange}

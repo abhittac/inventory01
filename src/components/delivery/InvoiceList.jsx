@@ -13,49 +13,51 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
-} from '@mui/material';
-import { PictureAsPdf } from '@mui/icons-material';
-import { generateInvoicePDF } from '../../utils/pdfGenerator';
-import toast from 'react-hot-toast';
+  CircularProgress,
+} from "@mui/material";
+import { PictureAsPdf } from "@mui/icons-material";
+import { generateInvoicePDF } from "../../utils/pdfGenerator";
+import toast from "react-hot-toast";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 const mockInvoices = [
   {
-    id: 'INV-001',
-    orderId: 'ORD-001',
-    customerName: 'John Doe',
-    jobName: 'Premium Shopping Bags',
-    date: '2024-02-20',
+    id: "INV-001",
+    orderId: "ORD-001",
+    customerName: "John Doe",
+    jobName: "Premium Shopping Bags",
+    date: "2024-02-20",
     amount: 15000,
-    status: 'delivered'
+    status: "delivered",
   },
   {
-    id: 'INV-002',
-    orderId: 'ORD-002',
-    customerName: 'Jane Smith',
-    jobName: 'Eco Friendly Bags',
-    date: '2024-02-19',
+    id: "INV-002",
+    orderId: "ORD-002",
+    customerName: "Jane Smith",
+    jobName: "Eco Friendly Bags",
+    date: "2024-02-19",
     amount: 25000,
-    status: 'in_transit'
-  }
+    status: "in_transit",
+  },
 ];
 
 export default function InvoiceList() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const handleDownloadInvoice = (invoice) => {
     try {
       generateInvoicePDF({
         ...invoice,
         invoiceNumber: invoice.id,
-        gstNumber: 'GST123456789',
+        gstNumber: "GST123456789",
         subtotal: invoice.amount,
         gst: invoice.amount * 0.18,
-        total: invoice.amount * 1.18
+        total: invoice.amount * 1.18,
       });
-      toast.success('Invoice downloaded successfully');
+      toast.success("Invoice downloaded successfully");
     } catch (error) {
-      toast.error('Failed to download invoice');
+      toast.error("Failed to download invoice");
     }
   };
 
@@ -67,36 +69,48 @@ export default function InvoiceList() {
         </Typography>
         <Divider sx={{ my: 1 }} />
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" color="text.secondary">Invoice ID:</Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Invoice ID:
+          </Typography>
           <Typography variant="body2">{invoice.id}</Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" color="text.secondary">Order ID:</Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Order ID:
+          </Typography>
           <Typography variant="body2">{invoice.orderId}</Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" color="text.secondary">Customer:</Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Customer:
+          </Typography>
           <Typography variant="body2">{invoice.customerName}</Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" color="text.secondary">Job Name:</Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Job Name:
+          </Typography>
           <Typography variant="body2">{invoice.jobName}</Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" color="text.secondary">Date:</Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Date:
+          </Typography>
           <Typography variant="body2">{invoice.date}</Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="body2" color="text.secondary">Status:</Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            Status:
+          </Typography>
           <Chip
             label={invoice.status.toUpperCase()}
-            color={invoice.status === 'delivered' ? 'success' : 'warning'}
+            color={invoice.status === "delivered" ? "success" : "warning"}
             size="small"
           />
         </Box>
@@ -104,9 +118,10 @@ export default function InvoiceList() {
         <IconButton
           color="primary"
           onClick={() => handleDownloadInvoice(invoice)}
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
         >
-          <PictureAsPdf /> <Typography sx={{ ml: 1 }}>Download Invoice</Typography>
+          <PictureAsPdf />{" "}
+          <Typography sx={{ ml: 1 }}>Download Invoice</Typography>
         </IconButton>
       </Box>
     </Card>
@@ -115,7 +130,9 @@ export default function InvoiceList() {
   if (isMobile) {
     return (
       <Box>
-        <Typography variant="h6" sx={{ mb: 2 }}>Delivery Invoices</Typography>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Delivery Invoices
+        </Typography>
         {mockInvoices.map((invoice) => (
           <MobileCard key={invoice.id} invoice={invoice} />
         ))}
@@ -142,31 +159,51 @@ export default function InvoiceList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockInvoices.map((invoice) => (
-              <TableRow key={invoice.id}>
-                <TableCell>{invoice.id}</TableCell>
-                <TableCell>{invoice.orderId}</TableCell>
-                <TableCell>{invoice.customerName}</TableCell>
-                <TableCell>{invoice.jobName}</TableCell>
-                <TableCell>{invoice.date}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={invoice.status.toUpperCase()}
-                    color={invoice.status === 'delivered' ? 'success' : 'warning'}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => handleDownloadInvoice(invoice)}
-                  >
-                    <PictureAsPdf />
-                  </IconButton>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  <CircularProgress />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : mockInvoices.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  <Typography>No invoices found</Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              mockInvoices.map((invoice) => (
+                <TableRow key={invoice.id}>
+                  <TableCell>{formatSnakeCase(invoice.id)}</TableCell>
+                  <TableCell>{formatSnakeCase(invoice.orderId)}</TableCell>
+                  <TableCell>{formatSnakeCase(invoice.customerName)}</TableCell>
+                  <TableCell>{formatSnakeCase(invoice.jobName)}</TableCell>
+                  <TableCell>
+                    {invoice.date
+                      ? new Date(invoice.date).toLocaleDateString()
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={formatSnakeCase(invoice.status).toUpperCase()}
+                      color={
+                        invoice.status === "delivered" ? "success" : "warning"
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => handleDownloadInvoice(invoice)}
+                    >
+                      <PictureAsPdf />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
