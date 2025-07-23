@@ -73,7 +73,7 @@ export default function Sidebar({ open, onClose }) {
   return (
     <Drawer
       variant={isMobile ? "temporary" : "permanent"}
-      open={open}
+      open={false}
       onClose={onClose}
       sx={{
         width: DRAWER_WIDTH,

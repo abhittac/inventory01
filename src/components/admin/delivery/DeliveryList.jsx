@@ -154,7 +154,7 @@ export default function DeliveryList() {
 
   return (
     <>
-      <Card>
+      <Card sx={{ mb: 2, p: 2 }}>
         <Box
           sx={{ display: "flex", gap: 2, alignItems: "center", mb: 3, p: 2 }}
         >

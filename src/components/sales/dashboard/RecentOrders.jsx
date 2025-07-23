@@ -9,6 +9,7 @@ import {
   TableRow,
   Chip,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -108,7 +109,13 @@ export default function RecentOrders() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.length > 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  <CircularProgress />
+                </TableCell>
+              </TableRow>
+            ) : orders.length > 0 ? (
               orders.map((order) => (
                 <TableRow key={order.id || `order-${order._id}`}>
                   <TableCell>{formatSnakeCase(order.customerName)}</TableCell>

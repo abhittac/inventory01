@@ -19,7 +19,7 @@ import {
   MenuItem,
   CircularProgress,
 } from "@mui/material";
-import { Visibility } from "@mui/icons-material";
+import { Edit, Visibility } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import deliveryService from "../../services/deliveryService";
 import DeliveryDetailsModal from "./DeliveryDetailsModal";
@@ -114,7 +114,7 @@ export default function DeliveryList() {
 
   return (
     <>
-      <Card>
+      <Card sx={{ p: 2, mb: 2 }}>
         <Box sx={{ p: 2 }}>
           <DeliveryFilters filters={filters} onFilterChange={setFilters} />
         </Box>
@@ -152,7 +152,9 @@ export default function DeliveryList() {
                     <TableCell>
                       {formatSnakeCase(delivery.orderDetails?.customerName)}
                     </TableCell>
-                    <TableCell>{delivery.orderDetails?.mobileNumber}</TableCell>
+                    <TableCell>
+                      {delivery.orderDetails?.mobileNumber || "N/A"}
+                    </TableCell>
                     <TableCell>
                       {delivery.deliveryDate
                         ? new Date(delivery.deliveryDate).toLocaleDateString()
@@ -177,12 +179,12 @@ export default function DeliveryList() {
                       {delivery.status !== "delivered" && (
                         <Button
                           size="small"
-                          variant="contained"
-                          color="primary"
+                          // variant="contained"
+                          color="secondary"
                           onClick={() => handleStatusUpdateClick(delivery)}
                           sx={{ ml: 1 }}
                         >
-                          Update Status
+                          <Edit />
                         </Button>
                       )}
                     </TableCell>

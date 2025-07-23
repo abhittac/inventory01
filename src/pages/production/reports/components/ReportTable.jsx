@@ -53,7 +53,7 @@ export default function ReportTable({ records }) {
     );
   });
   return (
-    <Card>
+    <Card sx={{ mb: 2, p: 2 }}>
       <div className="flex justify-between items-center p-4">
         <Typography variant="h6">Production Records</Typography>
         <div className="flex gap-3">
@@ -113,7 +113,7 @@ export default function ReportTable({ records }) {
                       <Chip
                         label={
                           record.status
-                            ? record.status.replace("_", " ").toUpperCase()
+                            ? formatSnakeCase(record.status)
                             : "UNKNOWN"
                         }
                         color={getStatusColor(record.status)}

@@ -147,7 +147,7 @@ export default function WCutProductionPage() {
           </div>
 
           <>
-            <TableContainer component={Paper}>
+            <TableContainer>
               <Table>
                 <TableHead>
                   <TableRow>

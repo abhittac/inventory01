@@ -144,38 +144,40 @@ export default function AdminSalesOverview() {
     page * rowsPerPage + rowsPerPage
   );
   return (
-    <Box sx={{ mb: 3 }}>
-      <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 3 }}>
-        <TextField
-          size="small"
-          placeholder="Search..."
-          name="search"
-          value={filters.search}
-          onChange={handleFilterChange}
-          InputProps={{
-            startAdornment: <Search sx={{ color: "text.secondary", mr: 1 }} />,
-          }}
-        />
-        <TextField
-          select
-          size="small"
-          name="status"
-          value={filters.type}
-          onChange={handleFilterChange}
-          sx={{ minWidth: 120 }}
-        >
-          <MenuItem value="all">All Types</MenuItem>
-          <MenuItem value="pending">Pending</MenuItem>
-          <MenuItem value="cancelled">Cancelled</MenuItem>
-          <MenuItem value="completed">Completed</MenuItem>
-        </TextField>
+    <Card sx={{ mb: 2, p: 2 }}>
+      <Box sx={{ mb: 3 }}>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 3 }}>
+          <TextField
+            size="small"
+            placeholder="Search..."
+            name="search"
+            value={filters.search}
+            onChange={handleFilterChange}
+            InputProps={{
+              startAdornment: (
+                <Search sx={{ color: "text.secondary", mr: 1 }} />
+              ),
+            }}
+          />
+          <TextField
+            select
+            size="small"
+            name="status"
+            value={filters.type}
+            onChange={handleFilterChange}
+            sx={{ minWidth: 120 }}
+          >
+            <MenuItem value="all">All Types</MenuItem>
+            <MenuItem value="pending">Pending</MenuItem>
+            <MenuItem value="cancelled">Cancelled</MenuItem>
+            <MenuItem value="completed">Completed</MenuItem>
+          </TextField>
 
-        <Button variant="outlined" onClick={handleResetFilters}>
-          Reset
-        </Button>
-      </Box>
+          <Button variant="outlined" onClick={handleResetFilters}>
+            Reset
+          </Button>
+        </Box>
 
-      <Card>
         <TableContainer>
           <Table>
             <TableHead>
@@ -256,22 +258,22 @@ export default function AdminSalesOverview() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </Card>
 
-      <OrderForm
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        onSubmit={handleFormSubmit}
-        order={selectedOrder}
-      />
+        <OrderForm
+          open={formOpen}
+          onClose={() => setFormOpen(false)}
+          onSubmit={handleFormSubmit}
+          order={selectedOrder}
+        />
 
-      <DeleteConfirmDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={handleDeleteConfirm}
-        title="Delete Order"
-        content="Are you sure you want to delete this order? This action cannot be undone."
-      />
-    </Box>
+        <DeleteConfirmDialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Order"
+          content="Are you sure you want to delete this order? This action cannot be undone."
+        />
+      </Box>{" "}
+    </Card>
   );
 }

@@ -95,49 +95,51 @@ export default function DCutOpsertPage() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 3 }}>
-        <TextField
-          size="small"
-          placeholder="Search..."
-          name="search"
-          value={filters.search}
-          onChange={handleFilterChange}
-          InputProps={{
-            startAdornment: <Search sx={{ color: "text.secondary", mr: 1 }} />,
-          }}
-        />
-        <TextField
-          select
-          size="small"
-          name="status"
-          value={filters.status}
-          onChange={handleFilterChange}
-          sx={{ minWidth: 120 }}
-          SelectProps={{
-            displayEmpty: true,
-            renderValue: (selected) => {
-              if (selected === "") {
-                return <em>All Statuses</em>;
-              }
-              return selected;
-            },
-          }}
-        >
-          <MenuItem value="">
-            <em>All Statuses</em>
-          </MenuItem>
-          <MenuItem value="pending">Pending</MenuItem>
-          <MenuItem value="in_progress">In Progress</MenuItem>
-          <MenuItem value="completed">Completed</MenuItem>
-        </TextField>
+    <Card sx={{ p: 3, mb: 3 }}>
+      <Box>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 3 }}>
+          <TextField
+            size="small"
+            placeholder="Search..."
+            name="search"
+            value={filters.search}
+            onChange={handleFilterChange}
+            InputProps={{
+              startAdornment: (
+                <Search sx={{ color: "text.secondary", mr: 1 }} />
+              ),
+            }}
+          />
+          <TextField
+            select
+            size="small"
+            name="status"
+            value={filters.status}
+            onChange={handleFilterChange}
+            sx={{ minWidth: 120 }}
+            SelectProps={{
+              displayEmpty: true,
+              renderValue: (selected) => {
+                if (selected === "") {
+                  return <em>All Statuses</em>;
+                }
+                return selected;
+              },
+            }}
+          >
+            <MenuItem value="">
+              <em>All Statuses</em>
+            </MenuItem>
+            <MenuItem value="pending">Pending</MenuItem>
+            <MenuItem value="in_progress">In Progress</MenuItem>
+            <MenuItem value="completed">Completed</MenuItem>
+          </TextField>
 
-        <Button variant="outlined" onClick={handleReset}>
-          Reset
-        </Button>
-      </Box>
+          <Button variant="outlined" onClick={handleReset}>
+            Reset
+          </Button>
+        </Box>
 
-      <Card>
         <TableContainer>
           <Table>
             <TableHead>
@@ -234,7 +236,7 @@ export default function DCutOpsertPage() {
             </TableBody>
           </Table>
         </TableContainer>
-      </Card>
-    </Box>
+      </Box>
+    </Card>
   );
 }

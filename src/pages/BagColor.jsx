@@ -135,7 +135,7 @@ export default function BagColor() {
 
   return (
     <>
-      <Card>
+      <Card sx={{ p: 3, mb: 3 }}>
         <Box
           display="flex"
           justifyContent="space-between"

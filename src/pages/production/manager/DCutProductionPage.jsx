@@ -164,7 +164,7 @@ export default function DCutProductionPage() {
             </div>
           </div>
 
-          <TableContainer component={Paper}>
+          <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>

@@ -181,7 +181,10 @@ export default function DeliveryManagement() {
               >
                 <MenuItem value="">All Status</MenuItem>
                 <MenuItem value="pending">Pending</MenuItem>
-                <MenuItem value="done">Completed</MenuItem>
+                <MenuItem value="in_transit">In Transit</MenuItem>
+                <MenuItem value="cancelled">Cancelled</MenuItem>
+                <MenuItem value="delivered">Delivered</MenuItem>
+                <MenuItem value="done">Done</MenuItem>
               </Select>
             </div>
           </div>

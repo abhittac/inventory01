@@ -139,7 +139,7 @@ export default function HandleColor() {
 
   return (
     <>
-      <Card>
+      <Card sx={{ mb: 2, p: 2 }}>
         <Box
           display="flex"
           justifyContent="space-between"

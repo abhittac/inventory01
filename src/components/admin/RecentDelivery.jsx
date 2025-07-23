@@ -51,7 +51,7 @@ export default function DeliveryList() {
 
   return (
     <>
-      <Card>
+      <Card sx={{ mb: 2, p: 2 }}>
         <Box sx={{ p: 2 }}>
           <Typography variant="h6" gutterBottom>
             Delivery Management
@@ -88,7 +88,9 @@ export default function DeliveryList() {
                     <TableCell>
                       {formatSnakeCase(delivery.orderDetails?.customerName)}
                     </TableCell>
-                    <TableCell>{delivery.orderDetails?.mobileNumber}</TableCell>
+                    <TableCell>
+                      {delivery.orderDetails?.mobileNumber || "N/A"}
+                    </TableCell>
                     <TableCell>
                       {delivery.deliveryDate
                         ? new Date(delivery.deliveryDate).toLocaleDateString()

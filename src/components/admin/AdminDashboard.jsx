@@ -1,9 +1,9 @@
-import { Grid } from '@mui/material';
-import SummaryCard from '../dashboard/SummaryCard';
-import RecentOrders from '../sales/dashboard/RecentOrders';
-import DeliveryList from './RecentDelivery';
-import ProductionOverview from './ProductionOverview';
-import InventoryOverview from './InventoryOverview';
+import { Grid } from "@mui/material";
+import SummaryCard from "../dashboard/SummaryCard";
+import RecentOrders from "../sales/dashboard/RecentOrders";
+import DeliveryList from "./RecentDelivery";
+import ProductionOverview from "./ProductionOverview";
+import InventoryOverview from "./InventoryOverview";
 
 export default function AdminDashboard() {
   return (

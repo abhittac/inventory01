@@ -17,6 +17,7 @@ import {
   Select,
   MenuItem,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import { Print, Update, LocalShipping } from "@mui/icons-material";
 import toast from "react-hot-toast";
@@ -105,7 +106,7 @@ export default function OpsertOrderList({
             <TableBody>
               {noOrdersFound ? (
                 <TableRow>
-                  <TableCell colSpan={9} align="center">
+                  <TableCell colSpan={15} align="center">
                     <Typography variant="body1" color="text.secondary">
                       No Orders Found
                     </Typography>
@@ -182,15 +183,16 @@ export default function OpsertOrderList({
                         </Button>
                       )}
                       {order.opsertDetails[0].status === "completed" && (
-                        <Button
-                          startIcon={<LocalShipping />}
-                          variant="contained"
-                          color="primary"
-                          size="small"
-                          onClick={() => handleMoveToPackaging(order.orderId)}
-                        >
-                          Move to Packaging
-                        </Button>
+                        <Tooltip title="Move to Packaging" arrow>
+                          <Button
+                            variant="contained"
+                            color="info"
+                            onClick={() => handleMoveToPackaging(order.orderId)}
+                            size="small"
+                          >
+                            <LocalShipping color="white" />
+                          </Button>
+                        </Tooltip>
                       )}
                     </TableCell>
                   </TableRow>

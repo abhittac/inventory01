@@ -24,7 +24,7 @@ const roles = [
 
 export default function RoleManagement() {
   return (
-    <Card>
+    <Card sx={{ mb: 2, p: 2 }}>
       <Typography variant="h5" sx={{ p: 2 }}>
         Role Management
       </Typography>

@@ -1,25 +1,19 @@
-import { useState, useEffect } from 'react';
-import {
-  Box,
-  Card,
-  Button,
-  Typography,
-  Grid,
-  Divider
-} from '@mui/material';
-import { Dashboard, Assessment } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { useColorMode } from '../../contexts/ColorModeContext';
-import { useAuth } from '../../hooks/useAuth';
-import OpsertOrderList from './components/OpsertOrderList';
-import OrderService from '../../services/dcutOpsertService';
+import { useState, useEffect } from "react";
+import { Box, Card, Button, Typography, Grid, Divider } from "@mui/material";
+import { Dashboard, Assessment } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { useColorMode } from "../../contexts/ColorModeContext";
+import { useAuth } from "../../hooks/useAuth";
+import OpsertOrderList from "./components/OpsertOrderList";
+import OrderService from "../../services/dcutOpsertService";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 export default function OpsertDashboard() {
   const navigate = useNavigate();
   const { toggleColorMode } = useColorMode();
   const { logout } = useAuth();
   const [orders, setOrders] = useState([]);
-  const [activeStatus, setActiveStatus] = useState('pending');
+  const [activeStatus, setActiveStatus] = useState("pending");
   const [noOrdersFound, setNoOrdersFound] = useState(false);
 
   const fetchOrders = (status) => {
@@ -32,7 +26,8 @@ export default function OpsertDashboard() {
           setOrders([]);
           setNoOrdersFound(true);
         }
-      }).catch((error) => {
+      })
+      .catch((error) => {
         console.error(error);
         setOrders([]);
         setNoOrdersFound(true);
@@ -56,8 +51,8 @@ export default function OpsertDashboard() {
               variant="contained"
               fullWidth
               startIcon={<Dashboard />}
-              onClick={() => navigate('/production/opsert/dashboard')}
-              sx={{ height: '60px' }}
+              onClick={() => navigate("/production/opsert/dashboard")}
+              sx={{ height: "60px" }}
             >
               Dashboard
             </Button>
@@ -67,8 +62,8 @@ export default function OpsertDashboard() {
               variant="contained"
               fullWidth
               startIcon={<Assessment />}
-              onClick={() => navigate('/production/opsert/reports')}
-              sx={{ height: '60px' }}
+              onClick={() => navigate("/production/opsert/reports")}
+              sx={{ height: "60px" }}
             >
               Reports
             </Button>
@@ -82,14 +77,14 @@ export default function OpsertDashboard() {
             </Typography>
             <Divider sx={{ mb: 2 }} />
             <Grid container spacing={2}>
-              {['pending', 'in_progress', 'completed'].map((status) => (
+              {["pending", "in_progress", "completed"].map((status) => (
                 <Grid item xs={4} key={status}>
                   <Button
-                    variant={activeStatus === status ? 'contained' : 'outlined'}
+                    variant={activeStatus === status ? "contained" : "outlined"}
                     onClick={() => setActiveStatus(status)}
                     fullWidth
                   >
-                    {status.replace('_', ' ').toUpperCase()}
+                    {formatSnakeCase(status)}
                   </Button>
                 </Grid>
               ))}
