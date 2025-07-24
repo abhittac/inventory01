@@ -50,6 +50,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import QRCode from "qrcode";
 import COMPANY_LOGO from "../../assets/logo.jpg";
 import { formatSnakeCase } from "../../utils/formatSnakeCase";
+import DeleteConfirmDialog from "../../components/common/DeleteConfirmDialog";
 const categoryOptions = [
   { value: "fabric", label: "Fabric" },
   { value: "handle", label: "Handle" },
@@ -78,12 +79,13 @@ export default function RawMaterials() {
   const [viewSubcategoriesOpen, setViewSubcategoriesOpen] = useState(false);
   const [addSubcategoryDialogOpen, setAddSubcategoryDialogOpen] =
     useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
   const [updateStatusModalOpen, setUpdateStatusModalOpen] = useState(false);
   const [updateQuantityModalOpen, setUpdateQuantityModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [unitToUpdate, setQuantityToUpdate] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [bagAttributes, setBagAttributes] = useState({
     "bag-color": [],
     "fabric-quality": [],
@@ -191,9 +193,12 @@ export default function RawMaterials() {
       setIsLoading(false); // set isLoading to false when fetching is complete
     }
   };
-
+  const handleDelete = (product) => {
+    setProductToDelete(product);
+    setDeleteDialogOpen(true);
+  };
   // Delete category
-  const handleDeleteCategory = async (category) => {
+  const handleDeleteCategory = async () => {
     try {
       const token = authService.getToken();
       if (!token) {
@@ -202,7 +207,7 @@ export default function RawMaterials() {
 
       // Send DELETE request to backend
       await axios.delete(
-        `${API_BASE_URL}/inventory/raw-material/${category?._id}`,
+        `${API_BASE_URL}/inventory/raw-material/${productToDelete?._id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -212,6 +217,7 @@ export default function RawMaterials() {
       );
 
       toast.success("Category deleted successfully");
+      setDeleteDialogOpen(false);
       fetchCategories();
     } catch (error) {
       const errorMessage = error?.message || "Error delete category";
@@ -631,7 +637,7 @@ export default function RawMaterials() {
           </IconButton>
         </Box>
       </DialogTitle>
-      <Divider />
+
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12}>
@@ -765,7 +771,7 @@ export default function RawMaterials() {
       <IconButton
         size="small"
         color="error"
-        onClick={() => handleDeleteCategory(category)}
+        onClick={() => handleDelete(category)}
       >
         <Delete />
       </IconButton>
@@ -1091,6 +1097,13 @@ export default function RawMaterials() {
         open={qrDialogOpen}
         onClose={() => setQrDialogOpen(false)}
         orderData={selectedQrOrder}
+      />
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDeleteCategory}
+        title="Delete Raw Material"
+        content="Are you sure you want to delete this raw material? This action cannot be undone."
       />
     </>
   );

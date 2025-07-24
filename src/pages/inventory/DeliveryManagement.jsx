@@ -278,6 +278,7 @@ export default function DeliveryManagement() {
                       <TableCell>
                         <IconButton
                           size="small"
+                          disabled={delivery.status === "delivered"}
                           onClick={() => handleEdit(delivery)}
                         >
                           <Edit />

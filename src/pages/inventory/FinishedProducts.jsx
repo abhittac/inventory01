@@ -125,8 +125,8 @@ export default function FinishedProducts() {
       const orderId = product?.order_id?.toString() || "";
       return (
         customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        jobName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        orderId.includes(searchQuery)
+        orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        jobName.toLowerCase().includes(searchQuery.toLowerCase())
       );
     })
     .filter((product) =>

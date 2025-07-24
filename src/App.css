@@ -40,10 +40,7 @@
 .read-the-docs {
   color: #888;
 }
-tr.MuiTableRow-root.MuiTableRow-head {
-  background-color: #edf4fb !important;
-  /* width: 100% !important; */
-}
+
 .MuiPickersOutlinedInput-root {
   height: 40px !important;
 }

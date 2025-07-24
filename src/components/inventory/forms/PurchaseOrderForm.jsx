@@ -118,7 +118,7 @@ export default function PurchaseOrderForm({
             </IconButton>
           </Box>
         </DialogTitle>
-        <Divider />
+
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} md={6}>

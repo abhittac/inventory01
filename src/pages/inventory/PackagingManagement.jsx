@@ -517,8 +517,7 @@ export default function PackagingManagement() {
               >
                 <MenuItem value="">All Status</MenuItem>
                 <MenuItem value="pending">Pending</MenuItem>
-                <MenuItem value="processing">Processing</MenuItem>
-                <MenuItem value="completed">Completed</MenuItem>
+                <MenuItem value="delivery">Delivery</MenuItem>
                 <MenuItem value="cancelled">Cancelled</MenuItem>
               </Select>
               <Button
