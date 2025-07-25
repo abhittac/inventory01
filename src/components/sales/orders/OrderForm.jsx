@@ -185,6 +185,7 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
       }));
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -251,13 +252,11 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
               <label className="text-sm">
                 Customer Name <span className="text-red-500">*</span>
               </label>
-              <TextField
+              <FormInput
                 name="customerName"
                 value={formData.customerName}
                 onChange={handleChange}
-                fullWidth
                 required
-                className="text-sm"
                 placeholder="Enter customer name"
               />
             </Grid>
@@ -265,7 +264,9 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
               <label className="text-sm">
                 Mobile Number <span className="text-red-500">*</span>
               </label>
-              <Autocomplete
+              <FormInput
+                label=""
+                name="mobileNumber"
                 value={formData.mobileNumber}
                 onChange={handleMobileNumberSearch}
                 onInputChange={(event, newValue) => {
@@ -277,15 +278,9 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 options={mobileNumbers}
                 getOptionLabel={(option) => option}
                 freeSolo
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Search or enter mobile number"
-                    variant="outlined"
-                    fullWidth
-                    required
-                  />
-                )}
+                placeholder="Search or enter mobile number"
+                fullWidth
+                required
               />
             </Grid>
             <Grid item xs={12}>
@@ -355,9 +350,10 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 onChange={handleChange}
                 options={bagTypes}
                 required
-                disabled={editQuantity}
+                disabled={order?.status === "completed"}
                 className="text-sm"
               />
+              {console.log("order", order?.status === "completed")}
             </Grid>
 
             <Grid item xs={12} md={6}>
@@ -375,7 +371,7 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                   })) || []
                 }
                 required
-                disabled={editQuantity}
+                disabled={order?.status === "completed"}
                 className="text-sm"
               />
             </Grid>
@@ -393,7 +389,7 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                   []
                 }
                 required
-                disabled={editQuantity}
+                disabled={order?.status === "completed"}
                 className="text-sm"
               />
             </Grid>
@@ -407,7 +403,7 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 value={formData.jobName}
                 onChange={handleChange}
                 required
-                disabled={editQuantity}
+                disabled={order?.status === "completed"}
                 className="text-sm"
                 placeholder="Job Name"
               />
@@ -428,7 +424,7 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                   })) || []
                 }
                 required
-                disabled={editQuantity}
+                disabled={order?.status === "completed"}
                 className="text-sm"
               />
             </Grid>
@@ -443,7 +439,7 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 value={formData.bagDetails.printColor}
                 onChange={handleChange}
                 required
-                disabled={editQuantity}
+                disabled={order?.status === "completed"}
                 className="text-sm"
                 placeholder="Print Color"
                 onKeyDown={(e) => {
@@ -462,7 +458,7 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
               <FormSelect
                 name="bagDetails.gsm"
                 value={formData.bagDetails.gsm}
-                disabled={editQuantity}
+                disabled={order?.status === "completed"}
                 onChange={handleChange}
                 options={
                   bagAttributes["gsm"]?.map((v) => ({ label: v, value: v })) ||
@@ -480,7 +476,7 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 name="fabricQuality"
                 value={formData.fabricQuality}
                 onChange={handleChange}
-                disabled={editQuantity}
+                disabled={order?.status === "completed"}
                 options={
                   bagAttributes["fabric-quality"]?.map((v) => ({
                     label: v,
@@ -501,7 +497,7 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 name="quantity"
                 type="number"
                 value={formData.quantity}
-                disabled={editQuantity}
+                disabled={order?.status === "completed"}
                 onChange={handleChange}
                 required
                 className="text-sm"

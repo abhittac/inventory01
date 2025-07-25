@@ -160,7 +160,9 @@ export default function UpdateDetailsDialog({
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" color="primary">
             Update

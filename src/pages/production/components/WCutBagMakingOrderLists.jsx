@@ -254,7 +254,7 @@ export default function WCutBagMakingOrderLists({
               <MenuItem value="3">3</MenuItem>
             </Select>
           </FormControl>
-          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-between" }}>
             <Button
               onClick={() => setUpdateStatusModalOpen(false)}
               sx={{ mr: 1 }}
@@ -286,7 +286,7 @@ export default function WCutBagMakingOrderLists({
             onChange={(e) => setScrapToUpdate(e.target.value)}
             inputProps={{ min: 0 }}
           />
-          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
             <Button
               onClick={() => setUpdateScrapModalOpen(false)}
               sx={{ mr: 1 }}

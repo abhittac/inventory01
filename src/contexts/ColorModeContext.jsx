@@ -29,6 +29,26 @@ export function ColorModeProvider({ children }) {
               },
             },
           },
+          MuiInputBase: {
+            styleOverrides: {
+              root: {
+                "&.Mui-disabled": {
+                  backgroundColor: mode === "dark" ? "#2c2c2c" : "#f5f5f5",
+                },
+              },
+            },
+          },
+          MuiCssBaseline: {
+            styleOverrides:
+              mode === "dark"
+                ? {
+                    "input:disabled, select:disabled, textarea:disabled": {
+                      backgroundColor: "#1f2937", // Tailwind gray-800
+                      cursor: "not-allowed",
+                    },
+                  }
+                : {},
+          },
         },
       }),
     [mode]
