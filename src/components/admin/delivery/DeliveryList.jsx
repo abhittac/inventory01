@@ -24,11 +24,13 @@ import toast from "react-hot-toast";
 import deliveryService from "/src/services/adminService.js"; // Make sure the service is correctly imported
 import { Edit, Delete, Add, Search } from "@mui/icons-material";
 import { formatSnakeCase } from "../../../utils/formatSnakeCase";
+import DeleteConfirmDialog from "../../common/DeleteConfirmDialog";
 export default function DeliveryList() {
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
-
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [filters, setFilters] = useState({ search: "", status: "all" });
 
   const [page, setPage] = useState(0);
@@ -69,7 +71,10 @@ export default function DeliveryList() {
     const d = new Date(date);
     return d.toISOString().split("T")[0]; // 'YYYY-MM-DD'
   };
-
+  const handleDelete = (user) => {
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
   const handleEditClick = (delivery) => {
     setSelectedDelivery(delivery);
     setEditForm({
@@ -130,13 +135,17 @@ export default function DeliveryList() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDeleteRecord = async () => {
     try {
-      await deliveryService.deleteDelivery(id);
+      await deliveryService.deleteDelivery(userToDelete);
+
       toast.success("Delivery deleted successfully");
       fetchDeliveries(); // Refresh the list after deletion
     } catch (error) {
       toast.error("Error deleting delivery");
+    } finally {
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
     }
   };
   const getStatusColor = (status) => {
@@ -333,6 +342,13 @@ export default function DeliveryList() {
           </Button>
         </DialogActions>
       </Dialog>
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDeleteRecord}
+        title="Delete Order"
+        content="Are you sure you want to delete this order? This action cannot be undone."
+      />
     </>
   );
 }
