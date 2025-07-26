@@ -265,22 +265,12 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 Mobile Number <span className="text-red-500">*</span>
               </label>
               <FormInput
-                label=""
+                id="mobileNumber"
                 name="mobileNumber"
-                value={formData.mobileNumber}
-                onChange={handleMobileNumberSearch}
-                onInputChange={(event, newValue) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    mobileNumber: newValue,
-                  }));
-                }}
-                options={mobileNumbers}
-                getOptionLabel={(option) => option}
-                freeSolo
-                placeholder="Search or enter mobile number"
-                fullWidth
                 required
+                value={formData.mobileNumber}
+                onChange={handleChange}
+                placeholder="Enter your mobile number"
               />
             </Grid>
             <Grid item xs={12}>

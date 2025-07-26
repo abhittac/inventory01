@@ -893,7 +893,7 @@ export default function RawMaterials() {
           </Table>
         </TableContainer>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ display: "flex", justifyContent: "space-between" }}>
         <Button onClick={() => setViewSubcategoriesOpen(false)}>Close</Button>
       </DialogActions>
     </Dialog>

@@ -82,17 +82,10 @@ export default function AdminSalesOverview() {
 
   const handleFormSubmit = async (formData) => {
     try {
-      if (selectedOrder) {
-        await adminService.updateSalesOrder(selectedOrder._id, formData);
-        toast.success("Order updated successfully");
-      } else {
-        await adminService.addSalesOrder(formData);
-        toast.success("Order created successfully");
-      }
       setFormOpen(false);
-      fetchOrders();
+      await fetchOrders();
     } catch (error) {
-      toast.error(error.message || "Error updating order");
+      toast.error(error.message);
     }
   };
 

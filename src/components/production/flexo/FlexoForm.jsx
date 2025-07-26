@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,27 +6,27 @@ import {
   DialogActions,
   Button,
   Grid,
-} from '@mui/material';
-import FormInput from '../../common/FormInput';
-import FormSelect from '../../common/FormSelect';
-import { colorOptions } from '../../../constants/colors';
-import { bagTypes } from '../../../constants/productionTypes';
+} from "@mui/material";
+import FormInput from "../../common/FormInput";
+import FormSelect from "../../common/FormSelect";
+import { colorOptions } from "../../../constants/colors";
+import { bagTypes } from "../../../constants/productionTypes";
 
 const initialFormData = {
-  print_color: '',
-  selendor_size: '',
-  role_size: '',
-  quantity: '',
-  weight: '',
-  qnt: '',
-  bag_type: '',
-  handle_color: '',
-  size: '',
-  job_name: '',
-  bag_color: '',
-  gsm: '',
-  fabric_quality: '',
-  status: 'pending'
+  print_color: "",
+  selendor_size: "",
+  role_size: "",
+  quantity: "",
+  weight: "",
+  qnt: "",
+  bag_type: "",
+  handle_color: "",
+  size: "",
+  job_name: "",
+  bag_color: "",
+  gsm: "",
+  fabric_quality: "",
+  status: "pending",
 };
 
 export default function FlexoForm({ open, onClose, onSubmit, record = null }) {
@@ -42,7 +42,7 @@ export default function FlexoForm({ open, onClose, onSubmit, record = null }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -51,29 +51,28 @@ export default function FlexoForm({ open, onClose, onSubmit, record = null }) {
   };
 
   const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'completed', label: 'Completed' }
+    { value: "pending", label: "Pending" },
+    { value: "in_progress", label: "In Progress" },
+    { value: "completed", label: "Completed" },
   ];
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <form onSubmit={handleSubmit}>
         <DialogTitle>
-          {record ? 'Edit Record' : 'Create New Record'}
+          {record ? "Edit Record" : "Create New Record"}
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} md={6}>
-            <FormInput
+              <FormInput
                 label="Order Id"
-                 type='text'
+                type="text"
                 name="order_id"
                 value={formData.order_id}
                 onChange={handleChange}
                 required
               />
-
             </Grid>
             <Grid item xs={12} md={6}>
               <FormInput
@@ -193,7 +192,7 @@ export default function FlexoForm({ open, onClose, onSubmit, record = null }) {
               />
             </Grid>
             <Grid item xs={12} md={6}>
-            <FormSelect
+              <FormSelect
                 label="Print Color"
                 name="print_color"
                 value={formData.print_color}
@@ -201,9 +200,9 @@ export default function FlexoForm({ open, onClose, onSubmit, record = null }) {
                 options={colorOptions}
                 required
               />
-              </Grid>
- <Grid item xs={12} md={6}>
- <FormSelect
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormSelect
                 label="Status"
                 name="status"
                 value={formData.status}
@@ -211,14 +210,15 @@ export default function FlexoForm({ open, onClose, onSubmit, record = null }) {
                 options={statusOptions}
                 required
               />
- </Grid>
-
+            </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" color="primary">
-            {record ? 'Update' : 'Create'}
+            {record ? "Update" : "Create"}
           </Button>
         </DialogActions>
       </form>

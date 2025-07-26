@@ -43,9 +43,10 @@ export default function DeliveryList() {
 
   const getStatusColor = (status) => {
     const colors = {
-      Pending: "warning",
-      "In Transit": "info",
-      Delivered: "success",
+      pending: "warning",
+      in_transit: "info",
+      delivered: "success",
+      done: "success",
     };
     return colors[status] || "default";
   };

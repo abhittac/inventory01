@@ -390,7 +390,9 @@ export default function DeliveryManagement() {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={() => setSelectedDelivery(null)} disabled={saving}>
             Cancel
           </Button>

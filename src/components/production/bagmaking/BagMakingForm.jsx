@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,26 +6,31 @@ import {
   DialogActions,
   Button,
   Grid,
-} from '@mui/material';
-import FormInput from '../../common/FormInput';
-import FormSelect from '../../common/FormSelect';
-import { bagTypes } from '../../../constants/productionTypes';
-import { colorOptions } from '../../../constants/colors';
+} from "@mui/material";
+import FormInput from "../../common/FormInput";
+import FormSelect from "../../common/FormSelect";
+import { bagTypes } from "../../../constants/productionTypes";
+import { colorOptions } from "../../../constants/colors";
 
 const initialFormData = {
-  role_size: '',
-  bag_type: '',
-  bag_color: '',
-  bag_size: '',
-  job_name: '',
-  gsm: '',
-  quantity: '',
-  weight: '',
-  qnt: '',
-  status: 'pending'
+  role_size: "",
+  bag_type: "",
+  bag_color: "",
+  bag_size: "",
+  job_name: "",
+  gsm: "",
+  quantity: "",
+  weight: "",
+  qnt: "",
+  status: "pending",
 };
 
-export default function BagMakingForm({ open, onClose, onSubmit, record = null }) {
+export default function BagMakingForm({
+  open,
+  onClose,
+  onSubmit,
+  record = null,
+}) {
   const [formData, setFormData] = useState(initialFormData);
 
   useEffect(() => {
@@ -40,14 +45,14 @@ export default function BagMakingForm({ open, onClose, onSubmit, record = null }
     const { name, value } = e.target;
 
     // Clear job_name when switching to D-Cut Loop Handle
-    if (name === 'bag_type' && value === 'd-cut-loop-handle') {
-      setFormData(prev => ({
+    if (name === "bag_type" && value === "d-cut-loop-handle") {
+      setFormData((prev) => ({
         ...prev,
         [name]: value,
-        job_name: ''
+        job_name: "",
       }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -57,32 +62,30 @@ export default function BagMakingForm({ open, onClose, onSubmit, record = null }
   };
 
   const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'completed', label: 'Completed' }
+    { value: "pending", label: "Pending" },
+    { value: "in_progress", label: "In Progress" },
+    { value: "completed", label: "Completed" },
   ];
 
-  const showJobName = formData.bag_type !== 'd-cut-loop-handle';
+  const showJobName = formData.bag_type !== "d-cut-loop-handle";
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <form onSubmit={handleSubmit}>
         <DialogTitle>
-          {record ? 'Edit Record' : 'Create New Record'}
+          {record ? "Edit Record" : "Create New Record"}
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} md={6}>
               <FormInput
-                            label="Order Id"
-                             type='text'
-                            name="order_id"
-                            value={formData.order_id}
-                            onChange={handleChange}
-                            required
-                          />
-
-
+                label="Order Id"
+                type="text"
+                name="order_id"
+                value={formData.order_id}
+                onChange={handleChange}
+                required
+              />
             </Grid>
             <Grid item xs={12} md={6}>
               <FormSelect
@@ -177,7 +180,7 @@ export default function BagMakingForm({ open, onClose, onSubmit, record = null }
               />
             </Grid>
             <Grid item xs={12} md={6}>
-            <FormInput
+              <FormInput
                 label="Role Size"
                 name="role_size"
                 value={formData.role_size}
@@ -187,10 +190,12 @@ export default function BagMakingForm({ open, onClose, onSubmit, record = null }
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" color="primary">
-            {record ? 'Update' : 'Create'}
+            {record ? "Update" : "Create"}
           </Button>
         </DialogActions>
       </form>

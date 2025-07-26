@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,23 +6,23 @@ import {
   DialogActions,
   Button,
   Grid,
-} from '@mui/material';
-import FormInput from '../../common/FormInput';
-import FormSelect from '../../common/FormSelect';
-import { colorOptions } from '../../../constants/colors';
-import { bagTypes } from '../../../constants/productionTypes';
-import { printTypes } from '../../../constants/printTypes';
+} from "@mui/material";
+import FormInput from "../../common/FormInput";
+import FormSelect from "../../common/FormSelect";
+import { colorOptions } from "../../../constants/colors";
+import { bagTypes } from "../../../constants/productionTypes";
+import { printTypes } from "../../../constants/printTypes";
 
 const initialFormData = {
-  agent_name: '',
-  bag_type: '',
-  bag_size: '',
-  bag_color: '',
-  print_color: '',
-  quantity: '',
-  qnt: '',
-  print_type: '',
-  status: 'pending'
+  agent_name: "",
+  bag_type: "",
+  bag_size: "",
+  bag_color: "",
+  print_color: "",
+  quantity: "",
+  qnt: "",
+  print_type: "",
+  status: "pending",
 };
 
 export default function OpsertForm({ open, onClose, onSubmit, record = null }) {
@@ -38,7 +38,7 @@ export default function OpsertForm({ open, onClose, onSubmit, record = null }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -47,29 +47,29 @@ export default function OpsertForm({ open, onClose, onSubmit, record = null }) {
   };
 
   const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'completed', label: 'Completed' }
+    { value: "pending", label: "Pending" },
+    { value: "in_progress", label: "In Progress" },
+    { value: "completed", label: "Completed" },
   ];
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <form onSubmit={handleSubmit}>
         <DialogTitle>
-          {record ? 'Edit Record' : 'Create New Record'}
+          {record ? "Edit Record" : "Create New Record"}
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} md={6}>
               <FormInput
-                            label="Order Id"
-                             type='text'
-                            name="order_id"
-                            value={formData.order_id}
-                            onChange={handleChange}
-                            required
-                          />
-</Grid>
+                label="Order Id"
+                type="text"
+                name="order_id"
+                value={formData.order_id}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
 
             <Grid item xs={12} md={6}>
               <FormSelect
@@ -142,7 +142,7 @@ export default function OpsertForm({ open, onClose, onSubmit, record = null }) {
               />
             </Grid>
             <Grid item xs={12} md={6}>
-            <FormInput
+              <FormInput
                 label="Agent Name"
                 name="agent_name"
                 value={formData.agent_name}
@@ -162,10 +162,12 @@ export default function OpsertForm({ open, onClose, onSubmit, record = null }) {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" color="primary">
-            {record ? 'Update' : 'Create'}
+            {record ? "Update" : "Create"}
           </Button>
         </DialogActions>
       </form>

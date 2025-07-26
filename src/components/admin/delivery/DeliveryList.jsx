@@ -6,6 +6,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  Select,
   TableRow,
   Chip,
   TextField,
@@ -19,12 +20,15 @@ import {
   MenuItem,
   TablePagination,
   CircularProgress,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import toast from "react-hot-toast";
 import deliveryService from "/src/services/adminService.js"; // Make sure the service is correctly imported
 import { Edit, Delete, Add, Search } from "@mui/icons-material";
 import { formatSnakeCase } from "../../../utils/formatSnakeCase";
 import DeleteConfirmDialog from "../../common/DeleteConfirmDialog";
+import FormSelect from "../../common/FormSelect";
 export default function DeliveryList() {
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -108,7 +112,11 @@ export default function DeliveryList() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
+  const statusOptions = [
+    { value: "pending", label: "Pending" },
+    { value: "in_transit", label: "In Transit" },
+    { value: "delivered", label: "Delivered" },
+  ];
   const filteredDeliveries = deliveries.filter((delivery) => {
     console.log("delivery is a", delivery);
     const searchLower = filters.search.toLowerCase();
@@ -152,7 +160,7 @@ export default function DeliveryList() {
     const colors = {
       pending: "warning",
       in_transit: "info",
-      done: "success",
+      delivered: "success",
     };
     return colors[status] || "default";
   };
@@ -290,14 +298,6 @@ export default function DeliveryList() {
         <DialogContent>
           <TextField
             fullWidth
-            label="Status"
-            name="status"
-            value={editForm.status}
-            onChange={handleEditFormChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
             label="Delivery Date"
             name="deliveryDate"
             type="date"
@@ -332,8 +332,26 @@ export default function DeliveryList() {
             onChange={handleEditFormChange}
             margin="normal"
           />
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="status-label">Status</InputLabel>
+            <Select
+              labelId="status-label"
+              name="status"
+              value={editForm.status}
+              onChange={handleEditFormChange}
+              label="Status" // required for floating label to work
+            >
+              {statusOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={() => setOpenEditDialog(false)} color="primary">
             Cancel
           </Button>

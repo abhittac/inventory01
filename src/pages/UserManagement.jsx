@@ -358,7 +358,9 @@ export default function UserManagement() {
             helperText={error}
           />
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={handleClosePasswordModal} disabled={loading}>
             Cancel
           </Button>

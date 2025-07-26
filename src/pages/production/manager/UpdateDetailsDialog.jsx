@@ -139,7 +139,7 @@ export default function UpdateDetailsDialog({
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Quantity (in Kgs)"
+                label="Quantity (in Rolls)"
                 name="quantity_rolls"
                 type="number"
                 value={formData.quantity_rolls}

@@ -10,7 +10,7 @@ import {
   Chip,
   Box,
   Stack,
-} from '@mui/material';
+} from "@mui/material";
 export default function DeliveryDetailsModal({ open, delivery, onClose }) {
   if (!delivery || !delivery.data || !delivery.data.data) {
     return null;
@@ -18,16 +18,16 @@ export default function DeliveryDetailsModal({ open, delivery, onClose }) {
 
   const deliveryData = delivery.data.data; // Extract correct data object
 
-  console.log('Delivery data:', deliveryData);
+  console.log("Delivery data:", deliveryData);
 
   const getStatusColor = (status) => {
     const colors = {
-      Pending: 'warning',
-      'In Transit': 'info',
-      Delivered: 'success',
-      Cancelled: 'error',
+      Pending: "warning",
+      "In Transit": "info",
+      Delivered: "success",
+      Cancelled: "error",
     };
-    return colors[status] || 'default';
+    return colors[status] || "default";
   };
 
   return (
@@ -46,7 +46,7 @@ export default function DeliveryDetailsModal({ open, delivery, onClose }) {
                 Customer Name
               </Typography>
               <Typography variant="body1" fontWeight="bold">
-                {deliveryData.customer || 'N/A'}
+                {deliveryData.customer || "N/A"}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -54,7 +54,7 @@ export default function DeliveryDetailsModal({ open, delivery, onClose }) {
                 Contact
               </Typography>
               <Typography variant="body1" fontWeight="bold">
-                {deliveryData.contact || 'N/A'}
+                {deliveryData.contact || "N/A"}
               </Typography>
             </Grid>
           </Grid>
@@ -75,7 +75,7 @@ export default function DeliveryDetailsModal({ open, delivery, onClose }) {
                 Driver Name
               </Typography>
               <Typography variant="body1" fontWeight="bold">
-                {deliveryData.driverName || 'N/A'}
+                {deliveryData.driverName || "N/A"}
               </Typography>
             </Grid>
 
@@ -84,7 +84,7 @@ export default function DeliveryDetailsModal({ open, delivery, onClose }) {
                 Driver Mobile
               </Typography>
               <Typography variant="body1" fontWeight="bold">
-                {deliveryData.driverContact || 'N/A'}
+                {deliveryData.driverContact || "N/A"}
               </Typography>
             </Grid>
 
@@ -93,7 +93,7 @@ export default function DeliveryDetailsModal({ open, delivery, onClose }) {
                 Vehicle Number
               </Typography>
               <Typography variant="body1" fontWeight="bold">
-                {deliveryData.vehicleNo || 'N/A'}
+                {deliveryData.vehicleNo || "N/A"}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -103,7 +103,7 @@ export default function DeliveryDetailsModal({ open, delivery, onClose }) {
               <Typography variant="body1" fontWeight="bold">
                 {deliveryData.deliveryDate
                   ? new Date(deliveryData.deliveryDate).toLocaleDateString()
-                  : 'N/A'}
+                  : "N/A"}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -111,7 +111,7 @@ export default function DeliveryDetailsModal({ open, delivery, onClose }) {
                 Status
               </Typography>
               <Chip
-                label={deliveryData.status || 'Unknown'}
+                label={deliveryData.status || "Unknown"}
                 color={getStatusColor(deliveryData.status)}
                 size="medium"
               />
@@ -121,7 +121,11 @@ export default function DeliveryDetailsModal({ open, delivery, onClose }) {
           {/* Additional Information */}
           {deliveryData.orderId || deliveryData.createdAt ? (
             <Box sx={{ mt: 4 }}>
-              <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+              <Typography
+                variant="subtitle1"
+                color="text.secondary"
+                gutterBottom
+              >
                 Additional Information
               </Typography>
               <Divider sx={{ mb: 2 }} />
@@ -161,7 +165,7 @@ export default function DeliveryDetailsModal({ open, delivery, onClose }) {
           ) : null}
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ display: "flex", justifyContent: "space-between" }}>
         <Button onClick={onClose} variant="outlined">
           Close
         </Button>

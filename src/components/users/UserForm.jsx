@@ -1,34 +1,51 @@
-import { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, FormControl, InputLabel, Select, MenuItem, TextField } from '@mui/material';
-import { registrationTypes } from '../../constants/userTypes';
-import { productionManagerBagTypes, operatorTypesByBag } from '../../constants/productionTypes';
-
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+} from "@mui/material";
+import { registrationTypes } from "../../constants/userTypes";
+import {
+  productionManagerBagTypes,
+  operatorTypesByBag,
+} from "../../constants/productionTypes";
+import { IconButton, InputAdornment } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 const initialFormData = {
-  fullName: '',
-  email: '',
-  mobileNumber: '',
-  password: '',
-  confirmPassword: '',
-  registrationType: '',
-  bagType: '',
-  operatorType: '',
+  fullName: "",
+  email: "",
+  mobileNumber: "",
+  password: "",
+  confirmPassword: "",
+  registrationType: "",
+  bagType: "",
+  operatorType: "",
 };
 
 export default function UserForm({ open, onClose, onSubmit, user = null }) {
   const [formData, setFormData] = useState(initialFormData);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   useEffect(() => {
     if (user && Object.keys(user).length > 0) {
-      console.log("Fetched user data:", user.data.fullName);  // Debug the response
+      console.log("Fetched user data:", user.data.fullName); // Debug the response
       const mappedData = {
-        fullName: user.data.fullName || '',
-        email: user.data.email || '',
-        mobileNumber: user.data.mobileNumber || '',
-        password: '',
-        confirmPassword: '',
-        registrationType: user.data.registrationType || '',
-        bagType: user.data.bagType || '',
-        operatorType: user.data.operatorType || '',
+        fullName: user.data.fullName || "",
+        email: user.data.email || "",
+        mobileNumber: user.data.mobileNumber || "",
+        password: "",
+        confirmPassword: "",
+        registrationType: user.data.registrationType || "",
+        bagType: user.data.bagType || "",
+        operatorType: user.data.operatorType || "",
       };
       setFormData(mappedData);
     } else {
@@ -42,13 +59,13 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
     setFormData((prev) => {
       const newData = { ...prev, [name]: value };
 
-      if (name === 'registrationType') {
-        newData.bagType = ''; // Clear dependent fields
-        newData.operatorType = '';
+      if (name === "registrationType") {
+        newData.bagType = ""; // Clear dependent fields
+        newData.operatorType = "";
       }
 
-      if (name === 'bagType') {
-        newData.operatorType = ''; // Clear dependent fields
+      if (name === "bagType") {
+        newData.operatorType = ""; // Clear dependent fields
       }
 
       return newData;
@@ -59,7 +76,7 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+      alert("Passwords do not match!");
       return;
     }
 
@@ -72,14 +89,16 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
     onSubmit(dataToSubmit);
   };
 
-  const showBagTypeField = formData.registrationType === 'production';
+  const showBagTypeField = formData.registrationType === "production";
   const showOperatorTypeField = showBagTypeField && formData.bagType;
-  const operatorOptions = formData.bagType ? operatorTypesByBag[formData.bagType] : [];
+  const operatorOptions = formData.bagType
+    ? operatorTypesByBag[formData.bagType]
+    : [];
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>{user ? 'Edit User' : 'Add New User'}</DialogTitle>
+        <DialogTitle>{user ? "Edit User" : "Add New User"}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
@@ -122,22 +141,52 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
                   <TextField
                     label="Password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={handleChange}
                     required
                     fullWidth
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
                     label="Confirm Password"
                     name="confirmPassword"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
                     fullWidth
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() =>
+                              setShowConfirmPassword((prev) => !prev)
+                            }
+                            edge="end"
+                          >
+                            {showConfirmPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
               </>
@@ -205,10 +254,12 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
             )}
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" color="primary">
-            {user ? 'Update' : 'Add'} User
+            {user ? "Update" : "Add"} User
           </Button>
         </DialogActions>
       </form>

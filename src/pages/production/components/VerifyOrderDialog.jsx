@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -9,11 +9,16 @@ import {
   TextField,
   Typography,
   Box,
-} from '@mui/material';
-import { Html5QrcodeScanner } from 'html5-qrcode';
-import toast from 'react-hot-toast';
+} from "@mui/material";
+import { Html5QrcodeScanner } from "html5-qrcode";
+import toast from "react-hot-toast";
 
-export default function VerifyOrderDialog({ open, onClose, order, onVerifyComplete }) {
+export default function VerifyOrderDialog({
+  open,
+  onClose,
+  order,
+  onVerifyComplete,
+}) {
   const [scanning, setScanning] = useState(false);
   const [scannedData, setScannedData] = useState(null);
   const scannerRef = useRef(null);
@@ -24,19 +29,19 @@ export default function VerifyOrderDialog({ open, onClose, order, onVerifyComple
       try {
         scannerRef.current.clear().catch(() => {
           // Ignore cleanup errors
-          console.log('Scanner cleanup completed');
+          console.log("Scanner cleanup completed");
         });
         scannerRef.current = null;
       } catch (error) {
         // Ignore any errors during cleanup
-        console.log('Scanner cleanup completed');
+        console.log("Scanner cleanup completed");
       }
     }
   }, [open]);
 
   const startScanning = () => {
     setScanning(true);
-    const qrScanner = new Html5QrcodeScanner('qr-reader', {
+    const qrScanner = new Html5QrcodeScanner("qr-reader", {
       qrbox: {
         width: 250,
         height: 250,
@@ -46,30 +51,33 @@ export default function VerifyOrderDialog({ open, onClose, order, onVerifyComple
 
     scannerRef.current = qrScanner;
 
-    qrScanner.render((decodedText) => {
-      try {
-        const data = JSON.parse(decodedText);
-        // Only keep serializable data
-        const cleanData = {
-          rollSize: data.rollSize || '',
-          gsm: data.gsm || '',
-          fabricColor: data.fabricColor || '',
-          bagType: data.bagType || '',
-          printColor: data.printColor || '',
-          cylinderSize: data.cylinderSize || ''
-        };
-        setScannedData(cleanData);
-        setScanning(false);
-        if (scannerRef.current) {
-          scannerRef.current.clear().catch(console.warn);
+    qrScanner.render(
+      (decodedText) => {
+        try {
+          const data = JSON.parse(decodedText);
+          // Only keep serializable data
+          const cleanData = {
+            rollSize: data.rollSize || "",
+            gsm: data.gsm || "",
+            fabricColor: data.fabricColor || "",
+            bagType: data.bagType || "",
+            printColor: data.printColor || "",
+            cylinderSize: data.cylinderSize || "",
+          };
+          setScannedData(cleanData);
+          setScanning(false);
+          if (scannerRef.current) {
+            scannerRef.current.clear().catch(console.warn);
+          }
+          toast.success("QR Code scanned successfully");
+        } catch (error) {
+          toast.error("Invalid QR Code format");
         }
-        toast.success('QR Code scanned successfully');
-      } catch (error) {
-        toast.error('Invalid QR Code format');
+      },
+      (error) => {
+        console.warn(`QR Code scan error: ${error}`);
       }
-    }, (error) => {
-      console.warn(`QR Code scan error: ${error}`);
-    });
+    );
   };
 
   const handleClose = () => {
@@ -77,12 +85,12 @@ export default function VerifyOrderDialog({ open, onClose, order, onVerifyComple
       try {
         scannerRef.current.clear().catch(() => {
           // Ignore cleanup errors
-          console.log('Scanner cleanup completed');
+          console.log("Scanner cleanup completed");
         });
         scannerRef.current = null;
       } catch (error) {
         // Ignore any errors during cleanup
-        console.log('Scanner cleanup completed');
+        console.log("Scanner cleanup completed");
       }
     }
     setScanning(false);
@@ -106,7 +114,7 @@ export default function VerifyOrderDialog({ open, onClose, order, onVerifyComple
       maxWidth="md"
       fullWidth
       PaperProps={{
-        sx: { minHeight: scanning ? '80vh' : 'auto' }
+        sx: { minHeight: scanning ? "80vh" : "auto" },
       }}
     >
       <DialogTitle>Verify Order - {order.orderId}</DialogTitle>
@@ -136,11 +144,11 @@ export default function VerifyOrderDialog({ open, onClose, order, onVerifyComple
                 <Box
                   id="qr-reader"
                   sx={{
-                    width: '100%',
-                    '& video': {
-                      width: '100% !important',
-                      borderRadius: '8px'
-                    }
+                    width: "100%",
+                    "& video": {
+                      width: "100% !important",
+                      borderRadius: "8px",
+                    },
                   }}
                 />
               </Box>
@@ -156,77 +164,91 @@ export default function VerifyOrderDialog({ open, onClose, order, onVerifyComple
                 <TextField
                   fullWidth
                   label="Roll Size"
-                  value={scannedData?.rollSize || ''}
+                  value={scannedData?.rollSize || ""}
                   disabled
-                  sx={{ backgroundColor: scannedData?.rollSize ? '#e8f5e9' : 'inherit' }}
+                  sx={{
+                    backgroundColor: scannedData?.rollSize
+                      ? "#e8f5e9"
+                      : "inherit",
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="GSM"
-                  value={scannedData?.gsm || ''}
+                  value={scannedData?.gsm || ""}
                   disabled
-                  sx={{ backgroundColor: scannedData?.gsm ? '#e8f5e9' : 'inherit' }}
+                  sx={{
+                    backgroundColor: scannedData?.gsm ? "#e8f5e9" : "inherit",
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Fabric Color"
-                  value={scannedData?.fabricColor || ''}
+                  value={scannedData?.fabricColor || ""}
                   disabled
-                  sx={{ backgroundColor: scannedData?.fabricColor ? '#e8f5e9' : 'inherit' }}
+                  sx={{
+                    backgroundColor: scannedData?.fabricColor
+                      ? "#e8f5e9"
+                      : "inherit",
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Bag Type"
-                  value={scannedData?.bagType || ''}
+                  value={scannedData?.bagType || ""}
                   disabled
-                  sx={{ backgroundColor: scannedData?.bagType ? '#e8f5e9' : 'inherit' }}
+                  sx={{
+                    backgroundColor: scannedData?.bagType
+                      ? "#e8f5e9"
+                      : "inherit",
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Print Color"
-                  value={scannedData?.printColor || ''}
+                  value={scannedData?.printColor || ""}
                   disabled
-                  sx={{ backgroundColor: scannedData?.printColor ? '#e8f5e9' : 'inherit' }}
+                  sx={{
+                    backgroundColor: scannedData?.printColor
+                      ? "#e8f5e9"
+                      : "inherit",
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Cylinder Size"
-                  value={scannedData?.cylinderSize || ''}
+                  value={scannedData?.cylinderSize || ""}
                   disabled
-                  sx={{ backgroundColor: scannedData?.cylinderSize ? '#e8f5e9' : 'inherit' }}
+                  sx={{
+                    backgroundColor: scannedData?.cylinderSize
+                      ? "#e8f5e9"
+                      : "inherit",
+                  }}
                 />
               </Grid>
             </Grid>
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ display: "flex", justifyContent: "space-between" }}>
         <Button onClick={handleClose}>Cancel</Button>
         {!scanning && !scannedData && (
-          <Button
-            variant="contained"
-            onClick={startScanning}
-            color="primary"
-          >
+          <Button variant="contained" onClick={startScanning} color="primary">
             Start Scanner
           </Button>
         )}
         {scannedData && (
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleConfirm}
-          >
+          <Button variant="contained" color="success" onClick={handleConfirm}>
             Confirm & Start Job
           </Button>
         )}

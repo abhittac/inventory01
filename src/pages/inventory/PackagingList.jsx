@@ -187,7 +187,9 @@ export default function PackagingList() {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={() => setSelectedPackage(null)}>Cancel</Button>
           <Button variant="contained" startIcon={<Save />} onClick={handleSave}>
             Save Changes

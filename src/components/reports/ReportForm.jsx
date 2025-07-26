@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,17 +6,17 @@ import {
   DialogActions,
   Button,
   Grid,
-} from '@mui/material';
-import FormInput from '../common/FormInput';
-import FormSelect from '../common/FormSelect';
-import FormTextarea from '../common/FormTextarea';
+} from "@mui/material";
+import FormInput from "../common/FormInput";
+import FormSelect from "../common/FormSelect";
+import FormTextarea from "../common/FormTextarea";
 
 const initialFormData = {
-  title: '',
-  type: 'sales',
-  description: '',
-  dateRange: '',
-  status: 'draft',
+  title: "",
+  type: "sales",
+  description: "",
+  dateRange: "",
+  status: "draft",
 };
 
 export default function ReportForm({ open, onClose, onSubmit, report = null }) {
@@ -32,7 +32,7 @@ export default function ReportForm({ open, onClose, onSubmit, report = null }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -40,15 +40,13 @@ export default function ReportForm({ open, onClose, onSubmit, report = null }) {
     onSubmit(formData);
   };
 
-  const reportTypes = [
-    { value: 'sales', label: 'Sales Report' },
-  ];
+  const reportTypes = [{ value: "sales", label: "Sales Report" }];
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
         <DialogTitle>
-          {report ? 'Edit Report' : 'Create New Report'}
+          {report ? "Edit Report" : "Create New Report"}
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -95,10 +93,12 @@ export default function ReportForm({ open, onClose, onSubmit, report = null }) {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" color="primary">
-            {report ? 'Update' : 'Create'} Report
+            {report ? "Update" : "Create"} Report
           </Button>
         </DialogActions>
       </form>

@@ -268,7 +268,9 @@ export default function SizePage() {
             <MenuItem value="inactive">Inactive</MenuItem>
           </TextField>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={() => setFormOpen(false)} color="inherit">
             Cancel
           </Button>

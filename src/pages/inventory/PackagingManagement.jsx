@@ -747,7 +747,9 @@ export default function PackagingManagement() {
             </Table>
           </TableContainer>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={() => setPackageListOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
@@ -838,7 +840,9 @@ export default function PackagingManagement() {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={handleCloseDialog}>Cancel</Button>
           <Button variant="contained" onClick={createPackages}>
             Add Package
@@ -897,7 +901,9 @@ export default function PackagingManagement() {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={() => setEditPackageOpen(false)}>Cancel</Button>
           <Button variant="contained" onClick={handleUpdatePackage}>
             Update Package
@@ -1070,7 +1076,9 @@ export default function PackagingManagement() {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={handleCancel}>Cancel</Button>
           <Button variant="contained" onClick={handleSavePackages}>
             Save Packages
