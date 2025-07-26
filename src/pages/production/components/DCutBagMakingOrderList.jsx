@@ -23,6 +23,7 @@ import {
   Grid,
   TextField,
   CircularProgress,
+  Tooltip,
 } from "@mui/material";
 
 import {
@@ -372,24 +373,27 @@ export default function BagMakingOrderList({ status = "pending", bagType }) {
       if (order.dcutbagmakingDetails[0].status === "completed") {
         return (
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Button
-              startIcon={<Receipt />}
-              variant="contained"
-              color="secondary"
-              size="small"
-              onClick={() => handleOpenScrapModal(order, "billing")}
-            >
-              Direct Billing
-            </Button>
-            <Button
-              startIcon={<LocalShipping />}
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => handleOpenScrapModal(order, "opsert")}
-            >
-              Move to Offset
-            </Button>
+            <Tooltip title="Direct Billing" arrow>
+              <Button
+                variant="contained"
+                color="secondary"
+                size="small"
+                onClick={() => handleOpenScrapModal(order, "billing")}
+              >
+                <Receipt />
+              </Button>
+            </Tooltip>
+
+            <Tooltip title="Move to Offset" arrow>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={() => handleOpenScrapModal(order, "opsert")}
+              >
+                <LocalShipping />
+              </Button>
+            </Tooltip>
           </Box>
         );
       }
@@ -654,7 +658,7 @@ export default function BagMakingOrderList({ status = "pending", bagType }) {
               <MenuItem value="3">3</MenuItem>
             </Select>
           </FormControl>
-          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
             <Button
               onClick={() => setUpdateStatusModalOpen(false)}
               sx={{ mr: 1 }}
@@ -693,7 +697,7 @@ export default function BagMakingOrderList({ status = "pending", bagType }) {
             onChange={(e) => setScrapToUpdate(e.target.value)}
             inputProps={{ min: 0 }}
           />
-          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
             <Button
               onClick={() => setUpdateScrapModalOpen(false)}
               sx={{ mr: 1 }}

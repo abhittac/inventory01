@@ -224,7 +224,9 @@ export default function OpsertOrderList({
               </Select>
             </FormControl>
 
-            <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+            <Box
+              sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}
+            >
               <Button
                 onClick={() => setUpdateStatusModalOpen(false)}
                 sx={{ mr: 1 }}

@@ -28,6 +28,7 @@ const initialFormData = {
   registrationType: "",
   bagType: "",
   operatorType: "",
+  status: "active", // Default status
 };
 
 export default function UserForm({ open, onClose, onSubmit, user = null }) {
@@ -46,6 +47,7 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
         registrationType: user.data.registrationType || "",
         bagType: user.data.bagType || "",
         operatorType: user.data.operatorType || "",
+        status: user.data.status || "active", // Default to active if not provided
       };
       setFormData(mappedData);
     } else {
@@ -111,7 +113,6 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
                 fullWidth
               />
             </Grid>
-
             <Grid item xs={12}>
               <TextField
                 label="Email"
@@ -123,7 +124,6 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
                 fullWidth
               />
             </Grid>
-
             <Grid item xs={12}>
               <TextField
                 label="Mobile Number"
@@ -134,7 +134,6 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
                 fullWidth
               />
             </Grid>
-
             {!user && (
               <>
                 <Grid item xs={12}>
@@ -191,7 +190,6 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
                 </Grid>
               </>
             )}
-
             <Grid item xs={12}>
               <FormControl fullWidth>
                 <InputLabel>Registration Type</InputLabel>
@@ -210,7 +208,6 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
                 </Select>
               </FormControl>
             </Grid>
-
             {showBagTypeField && (
               <Grid item xs={12}>
                 <FormControl fullWidth>
@@ -231,7 +228,6 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
                 </FormControl>
               </Grid>
             )}
-
             {showOperatorTypeField && (
               <Grid item xs={12}>
                 <FormControl fullWidth>
@@ -248,6 +244,22 @@ export default function UserForm({ open, onClose, onSubmit, user = null }) {
                         {type.label}
                       </MenuItem>
                     ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            )}
+            {user && (
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel>Status </InputLabel>
+                  <Select
+                    label="Status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                  >
+                    <MenuItem value="active">Active</MenuItem>
+                    <MenuItem value="inactive">Inactive</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

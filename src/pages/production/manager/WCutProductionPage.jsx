@@ -25,6 +25,7 @@ import UpdateDetailsDialog from "./UpdateDetailsDialog";
 import FullDetailsDialog from "./FullDetailsDialog";
 import orderService from "/src/services/productionManagerService.js";
 import { formatSnakeCase } from "../../../utils/formatSnakeCase";
+import formatDate from "../../../utils/formatDate";
 
 export default function WCutProductionPage() {
   function ProductionTable({ type }) {
@@ -161,6 +162,8 @@ export default function WCutProductionPage() {
                     <TableCell>Bag Color</TableCell>
                     <TableCell>Fabric Quality</TableCell>
                     <TableCell>Production Status</TableCell>
+                    <TableCell>Created At</TableCell>
+                    <TableCell>Updated At</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -236,6 +239,16 @@ export default function WCutProductionPage() {
                               }
                               size="small"
                             />
+                          </TableCell>
+                          <TableCell>
+                            {record.createdAt
+                              ? formatDate(record.createdAt)
+                              : "N/A"}
+                          </TableCell>
+                          <TableCell>
+                            {record.updatedAt
+                              ? formatDate(record.updatedAt)
+                              : "N/A"}
                           </TableCell>
                           <TableCell>
                             <IconButton

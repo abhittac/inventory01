@@ -23,6 +23,7 @@ import orderService from "/src/services/productionManagerService.js";
 import UpdateDetailsDialog from "./UpdateDetailsDialog";
 import FullDetailsDialog from "./FullDetailsDialog";
 import { formatSnakeCase } from "../../../utils/formatSnakeCase";
+import formatDate from "../../../utils/formatDate";
 
 export default function DCutProductionPage() {
   function ProductionTable({ type }) {
@@ -176,6 +177,8 @@ export default function DCutProductionPage() {
                   <TableCell>Quantity</TableCell>
                   <TableCell>Bag Color</TableCell>
                   <TableCell>Production Status</TableCell>
+                  <TableCell>Created At</TableCell>
+                  <TableCell>Updated At</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -233,6 +236,16 @@ export default function DCutProductionPage() {
                             }
                             size="small"
                           />
+                        </TableCell>
+                        <TableCell>
+                          {record.createdAt
+                            ? formatDate(record.createdAt)
+                            : "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          {record.updatedAt
+                            ? formatDate(record.updatedAt)
+                            : "N/A"}
                         </TableCell>
                         <TableCell>
                           <IconButton

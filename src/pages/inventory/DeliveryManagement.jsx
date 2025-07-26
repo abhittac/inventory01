@@ -383,7 +383,7 @@ export default function DeliveryManagement() {
                 >
                   <MenuItem value="pending">Pending</MenuItem>
                   <MenuItem value="in_transit">In Transit</MenuItem>
-                  <MenuItem value="delivered">Delivered</MenuItem>
+                  {/* <MenuItem value="delivered">Delivered</MenuItem> */}
                   <MenuItem value="cancelled">Cancelled</MenuItem>
                 </Select>
               </FormControl>

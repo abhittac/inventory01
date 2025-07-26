@@ -23,6 +23,7 @@ import {
   TextField,
   TablePagination,
   CircularProgress,
+  Tooltip,
 } from "@mui/material";
 import {
   QrCodeScanner,
@@ -309,24 +310,27 @@ export default function FlexoOrderList({ status = "pending", bagType }) {
       if (order.flexoDetails[0].status === "completed") {
         return (
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Button
-              startIcon={<Receipt />}
-              variant="contained"
-              color="secondary"
-              size="small"
-              onClick={() => handleBillingClick(order)}
-            >
-              Direct Billing
-            </Button>
-            <Button
-              startIcon={<LocalShipping />}
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => handleMoveToBagMaking(order.orderId)}
-            >
-              Move to Bag Making
-            </Button>
+            <Tooltip title="Direct Billing" arrow>
+              <Button
+                variant="contained"
+                color="secondary"
+                size="small"
+                onClick={() => handleBillingClick(order)}
+              >
+                <Receipt />
+              </Button>
+            </Tooltip>
+
+            <Tooltip title="Move to Bag Making" arrow>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={() => handleMoveToBagMaking(order.orderId)}
+              >
+                <LocalShipping />
+              </Button>
+            </Tooltip>
           </Box>
         );
       }
@@ -577,7 +581,7 @@ export default function FlexoOrderList({ status = "pending", bagType }) {
               <MenuItem value="2">2</MenuItem>
             </Select>
           </FormControl>
-          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
             <Button
               onClick={() => setUpdateStatusModalOpen(false)}
               sx={{ mr: 1 }}

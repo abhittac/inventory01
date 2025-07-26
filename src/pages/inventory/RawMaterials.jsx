@@ -1076,7 +1076,7 @@ export default function RawMaterials() {
               />
             </Grid>
           </FormControl>
-          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
             <Button
               onClick={() => setUpdateQuantityModalOpen(false)}
               sx={{ mr: 1 }}
