@@ -260,17 +260,31 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 placeholder="Enter customer name"
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6}>
               <label className="text-sm">
                 Mobile Number <span className="text-red-500">*</span>
               </label>
-              <FormInput
-                id="mobileNumber"
-                name="mobileNumber"
-                required
+              <Autocomplete
                 value={formData.mobileNumber}
-                onChange={handleChange}
-                placeholder="Enter your mobile number"
+                onChange={handleMobileNumberSearch}
+                onInputChange={(event, newValue) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    mobileNumber: newValue,
+                  }));
+                }}
+                options={mobileNumbers}
+                getOptionLabel={(option) => option}
+                freeSolo
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search or enter mobile number"
+                    variant="outlined"
+                    fullWidth
+                    required
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12}>
@@ -291,7 +305,6 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
             <Grid item xs={12} md={6}>
               <label className="text-sm">
                 Email
-                <span className="text-red-500">*</span>
               </label>
               <FormInput
                 name="email"
@@ -348,7 +361,7 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
 
             <Grid item xs={12} md={6}>
               <label className="text-sm">
-                Handle Color <span className="text-red-500">*</span>
+                Handle Color 
               </label>
               <FormSelect
                 name="bagDetails.handleColor"
@@ -360,7 +373,6 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                     value: v,
                   })) || []
                 }
-                required
                 disabled={order?.status === "completed"}
                 className="text-sm"
               />

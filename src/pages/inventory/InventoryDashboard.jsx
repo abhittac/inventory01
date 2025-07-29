@@ -28,6 +28,7 @@ export default function InventoryDashboard() {
   const fetchOrders = async () => {
     try {
       const response = await purchaseOrderService.getOrders();
+      console.log('---------------------',response.data);
       setOrders(response.data);
       // Calculate total stock value
       const totalValue = response.data.reduce((acc, order) => acc + order.totalAmount, 0);
@@ -49,7 +50,7 @@ export default function InventoryDashboard() {
       const sortedData = Object.values(monthlyData).sort((a, b) =>
         new Date(`1 ${a.name} 2024`) - new Date(`1 ${b.name} 2024`)
       );
-
+      console.log('response.data',response.data);
       setChartData(sortedData);
 
     } catch (error) {
