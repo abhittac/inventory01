@@ -39,7 +39,7 @@ import DeliveryDashboard from "./pages/delivery/DeliveryDashboard";
 import DeliveryList from "./pages/delivery/DeliveryList";
 import WcutBagMakingReportsPage from "./pages/production/reports/WcutBagMakingReportsPage";
 import DcutBagMakingReportsPage from "./pages/production/reports/DcutBagMakingReportsPage";
-import "./App.css";
+import "./app.css";
 export default function App() {
   return (
     <>
