@@ -403,6 +403,7 @@ export default function FlexoOrderList({ status = "pending", bagType }) {
                     <TableCell>Fabric Color</TableCell>
                     <TableCell>Roll Size</TableCell>
                     <TableCell>Quantity</TableCell>
+                    <TableCell>Status</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -434,17 +435,24 @@ export default function FlexoOrderList({ status = "pending", bagType }) {
                         </TableCell>
                         <TableCell>{material.quantity}</TableCell>
                         <TableCell>
-                          <Button
+                          <Chip
+                            label={material.status}
+                            color={material.status === 'inactive' ? 'default' : 'success'}
                             variant="outlined"
-                            color="primary"
                             size="small"
-                            onClick={() =>
-                              handleVerifyOrder(selectedOrderId, material._id)
-                            }
-                          >
-                            Scanner
-                          </Button>
+                          />
                         </TableCell>
+                      <TableCell>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        onClick={() => handleVerifyOrder(selectedOrderId, material._id)}
+                        disabled={material.status === 'inactive'} // Disable if inactive
+                      >
+                        Scanner
+                      </Button>
+                    </TableCell>
                       </TableRow>
                     ))
                   )}

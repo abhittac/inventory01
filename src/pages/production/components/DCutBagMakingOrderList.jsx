@@ -487,6 +487,7 @@ export default function BagMakingOrderList({ status = "pending", bagType }) {
                     <TableCell>Fabric Color</TableCell>
                     <TableCell>Roll Size</TableCell>
                     <TableCell>Quantity(Kg)</TableCell>
+                     <TableCell>Status</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -519,14 +520,21 @@ export default function BagMakingOrderList({ status = "pending", bagType }) {
                           {formatSnakeCase(material.rollSize)}
                         </TableCell>
                         <TableCell>{material.quantity}</TableCell>
+                         <TableCell>
+                            <Chip
+                              label={material.status}
+                              color={material.status === 'inactive' ? 'default' : 'success'}
+                              variant="outlined"
+                              size="small"
+                            />
+                          </TableCell>
                         <TableCell>
                           <Button
                             variant="outlined"
                             color="primary"
                             size="small"
-                            onClick={() =>
-                              handleVerifyOrder(selectedOrderId, material._id)
-                            }
+                            onClick={() => handleVerifyOrder(selectedOrderId, material._id)}
+                             disabled={material.status === 'inactive'} // Disable if inactive
                           >
                             Scanner
                           </Button>
