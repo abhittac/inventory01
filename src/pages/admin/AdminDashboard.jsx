@@ -7,6 +7,7 @@ import RecentOrders from "../../components/sales/dashboard/RecentOrders";
 import DeliveryList from "../../components/admin/RecentDelivery";
 
 import adminService from "../../services/adminService";
+import Loader from "../../utils/Loader";
 
 export default function AdminDashboard() {
   const [dashboardData, setDashboardData] = useState(null);
@@ -28,7 +29,7 @@ export default function AdminDashboard() {
   }, []);
 
   if (error) return <p>Error: {error}</p>;
-  if (!dashboardData) return <p>Loading...</p>;
+  if (!dashboardData) return <Loader />;
 
   return (
     <Grid container spacing={3}>

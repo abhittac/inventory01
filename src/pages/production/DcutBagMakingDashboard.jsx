@@ -1,19 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Box, Card, Button, Typography, Grid, Divider } from '@mui/material';
-import { Dashboard, Assessment } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { useColorMode } from '../../contexts/ColorModeContext';
-import DCutBagMakingOrderList from './components/DCutBagMakingOrderList';
-import OrderService from '../../services/dcutBagMakingService';
+import { useState, useEffect } from "react";
+import { Box, Card, Button, Typography, Grid, Divider } from "@mui/material";
+import { Dashboard, Assessment } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { useColorMode } from "../../contexts/ColorModeContext";
+import DCutBagMakingOrderList from "./components/DCutBagMakingOrderList";
+import OrderService from "../../services/dcutBagMakingService";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 export default function DcutBagMakingDashboard({ type }) {
   const navigate = useNavigate();
   const { toggleColorMode } = useColorMode();
-  const [activeStatus, setActiveStatus] = useState('pending');
+  const [activeStatus, setActiveStatus] = useState("pending");
   const [orders, setOrders] = useState([]);
   const [noOrdersFound, setNoOrdersFound] = useState(false);
 
-  const bagType = type === 'wcut' ? 'w_cut_bagmaking' : 'd_cut_bagmaking';
+  const bagType = type === "wcut" ? "w_cut_bagmaking" : "d_cut_bagmaking";
   const basePath = `/production/${type}/bagmaking`;
 
   const fetchOrders = (status) => {
@@ -48,7 +49,7 @@ export default function DcutBagMakingDashboard({ type }) {
               fullWidth
               startIcon={<Dashboard />}
               onClick={() => navigate(`${basePath}/dashboard`)}
-              sx={{ height: '60px' }}
+              sx={{ height: "60px" }}
             >
               Dashboard
             </Button>
@@ -59,7 +60,7 @@ export default function DcutBagMakingDashboard({ type }) {
               fullWidth
               startIcon={<Assessment />}
               onClick={() => navigate(`${basePath}/reports`)}
-              sx={{ height: '60px' }}
+              sx={{ height: "60px" }}
             >
               Reports
             </Button>
@@ -73,21 +74,26 @@ export default function DcutBagMakingDashboard({ type }) {
             </Typography>
             <Divider sx={{ mb: 2 }} />
             <Grid container spacing={2}>
-              {['pending', 'in_progress', 'completed'].map((status) => (
+              {["pending", "in_progress", "completed"].map((status) => (
                 <Grid item xs={4} key={status}>
                   <Button
-                    variant={activeStatus === status ? 'contained' : 'outlined'}
+                    variant={activeStatus === status ? "contained" : "outlined"}
                     onClick={() => setActiveStatus(status)}
                     fullWidth
                   >
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                    {formatSnakeCase(status)}
                   </Button>
                 </Grid>
               ))}
             </Grid>
           </Box>
         </Card>
-        <DCutBagMakingOrderList orders={orders} status={activeStatus} noOrdersFound={noOrdersFound} bagType={bagType} />
+        <DCutBagMakingOrderList
+          orders={orders}
+          status={activeStatus}
+          noOrdersFound={noOrdersFound}
+          bagType={bagType}
+        />
       </Box>
     </Box>
   );

@@ -1,30 +1,33 @@
-import { Breadcrumbs as MuiBreadcrumbs, Link, Typography } from '@mui/material';
-import { useLocation } from 'react-router-dom';
-import { NavigateNext } from '@mui/icons-material';
+import { Breadcrumbs as MuiBreadcrumbs, Link, Typography } from "@mui/material";
+import { NavigateNext } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
-export default function Breadcrumbs() {
-  const location = useLocation();
-  const pathnames = location.pathname.split('/').filter((x) => x);
+export default function Breadcrumbs({ items }) {
+  const navigate = useNavigate();
 
   return (
     <MuiBreadcrumbs
       separator={<NavigateNext fontSize="small" />}
       sx={{ mb: 3, mt: 1 }}
     >
-      <Link color="inherit" href="/admin">
-        Home
-      </Link>
-      {pathnames.map((name, index) => {
-        const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
-        const isLast = index === pathnames.length - 1;
-
-        return isLast ? (
-          <Typography key={name} color="text.primary">
-            {name.charAt(0).toUpperCase() + name.slice(1)}
-          </Typography>
-        ) : (
-          <Link key={name} color="inherit" href={routeTo}>
-            {name.charAt(0).toUpperCase() + name.slice(1)}
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1;
+        if (isLast || !item.path) {
+          return (
+            <Typography key={index} color="text.primary">
+              {item.title}
+            </Typography>
+          );
+        }
+        return (
+          <Link
+            key={index}
+            color="inherit"
+            underline="none"
+            onClick={() => navigate(item.path)}
+            sx={{ cursor: "pointer" }}
+          >
+            {item.title}
           </Link>
         );
       })}

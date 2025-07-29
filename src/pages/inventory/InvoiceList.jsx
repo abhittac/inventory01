@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Card,
   Table,
@@ -16,43 +16,43 @@ import {
   DialogContent,
   DialogActions,
   Button,
-} from '@mui/material';
-import { PictureAsPdf, Print, Visibility } from '@mui/icons-material';
-import { generateInvoicePDF } from '../../utils/pdfGenerator';
-import toast from 'react-hot-toast';
+} from "@mui/material";
+import { PictureAsPdf, Print, Visibility } from "@mui/icons-material";
+import { generateInvoicePDF } from "../../utils/pdfGenerator";
+import toast from "react-hot-toast";
 
 // Mock data with proper structure for PDF generation
 const mockInvoices = [
   {
-    id: 'INV-001',
-    orderId: 'ORD-001',
-    customerName: 'John Doe',
-    email: 'john@example.com',
-    phone: '+1234567890',
-    address: '123 Main St, City, State 12345',
-    date: '2024-02-20',
-    dueDate: '2024-03-20',
-    gstNumber: 'GST123456789',
-    jobName: 'Premium Shopping Bags',
+    id: "INV-001",
+    orderId: "ORD-001",
+    customerName: "John Doe",
+    email: "john@example.com",
+    phone: "+1234567890",
+    address: "123 Main St, City, State 12345",
+    date: "2024-02-20",
+    dueDate: "2024-03-20",
+    gstNumber: "GST123456789",
+    jobName: "Premium Shopping Bags",
     quantity: 1000,
     unitPrice: 15,
-    status: 'pending'
+    status: "pending",
   },
   {
-    id: 'INV-002',
-    orderId: 'ORD-002',
-    customerName: 'Jane Smith',
-    email: 'jane@example.com',
-    phone: '+0987654321',
-    address: '456 Oak Ave, Town, State 67890',
-    date: '2024-02-19',
-    dueDate: '2024-03-19',
-    gstNumber: 'GST987654321',
-    jobName: 'Eco Friendly Bags',
+    id: "INV-002",
+    orderId: "ORD-002",
+    customerName: "Jane Smith",
+    email: "jane@example.com",
+    phone: "+0987654321",
+    address: "456 Oak Ave, Town, State 67890",
+    date: "2024-02-19",
+    dueDate: "2024-03-19",
+    gstNumber: "GST987654321",
+    jobName: "Eco Friendly Bags",
     quantity: 2000,
     unitPrice: 12.5,
-    status: 'paid'
-  }
+    status: "paid",
+  },
 ];
 
 export default function InvoiceList() {
@@ -80,21 +80,23 @@ export default function InvoiceList() {
         date: invoice.date,
         dueDate: invoice.dueDate,
         gstNumber: invoice.gstNumber,
-        items: [{
-          name: invoice.jobName,
-          quantity: invoice.quantity,
-          unitPrice: invoice.unitPrice
-        }],
+        items: [
+          {
+            name: invoice.jobName,
+            quantity: invoice.quantity,
+            unitPrice: invoice.unitPrice,
+          },
+        ],
         subtotal,
         gst,
-        total
+        total,
       };
 
       generateInvoicePDF(invoiceData);
-      toast.success('Invoice downloaded successfully');
+      toast.success("Invoice downloaded successfully");
     } catch (error) {
-      console.error('Error downloading invoice:', error);
-      toast.error('Failed to download invoice');
+      console.error("Error downloading invoice:", error);
+      toast.error("Failed to download invoice");
     }
   };
 
@@ -104,7 +106,7 @@ export default function InvoiceList() {
   };
 
   const handlePrintConfirm = () => {
-    const printContent = document.getElementById('printable-invoice');
+    const printContent = document.getElementById("printable-invoice");
     const originalContents = document.body.innerHTML;
 
     document.body.innerHTML = printContent.innerHTML;
@@ -124,58 +126,121 @@ export default function InvoiceList() {
     const { subtotal, gst, total } = calculateTotals(invoice);
 
     return (
-      <div id="printable-invoice" style={{ padding: '20px', fontFamily: 'Arial' }}>
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <h2 style={{ margin: '0' }}>Thailiwale</h2>
-          <p style={{ margin: '5px 0' }}>201/1/4, SR Compound, Dewas Naka, Lasudia Mori, Indore, Madhya Pradesh 452016</p>
-          <p style={{ margin: '5px 0' }}>Phone: +91 7999857050 | Email: info@thailiwale.com</p>
+      <div
+        id="printable-invoice"
+        style={{ padding: "20px", fontFamily: "Arial" }}
+      >
+        <div style={{ textAlign: "center", marginBottom: "20px" }}>
+          <h2 style={{ margin: "0" }}>Thailiwale</h2>
+          <p style={{ margin: "5px 0" }}>
+            201/1/4, SR Compound, Dewas Naka, Lasudia Mori, Indore, Madhya
+            Pradesh 452016
+          </p>
+          <p style={{ margin: "5px 0" }}>
+            Phone: +91 7999857050 | Email: info@thailiwale.com
+          </p>
         </div>
 
-        <h3 style={{ textAlign: 'center', marginBottom: '20px' }}>INVOICE</h3>
+        <h3 style={{ textAlign: "center", marginBottom: "20px" }}>INVOICE</h3>
 
-        <div style={{ marginBottom: '20px' }}>
-          <div style={{ float: 'left' }}>
-            <strong>Bill To:</strong><br />
-            {invoice.customerName}<br />
-            {invoice.address}<br />
-            Phone: {invoice.phone}<br />
+        <div style={{ marginBottom: "20px" }}>
+          <div style={{ float: "left" }}>
+            <strong>Bill To:</strong>
+            <br />
+            {invoice.customerName}
+            <br />
+            {invoice.address}
+            <br />
+            Phone: {invoice.phone}
+            <br />
             Email: {invoice.email}
           </div>
-          <div style={{ float: 'right' }}>
-            <strong>Invoice Number:</strong> {invoice.id}<br />
-            <strong>Date:</strong> {invoice.date}<br />
-            <strong>Due Date:</strong> {invoice.dueDate}<br />
+          <div style={{ float: "right" }}>
+            <strong>Invoice Number:</strong> {invoice.id}
+            <br />
+            <strong>Date:</strong> {invoice.date}
+            <br />
+            <strong>Due Date:</strong> {invoice.dueDate}
+            <br />
             <strong>GST Number:</strong> {invoice.gstNumber}
           </div>
-          <div style={{ clear: 'both' }}></div>
+          <div style={{ clear: "both" }}></div>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            marginBottom: "20px",
+          }}
+        >
           <thead>
-            <tr style={{ backgroundColor: '#f0f0f0' }}>
-              <th style={{ border: '1px solid #ddd', padding: '8px' }}>Description</th>
-              <th style={{ border: '1px solid #ddd', padding: '8px' }}>Quantity</th>
-              <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit Price</th>
-              <th style={{ border: '1px solid #ddd', padding: '8px' }}>Amount</th>
+            <tr style={{ backgroundColor: "#f0f0f0" }}>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Description
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Quantity
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Unit Price
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Amount
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td style={{ border: '1px solid #ddd', padding: '8px' }}>{invoice.jobName}</td>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>{invoice.quantity}</td>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>₹{invoice.unitPrice}</td>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>₹{subtotal.toFixed(2)}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                {invoice.jobName}
+              </td>
+              <td
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "8px",
+                  textAlign: "center",
+                }}
+              >
+                {invoice.quantity}
+              </td>
+              <td
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "8px",
+                  textAlign: "right",
+                }}
+              >
+                ₹{invoice.unitPrice}
+              </td>
+              <td
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "8px",
+                  textAlign: "right",
+                }}
+              >
+                ₹{subtotal.toFixed(2)}
+              </td>
             </tr>
           </tbody>
         </table>
 
-        <div style={{ textAlign: 'right', marginBottom: '20px' }}>
-          <p style={{ margin: '5px 0' }}><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
-          <p style={{ margin: '5px 0' }}><strong>GST (18%):</strong> ₹{gst.toFixed(2)}</p>
-          <p style={{ margin: '5px 0', fontSize: '1.2em' }}><strong>Total:</strong> ₹{total.toFixed(2)}</p>
+        <div style={{ textAlign: "right", marginBottom: "20px" }}>
+          <p style={{ margin: "5px 0" }}>
+            <strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}
+          </p>
+          <p style={{ margin: "5px 0" }}>
+            <strong>GST (18%):</strong> ₹{gst.toFixed(2)}
+          </p>
+          <p style={{ margin: "5px 0", fontSize: "1.2em" }}>
+            <strong>Total:</strong> ₹{total.toFixed(2)}
+          </p>
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: '40px', fontSize: '0.8em' }}>
+        <div
+          style={{ textAlign: "center", marginTop: "40px", fontSize: "0.8em" }}
+        >
           <p>Thank you for your business!</p>
           <p>Terms & Conditions Apply</p>
         </div>
@@ -187,7 +252,9 @@ export default function InvoiceList() {
     <>
       <Card>
         <Box sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>Invoices</Typography>
+          <Typography variant="h6" gutterBottom>
+            Invoices
+          </Typography>
           <TableContainer>
             <Table>
               <TableHead>
@@ -214,7 +281,9 @@ export default function InvoiceList() {
                       <TableCell>
                         <Chip
                           label={invoice.status.toUpperCase()}
-                          color={invoice.status === 'paid' ? 'success' : 'warning'}
+                          color={
+                            invoice.status === "paid" ? "success" : "warning"
+                          }
                           size="small"
                         />
                       </TableCell>
@@ -261,7 +330,9 @@ export default function InvoiceList() {
         <DialogContent>
           {selectedInvoice && <PrintableInvoice invoice={selectedInvoice} />}
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={() => setPreviewOpen(false)}>Close</Button>
           <Button
             variant="contained"
@@ -281,18 +352,20 @@ export default function InvoiceList() {
       </Dialog>
 
       {/* Print Dialog */}
-      <Dialog
-        open={printDialogOpen}
-        onClose={() => setPrintDialogOpen(false)}
-      >
+      <Dialog open={printDialogOpen} onClose={() => setPrintDialogOpen(false)}>
         <DialogTitle>Print Invoice</DialogTitle>
         <DialogContent>
-          <Typography>
-            Are you sure you want to print this invoice?
-          </Typography>
-          {selectedInvoice && <PrintableInvoice invoice={selectedInvoice} style={{ display: 'none' }} />}
+          <Typography>Are you sure you want to print this invoice?</Typography>
+          {selectedInvoice && (
+            <PrintableInvoice
+              invoice={selectedInvoice}
+              style={{ display: "none" }}
+            />
+          )}
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={() => setPrintDialogOpen(false)}>Cancel</Button>
           <Button
             variant="contained"

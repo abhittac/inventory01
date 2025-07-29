@@ -5,14 +5,14 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-} from '@mui/material';
+} from "@mui/material";
 
-export default function DeleteConfirmDialog({ 
-  open, 
-  onClose, 
-  onConfirm, 
-  title, 
-  content 
+export default function DeleteConfirmDialog({
+  open,
+  onClose,
+  onConfirm,
+  title,
+  content,
 }) {
   return (
     <Dialog open={open} onClose={onClose}>
@@ -20,8 +20,10 @@ export default function DeleteConfirmDialog({
       <DialogContent>
         <DialogContentText>{content}</DialogContentText>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary">Cancel</Button>
+      <DialogActions sx={{ justifyContent: "space-between" }}>
+        <Button onClick={onClose} color="primary">
+          Cancel
+        </Button>
         <Button onClick={onConfirm} color="error" variant="contained">
           Delete
         </Button>

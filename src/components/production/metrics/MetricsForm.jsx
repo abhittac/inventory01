@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,20 +6,25 @@ import {
   DialogActions,
   Button,
   Grid,
-} from '@mui/material';
-import FormInput from '../../common/FormInput';
-import FormSelect from '../../common/FormSelect';
+} from "@mui/material";
+import FormInput from "../../common/FormInput";
+import FormSelect from "../../common/FormSelect";
 
 const initialFormData = {
-  production_rate: '',
-  efficiency: '',
-  quality_score: '',
-  machine_status: 'running',
-  last_maintenance: '',
-  next_service: '',
+  production_rate: "",
+  efficiency: "",
+  quality_score: "",
+  machine_status: "running",
+  last_maintenance: "",
+  next_service: "",
 };
 
-export default function MetricsForm({ open, onClose, onSubmit, currentMetrics }) {
+export default function MetricsForm({
+  open,
+  onClose,
+  onSubmit,
+  currentMetrics,
+}) {
   const [formData, setFormData] = useState(initialFormData);
 
   useEffect(() => {
@@ -30,7 +35,7 @@ export default function MetricsForm({ open, onClose, onSubmit, currentMetrics })
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -39,10 +44,10 @@ export default function MetricsForm({ open, onClose, onSubmit, currentMetrics })
   };
 
   const machineStatusOptions = [
-    { value: 'running', label: 'Running' },
-    { value: 'maintenance', label: 'Under Maintenance' },
-    { value: 'stopped', label: 'Stopped' },
-    { value: 'idle', label: 'Idle' }
+    { value: "running", label: "Running" },
+    { value: "maintenance", label: "Under Maintenance" },
+    { value: "stopped", label: "Stopped" },
+    { value: "idle", label: "Idle" },
   ];
 
   return (
@@ -117,7 +122,9 @@ export default function MetricsForm({ open, onClose, onSubmit, currentMetrics })
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" color="primary">
             Update Metrics

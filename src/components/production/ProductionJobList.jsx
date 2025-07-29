@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Card,
   Table,
@@ -11,24 +11,26 @@ import {
   Typography,
   Button,
   Chip,
-} from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
-import DeleteConfirmDialog from '../common/DeleteConfirmDialog';
+  CircularProgress,
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 const mockJobs = [
   {
     id: 1,
-    name: 'Product A Production',
-    status: 'In Progress',
-    startDate: '2024-02-10',
-    endDate: '2024-02-15',
+    name: "Product A Production",
+    status: "In Progress",
+    startDate: "2024-02-10",
+    endDate: "2024-02-15",
   },
   {
     id: 2,
-    name: 'Product B Production',
-    status: 'Pending',
-    startDate: '2024-02-12',
-    endDate: '2024-02-18',
+    name: "Product B Production",
+    status: "Pending",
+    startDate: "2024-02-12",
+    endDate: "2024-02-18",
   },
 ];
 
@@ -43,11 +45,11 @@ export default function ProductionJobList() {
 
   const getStatusColor = (status) => {
     const colors = {
-      'In Progress': 'primary',
-      'Pending': 'warning',
-      'Completed': 'success',
+      "In Progress": "primary",
+      Pending: "warning",
+      Completed: "success",
     };
-    return colors[status] || 'default';
+    return colors[status] || "default";
   };
 
   return (
@@ -67,32 +69,54 @@ export default function ProductionJobList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockJobs.map((job) => (
-              <TableRow key={job.id}>
-                <TableCell>{job.name}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={job.status}
-                    color={getStatusColor(job.status)}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>{job.startDate}</TableCell>
-                <TableCell>{job.endDate}</TableCell>
-                <TableCell>
-                  <IconButton size="small" color="primary">
-                    <Edit />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => handleDelete(job)}
-                  >
-                    <Delete />
-                  </IconButton>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  <CircularProgress />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : mockJobs.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  <Typography>No jobs found</Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              mockJobs.map((job) => (
+                <TableRow key={job.id}>
+                  <TableCell>{formatSnakeCase(job.name)}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={formatSnakeCase(job.status)}
+                      color={getStatusColor(job.status)}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {job.startDate
+                      ? new Date(job.startDate).toLocaleDateString()
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {job.endDate
+                      ? new Date(job.endDate).toLocaleDateString()
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    <IconButton size="small" color="primary">
+                      <Edit />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDelete(job)}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

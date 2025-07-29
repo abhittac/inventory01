@@ -1,25 +1,16 @@
-import { useState, useEffect } from 'react';
-import {
-  Box,
-  Card,
-  Button,
-  Typography,
-  Grid,
-  Divider
-} from '@mui/material';
-import {
-  Assessment,
-  Dashboard
-} from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { useColorMode } from '../../contexts/ColorModeContext';
-import FlexoOrderList from './components/FlexoOrderList';
-import OrderService from '../../services/wcutBagFlexoService';
+import { useState, useEffect } from "react";
+import { Box, Card, Button, Typography, Grid, Divider } from "@mui/material";
+import { Assessment, Dashboard } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { useColorMode } from "../../contexts/ColorModeContext";
+import FlexoOrderList from "./components/FlexoOrderList";
+import OrderService from "../../services/wcutBagFlexoService";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 export default function FlexoDashboard() {
   const navigate = useNavigate();
   const { toggleColorMode } = useColorMode();
-  const [activeStatus, setActiveStatus] = useState('pending');
+  const [activeStatus, setActiveStatus] = useState("pending");
   const [orders, setOrders] = useState([]);
   const [noOrdersFound, setNoOrdersFound] = useState(false);
 
@@ -54,8 +45,8 @@ export default function FlexoDashboard() {
               variant="contained"
               fullWidth
               startIcon={<Dashboard />}
-              onClick={() => navigate('/production/flexo/dashboard')}
-              sx={{ height: '60px' }}
+              onClick={() => navigate("/production/flexo/dashboard")}
+              sx={{ height: "60px" }}
             >
               Dashboard
             </Button>
@@ -65,8 +56,8 @@ export default function FlexoDashboard() {
               variant="contained"
               fullWidth
               startIcon={<Assessment />}
-              onClick={() => navigate('/production/flexo/reports')}
-              sx={{ height: '60px' }}
+              onClick={() => navigate("/production/flexo/reports")}
+              sx={{ height: "60px" }}
             >
               Reports
             </Button>
@@ -80,21 +71,26 @@ export default function FlexoDashboard() {
             </Typography>
             <Divider sx={{ mb: 2 }} />
             <Grid container spacing={2}>
-              {['pending', 'in_progress', 'completed'].map((status) => (
+              {["pending", "in_progress", "completed"].map((status) => (
                 <Grid item xs={4} key={status}>
                   <Button
-                    variant={activeStatus === status ? 'contained' : 'outlined'}
+                    variant={activeStatus === status ? "contained" : "outlined"}
                     onClick={() => setActiveStatus(status)}
                     fullWidth
                   >
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                    {formatSnakeCase(status)}
                   </Button>
                 </Grid>
               ))}
             </Grid>
           </Box>
         </Card>
-        <FlexoOrderList orders={orders} status={activeStatus} noOrdersFound={noOrdersFound} type='W-Cut' />
+        <FlexoOrderList
+          orders={orders}
+          status={activeStatus}
+          noOrdersFound={noOrdersFound}
+          type="W-Cut"
+        />
       </Box>
     </Box>
   );

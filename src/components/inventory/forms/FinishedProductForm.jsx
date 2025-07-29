@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,21 +6,26 @@ import {
   DialogActions,
   Button,
   Grid,
-} from '@mui/material';
-import FormInput from '../../common/FormInput';
-import FormSelect from '../../common/FormSelect';
+} from "@mui/material";
+import FormInput from "../../common/FormInput";
+import FormSelect from "../../common/FormSelect";
 
 const initialFormData = {
-  name: '',
-  category: '',
-  quantity: '',
-  size: '',
-  color: '',
-  price: '',
-  status: 'available',
+  name: "",
+  category: "",
+  quantity: "",
+  size: "",
+  color: "",
+  price: "",
+  status: "available",
 };
 
-export default function FinishedProductForm({ open, onClose, onSubmit, product = null }) {
+export default function FinishedProductForm({
+  open,
+  onClose,
+  onSubmit,
+  product = null,
+}) {
   const [formData, setFormData] = useState(initialFormData);
 
   useEffect(() => {
@@ -33,7 +38,7 @@ export default function FinishedProductForm({ open, onClose, onSubmit, product =
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -42,23 +47,21 @@ export default function FinishedProductForm({ open, onClose, onSubmit, product =
   };
 
   const categoryOptions = [
-    { value: 'shopping_bag', label: 'Shopping Bag' },
-    { value: 'gift_bag', label: 'Gift Bag' },
-    { value: 'promotional_bag', label: 'Promotional Bag' },
+    { value: "shopping_bag", label: "Shopping Bag" },
+    { value: "gift_bag", label: "Gift Bag" },
+    { value: "promotional_bag", label: "Promotional Bag" },
   ];
 
   const statusOptions = [
-    { value: 'available', label: 'Available' },
-    { value: 'reserved', label: 'Reserved' },
-    { value: 'out_of_stock', label: 'Out of Stock' },
+    { value: "available", label: "Available" },
+    { value: "reserved", label: "Reserved" },
+    { value: "out_of_stock", label: "Out of Stock" },
   ];
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>
-          {'Edit Product'}
-        </DialogTitle>
+        <DialogTitle>{"Edit Product"}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} md={6}>
@@ -132,10 +135,12 @@ export default function FinishedProductForm({ open, onClose, onSubmit, product =
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" color="primary">
-            {product ? 'Update' : 'Add'} Product
+            {product ? "Update" : "Add"} Product
           </Button>
         </DialogActions>
       </form>

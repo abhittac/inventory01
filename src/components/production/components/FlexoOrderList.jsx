@@ -9,38 +9,49 @@ import {
   Chip,
   Card,
   Box,
-} from '@mui/material';
-import { QrCodeScanner, Update, LocalShipping, Print } from '@mui/icons-material';
-import FilterBar from '../../common/FilterBar';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
-import adminService from '../../../services/adminService';
+} from "@mui/material";
+import {
+  QrCodeScanner,
+  Update,
+  LocalShipping,
+  Print,
+} from "@mui/icons-material";
+import FilterBar from "../../common/FilterBar";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import adminService from "../../../services/adminService";
+import { formatSnakeCase } from "../../../utils/formatSnakeCase";
 
-export default function FlexoOrderList({ orders, onVerify, onFilterChange, filters }) {
+export default function FlexoOrderList({
+  orders,
+  onVerify,
+  onFilterChange,
+  filters,
+}) {
   const handleStartPrinting = async (orderId) => {
     try {
       await adminService.startFlexoPrinting(orderId);
-      toast.success('Printing process started');
+      toast.success("Printing process started");
     } catch (error) {
-      toast.error('Failed to start printing');
+      toast.error("Failed to start printing");
     }
   };
 
   const handleUpdateStatus = async (orderId) => {
     try {
-      await adminService.updateFlexoStatus(orderId, 'completed');
-      toast.success('Order status updated successfully');
+      await adminService.updateFlexoStatus(orderId, "completed");
+      toast.success("Order status updated successfully");
     } catch (error) {
-      toast.error('Failed to update status');
+      toast.error("Failed to update status");
     }
   };
 
   const handleMoveToBagMaking = async (orderId) => {
     try {
       await adminService.moveFlexoToBagMaking(orderId);
-      toast.success('Order moved to Bag Making Process');
+      toast.success("Order moved to Bag Making Process");
     } catch (error) {
-      toast.error('Failed to move order');
+      toast.error("Failed to move order");
     }
   };
 
@@ -51,7 +62,7 @@ export default function FlexoOrderList({ orders, onVerify, onFilterChange, filte
           filters={filters}
           onFilterChange={onFilterChange}
           filterOptions={{
-            status: ['Pending', 'In Progress', 'Completed']
+            status: ["Pending", "In Progress", "Completed"],
           }}
         />
       </Box>
@@ -81,7 +92,7 @@ export default function FlexoOrderList({ orders, onVerify, onFilterChange, filte
                 <TableCell>{order.fabricQuality}</TableCell>
                 <TableCell>{order.gsm}</TableCell>
                 <TableCell>{order.fabricColor}</TableCell>
-                <TableCell>{order.bagType}</TableCell>
+                <TableCell>{formatSnakeCase(order.bagType)}</TableCell>
                 <TableCell>{order.rollSize}</TableCell>
                 <TableCell>{order.cylinderSize}</TableCell>
                 <TableCell>{order.quantity}</TableCell>
@@ -89,15 +100,18 @@ export default function FlexoOrderList({ orders, onVerify, onFilterChange, filte
                   <Chip
                     label={order.status}
                     color={
-                      order.status === 'completed' ? 'success' :
-                      order.status === 'in_progress' ? 'warning' : 'default'
+                      order.status === "completed"
+                        ? "success"
+                        : order.status === "in_progress"
+                        ? "warning"
+                        : "default"
                     }
                     size="small"
                   />
                 </TableCell>
                 <TableCell>
-                  {order.status === 'pending' && (
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                  {order.status === "pending" && (
+                    <Box sx={{ display: "flex", gap: 1 }}>
                       <Button
                         startIcon={<Print />}
                         variant="contained"
@@ -117,7 +131,7 @@ export default function FlexoOrderList({ orders, onVerify, onFilterChange, filte
                       </Button>
                     </Box>
                   )}
-                  {order.status === 'in_progress' && (
+                  {order.status === "in_progress" && (
                     <Button
                       startIcon={<Update />}
                       variant="contained"
@@ -128,7 +142,7 @@ export default function FlexoOrderList({ orders, onVerify, onFilterChange, filte
                       Complete
                     </Button>
                   )}
-                  {order.status === 'completed' && (
+                  {order.status === "completed" && (
                     <Button
                       startIcon={<LocalShipping />}
                       variant="contained"

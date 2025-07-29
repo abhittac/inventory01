@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -7,18 +7,18 @@ import {
   Button,
   Grid,
   Typography,
-} from '@mui/material';
-import FormInput from '../common/FormInput';
-import FormSelect from '../common/FormSelect';
-import { useOrders } from '../../hooks/useOrders';
+} from "@mui/material";
+import FormInput from "../common/FormInput";
+import FormSelect from "../common/FormSelect";
+import { useOrders } from "../../hooks/useOrders";
 
 const initialFormData = {
-  orderId: '',
-  invoiceNumber: '',
-  date: new Date().toISOString().split('T')[0],
-  dueDate: '',
-  gstNumber: '',
-  unitPrice: '',
+  orderId: "",
+  invoiceNumber: "",
+  date: new Date().toISOString().split("T")[0],
+  dueDate: "",
+  gstNumber: "",
+  unitPrice: "",
 };
 
 export default function InvoiceForm({ open, onClose, onSubmit }) {
@@ -28,16 +28,17 @@ export default function InvoiceForm({ open, onClose, onSubmit }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if (name === 'orderId') {
-      const order = orders.find(o => o.id === value);
+    if (name === "orderId") {
+      const order = orders.find((o) => o.id === value);
       setSelectedOrder(order);
     }
   };
 
   const calculateTotals = () => {
-    if (!selectedOrder || !formData.unitPrice) return { subtotal: 0, gst: 0, total: 0 };
+    if (!selectedOrder || !formData.unitPrice)
+      return { subtotal: 0, gst: 0, total: 0 };
 
     const subtotal = selectedOrder.quantity * parseFloat(formData.unitPrice);
     const gst = subtotal * 0.18; // 18% GST
@@ -59,11 +60,11 @@ export default function InvoiceForm({ open, onClose, onSubmit }) {
     });
   };
   const orderOptions = Array.isArray(orders)
-  ? orders.map(order => ({
-      value: order.id,
-      label: `${order.jobName} - ${order.customerName}`
-    }))
-  : [];
+    ? orders.map((order) => ({
+        value: order.id,
+        label: `${order.jobName} - ${order.customerName}`,
+      }))
+    : [];
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -219,7 +220,9 @@ export default function InvoiceForm({ open, onClose, onSubmit }) {
             )}
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={onClose}>Cancel</Button>
           <Button
             type="submit"

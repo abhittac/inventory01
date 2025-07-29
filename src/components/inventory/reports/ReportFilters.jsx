@@ -6,7 +6,7 @@ import {
   Select,
   MenuItem,
   TextField,
-} from '@mui/material';
+} from "@mui/material";
 
 export default function ReportFilters({ filters, onFilterChange }) {
   const handleChange = (e) => {
@@ -51,7 +51,7 @@ export default function ReportFilters({ filters, onFilterChange }) {
           </FormControl>
         </Grid>
 
-        {filters.dateRange === 'custom' && (
+        {filters.dateRange === "custom" && (
           <>
             <Grid item xs={12} md={3}>
               <TextField

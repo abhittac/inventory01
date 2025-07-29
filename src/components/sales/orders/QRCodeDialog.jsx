@@ -13,7 +13,7 @@ import html2canvas from "html2canvas";
 
 export default function QRCodeDialog({ open, onClose, orderData }) {
   const qrRef = useRef(null);
-  console.log('order data is', orderData)
+  console.log("order data is", orderData);
   if (!orderData) return null;
 
   const qrData = JSON.stringify({
@@ -30,7 +30,9 @@ export default function QRCodeDialog({ open, onClose, orderData }) {
       return;
     }
 
-    const canvas = await html2canvas(qrRef.current, { backgroundColor: "#fff" });
+    const canvas = await html2canvas(qrRef.current, {
+      backgroundColor: "#fff",
+    });
     const image = canvas.toDataURL("image/png");
 
     const link = document.createElement("a");
@@ -54,7 +56,12 @@ export default function QRCodeDialog({ open, onClose, orderData }) {
             p: 2,
           }}
         >
-          <QRCodeCanvas value={qrData} size={300} level="M" includeMargin={true} />
+          <QRCodeCanvas
+            value={qrData}
+            size={300}
+            level="M"
+            includeMargin={true}
+          />
 
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
             Scan this QR to get Roll details
@@ -78,7 +85,7 @@ export default function QRCodeDialog({ open, onClose, orderData }) {
           </Box>
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ display: "flex", justifyContent: "space-between" }}>
         <Button onClick={onClose}>Close</Button>
         <Button variant="contained" onClick={downloadQRCode}>
           Download QR Code

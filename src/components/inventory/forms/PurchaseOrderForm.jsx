@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,35 +6,44 @@ import {
   DialogActions,
   Button,
   Grid,
-} from '@mui/material';
-import FormInput from '../../common/FormInput';
-import FormSelect from '../../common/FormSelect';
-
+  Divider,
+  IconButton,
+  Box,
+  Typography,
+} from "@mui/material";
+import FormInput from "../../common/FormInput";
+import FormSelect from "../../common/FormSelect";
+import CloseIcon from "@mui/icons-material/Close";
 const initialFormData = {
-  orderNumber: '',
-  supplier: '',
-  materialType: '',
-  quantity: '',
-  unitPrice: '',
-  deliveryDate: '',
-  status: 'pending',
-  notes: '',
+  orderNumber: "",
+  supplier: "",
+  materialType: "",
+  quantity: "",
+  unitPrice: "",
+  deliveryDate: "",
+  status: "",
+  notes: "",
   totalAmount: 0,
 };
 
-export default function PurchaseOrderForm({ open, onClose, onSubmit, order = null }) {
+export default function PurchaseOrderForm({
+  open,
+  onClose,
+  onSubmit,
+  order = null,
+}) {
   const [formData, setFormData] = useState(initialFormData);
   useEffect(() => {
     if (order) {
       setFormData({
-        orderNumber: order.order_number || '',
-        supplier: order.supplier || '',
-        materialType: order.materialType || '',
-        quantity: order.quantity || '',
-        unitPrice: order.unitPrice || '',
-        deliveryDate: order.deliveryDate || '',
-        status: order.status || 'pending',
-        notes: order.notes || '',
+        orderNumber: order.order_number || "",
+        supplier: order.supplier || "",
+        materialType: order.materialType || "",
+        quantity: order.quantity || "",
+        unitPrice: order.unitPrice || "",
+        deliveryDate: order.deliveryDate || "",
+        status: order.status || "",
+        notes: order.notes || "",
         totalAmount: order.totalAmount || 0,
       });
     } else {
@@ -49,7 +58,7 @@ export default function PurchaseOrderForm({ open, onClose, onSubmit, order = nul
         ...prevData,
         [name]: value,
       };
-      if (name === 'quantity' || name === 'unitPrice') {
+      if (name === "quantity" || name === "unitPrice") {
         updatedData.totalAmount = updatedData.quantity * updatedData.unitPrice;
       }
 
@@ -71,29 +80,45 @@ export default function PurchaseOrderForm({ open, onClose, onSubmit, order = nul
       status: formData.status,
       notes: formData.notes,
     };
-    console.log('form data is', formDataToSend)
+    console.log("form data is", formDataToSend);
     onSubmit(formDataToSend);
   };
 
   const materialTypes = [
-    { value: 'fabric', label: 'Fabric' },
-    { value: 'handle', label: 'Handle Material' },
-    { value: 'thread', label: 'Thread' },
-    { value: 'dye', label: 'Dye' },
+    { value: "fabric", label: "Fabric" },
+    { value: "handle", label: "Handle Material" },
+    { value: "thread", label: "Thread" },
+    { value: "dye", label: "Dye" },
   ];
 
   const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'ordered', label: 'Ordered' },
-    { value: 'received', label: 'Received' },
-    { value: 'cancelled', label: 'Cancelled' },
+    { value: "pending", label: "Pending" },
+    { value: "approved", label: "Approved" },
+    { value: "ordered", label: "Ordered" },
+    { value: "received", label: "Received" },
+    { value: "cancelled", label: "Cancelled" },
   ];
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>{order ? 'Edit Purchase Order' : 'Create Purchase Order'}</DialogTitle>
+        <DialogTitle>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6">
+              {order ? "Edit Purchase Order" : "Create Purchase Order"}
+            </Typography>
+            <IconButton onClick={onClose}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} md={6}>
@@ -152,8 +177,10 @@ export default function PurchaseOrderForm({ open, onClose, onSubmit, order = nul
                 type="date"
                 value={
                   formData.deliveryDate
-                    ? new Date(formData.deliveryDate).toISOString().split('T')[0]
-                    : ''
+                    ? new Date(formData.deliveryDate)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
                 }
                 onChange={handleChange}
                 required
@@ -181,10 +208,10 @@ export default function PurchaseOrderForm({ open, onClose, onSubmit, order = nul
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ justifyContent: "space-between" }}>
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" color="primary">
-            {order ? 'Update' : 'Create'} Order
+            {order ? "Update" : "Create"} Order
           </Button>
         </DialogActions>
       </form>

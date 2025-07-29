@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -9,18 +9,18 @@ import {
   TextField,
   Typography,
   Box,
-} from '@mui/material';
-import { QRCodeSVG } from 'qrcode.react';
-import toast from 'react-hot-toast';
+} from "@mui/material";
+import { QRCodeSVG } from "qrcode.react";
+import toast from "react-hot-toast";
 
 // Dummy data to simulate QR code scan results
 const dummyQRData = {
-  rollSize: '15x20',
-  gsm: '100',
-  fabricColor: 'Green',
-  bagType: 'W-Cut',
-  printColor: 'Black',
-  cylinderSize: '30x40'
+  rollSize: "15x20",
+  gsm: "100",
+  fabricColor: "Green",
+  bagType: "W-Cut",
+  printColor: "Black",
+  cylinderSize: "30x40",
 };
 
 export default function VerifyOrderDialog({ open, onClose, order }) {
@@ -34,10 +34,10 @@ export default function VerifyOrderDialog({ open, onClose, order }) {
       try {
         // Simulate successful scan by setting dummy data
         setScannedData(dummyQRData);
-        toast.success('QR Code scanned successfully');
+        toast.success("QR Code scanned successfully");
         setScanning(false);
       } catch (error) {
-        toast.error('Failed to scan QR Code');
+        toast.error("Failed to scan QR Code");
         setScanning(false);
       }
     }, 1500);
@@ -70,7 +70,7 @@ export default function VerifyOrderDialog({ open, onClose, order }) {
                 Quantity: {order.quantity}
               </Typography>
             </Box>
-{/*
+            {/*
             <Typography variant="subtitle2" gutterBottom>
               Scan QR Code
             </Typography>
@@ -91,10 +91,12 @@ export default function VerifyOrderDialog({ open, onClose, order }) {
                 <TextField
                   fullWidth
                   label="Roll Size"
-                  value={scannedData?.rollSize || order.rollSize || ''}
+                  value={scannedData?.rollSize || order.rollSize || ""}
                   disabled
                   sx={{
-                    backgroundColor: scannedData?.rollSize ? '#e8f5e9' : 'inherit'
+                    backgroundColor: scannedData?.rollSize
+                      ? "#e8f5e9"
+                      : "inherit",
                   }}
                 />
               </Grid>
@@ -102,10 +104,10 @@ export default function VerifyOrderDialog({ open, onClose, order }) {
                 <TextField
                   fullWidth
                   label="GSM"
-                  value={scannedData?.gsm || order.gsm || ''}
+                  value={scannedData?.gsm || order.gsm || ""}
                   disabled
                   sx={{
-                    backgroundColor: scannedData?.gsm ? '#e8f5e9' : 'inherit'
+                    backgroundColor: scannedData?.gsm ? "#e8f5e9" : "inherit",
                   }}
                 />
               </Grid>
@@ -113,10 +115,12 @@ export default function VerifyOrderDialog({ open, onClose, order }) {
                 <TextField
                   fullWidth
                   label="Fabric Color"
-                  value={scannedData?.fabricColor || order.fabricColor || ''}
+                  value={scannedData?.fabricColor || order.fabricColor || ""}
                   disabled
                   sx={{
-                    backgroundColor: scannedData?.fabricColor ? '#e8f5e9' : 'inherit'
+                    backgroundColor: scannedData?.fabricColor
+                      ? "#e8f5e9"
+                      : "inherit",
                   }}
                 />
               </Grid>
@@ -124,10 +128,12 @@ export default function VerifyOrderDialog({ open, onClose, order }) {
                 <TextField
                   fullWidth
                   label="Bag Type"
-                  value={scannedData?.bagType || order.bagType || ''}
+                  value={scannedData?.bagType || order.bagType || ""}
                   disabled
                   sx={{
-                    backgroundColor: scannedData?.bagType ? '#e8f5e9' : 'inherit'
+                    backgroundColor: scannedData?.bagType
+                      ? "#e8f5e9"
+                      : "inherit",
                   }}
                 />
               </Grid>
@@ -135,10 +141,12 @@ export default function VerifyOrderDialog({ open, onClose, order }) {
                 <TextField
                   fullWidth
                   label="Print Color"
-                  value={scannedData?.printColor || order.printColor || ''}
+                  value={scannedData?.printColor || order.printColor || ""}
                   disabled
                   sx={{
-                    backgroundColor: scannedData?.printColor ? '#e8f5e9' : 'inherit'
+                    backgroundColor: scannedData?.printColor
+                      ? "#e8f5e9"
+                      : "inherit",
                   }}
                 />
               </Grid>
@@ -146,10 +154,12 @@ export default function VerifyOrderDialog({ open, onClose, order }) {
                 <TextField
                   fullWidth
                   label="Cylinder Size"
-                  value={scannedData?.cylinderSize || order.cylinderSize || ''}
+                  value={scannedData?.cylinderSize || order.cylinderSize || ""}
                   disabled
                   sx={{
-                    backgroundColor: scannedData?.cylinderSize ? '#e8f5e9' : 'inherit'
+                    backgroundColor: scannedData?.cylinderSize
+                      ? "#e8f5e9"
+                      : "inherit",
                   }}
                 />
               </Grid>
@@ -157,21 +167,17 @@ export default function VerifyOrderDialog({ open, onClose, order }) {
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ display: "flex", justifyContent: "space-between" }}>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button
-          variant="contained"
-          onClick={handleScan}
-          disabled={scanning}
-        >
-          {scanning ? 'Scanning...' : 'Scan QR Code'}
+        <Button variant="contained" onClick={handleScan} disabled={scanning}>
+          {scanning ? "Scanning..." : "Scan QR Code"}
         </Button>
         {scannedData && (
           <Button
             variant="contained"
             color="success"
             onClick={() => {
-              toast.success('Order details verified and saved');
+              toast.success("Order details verified and saved");
               handleClose();
             }}
           >

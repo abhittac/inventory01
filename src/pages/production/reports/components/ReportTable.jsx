@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Card,
   Table,
@@ -14,20 +14,21 @@ import {
   MenuItem,
   Button,
   TablePagination,
-} from '@mui/material';
+} from "@mui/material";
+import { formatSnakeCase } from "../../../../utils/formatSnakeCase";
 
 export default function ReportTable({ records }) {
   const getStatusColor = (status) => {
     const colors = {
-      pending: 'warning',
-      in_progress: 'info',
-      completed: 'success',
+      pending: "warning",
+      in_progress: "info",
+      completed: "success",
     };
-    return colors[status] || 'default';
+    return colors[status] || "default";
   };
   // Pagination & Filters
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -38,20 +39,21 @@ export default function ReportTable({ records }) {
   };
 
   const handleResetFilters = () => {
-    setSearchQuery('');
-    setStatusFilter('');
+    setSearchQuery("");
+    setStatusFilter("");
     setPage(0);
   };
   // Filtering records
   const filteredRecords = records.filter((record) => {
     return (
-      (statusFilter === '' || record.status === statusFilter) &&
-      (searchQuery === '' || record.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (statusFilter === "" || record.status === statusFilter) &&
+      (searchQuery === "" ||
+        record.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
         record.jobName.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   });
   return (
-    <Card>
+    <Card sx={{ mb: 2, p: 2 }}>
       <div className="flex justify-between items-center p-4">
         <Typography variant="h6">Production Records</Typography>
         <div className="flex gap-3">
@@ -61,13 +63,13 @@ export default function ReportTable({ records }) {
             variant="outlined"
             size="small"
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
 
           {/* Status Filter */}
           <Select
             value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
+            onChange={(e) => setStatusFilter(e.target.value)}
             displayEmpty
             size="small"
           >
@@ -76,7 +78,9 @@ export default function ReportTable({ records }) {
             <MenuItem value="completed">Completed</MenuItem>
             <MenuItem value="delivery">Delivery</MenuItem>
           </Select>
-          <Button variant="outlined" onClick={handleResetFilters}>Reset</Button>
+          <Button variant="outlined" onClick={handleResetFilters}>
+            Reset
+          </Button>
         </div>
       </div>
       <TableContainer>
@@ -97,18 +101,30 @@ export default function ReportTable({ records }) {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((record) => (
                   <TableRow key={record.orderId || Math.random()}>
-                    <TableCell>{record.orderId || 'N/A'}</TableCell>
-                    <TableCell>{record.jobName || 'N/A'}</TableCell>
-                    <TableCell>{record.bagType || 'N/A'}</TableCell>
-                    <TableCell>{record.quantity !== undefined ? record.quantity : 'N/A'}</TableCell>
+                    <TableCell>{record.orderId || "N/A"}</TableCell>
+                    <TableCell>{record.jobName || "N/A"}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(record.bagType) || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {record.quantity !== undefined ? record.quantity : "N/A"}
+                    </TableCell>
                     <TableCell>
                       <Chip
-                        label={record.status ? record.status.replace('_', ' ').toUpperCase() : 'UNKNOWN'}
+                        label={
+                          record.status
+                            ? formatSnakeCase(record.status)
+                            : "UNKNOWN"
+                        }
                         color={getStatusColor(record.status)}
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>{record.createdAt ? new Date(record.createdAt).toLocaleDateString() : '-'}</TableCell>
+                    <TableCell>
+                      {record.createdAt
+                        ? new Date(record.createdAt).toLocaleDateString()
+                        : "-"}
+                    </TableCell>
                   </TableRow>
                 ))
             ) : (

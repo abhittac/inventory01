@@ -1,41 +1,55 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Grid } from '@mui/material';
-import { useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
-import productionService from '/src/services/productionManagerService.js';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Grid,
+} from "@mui/material";
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import productionService from "/src/services/productionManagerService.js";
 
-export default function UpdateDetailsDialog({ open, onClose, record, quantityKg, type, orderId, fetchRecords }) {
+export default function UpdateDetailsDialog({
+  open,
+  onClose,
+  record,
+  quantityKg,
+  type,
+  orderId,
+  fetchRecords,
+}) {
   const [formData, setFormData] = useState({
-    type: '',
-    roll_size: '',
+    type: "",
+    roll_size: "",
     cylinder_size: 0,
-    quantity_kgs: '',
-    quantity_rolls: '',
-    remarks: '',
+    quantity_kgs: "",
+    quantity_rolls: "",
+    remarks: "",
   });
   // Reset form data when dialog opens with a new record
   useEffect(() => {
     if (open && record?.production_details) {
-
-      console.log('record is ds ', record)
+      console.log("record is ds ", record);
       setFormData({
-        type: type || '',
-        roll_size: record.production_details.roll_size || '',
-        cylinder_size: record.production_details.cylinder_size || '',
-        quantity_kgs: record.production_details.quantity_kgs || '',
-        quantity_rolls: record.production_details.quantity_rolls || '',
-        remarks: record.production_details.remarks || '',
+        type: type || "",
+        roll_size: record.production_details.roll_size || "",
+        cylinder_size: record.production_details.cylinder_size || "",
+        quantity_kgs: record.production_details.quantity_kgs || "",
+        quantity_rolls: record.production_details.quantity_rolls || "",
+        remarks: record.production_details.remarks || "",
       });
     } else if (open) {
-
-      console.log('record is ', record)
+      console.log("record is ", record);
       // Reset form when dialog opens without a valid record
       setFormData({
-        type: type || '',
-        roll_size: '',
+        type: type || "",
+        roll_size: "",
         cylinder_size: 0,
         quantity_kgs: quantityKg,
-        quantity_rolls: '',
-        remarks: '',
+        quantity_rolls: "",
+        remarks: "",
       });
     }
   }, [open, record, type]);
@@ -51,23 +65,29 @@ export default function UpdateDetailsDialog({ open, onClose, record, quantityKg,
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updatedRecord = await productionService.updateProductionRecord(formData, orderId);
+      const updatedRecord = await productionService.updateProductionRecord(
+        formData,
+        orderId
+      );
       if (!updatedRecord || !updatedRecord.data) {
-        toast.error('Unexpected response from server. Please try again.');
+        toast.error("Unexpected response from server. Please try again.");
         return;
       }
       if (updatedRecord.data.production_manager === null) {
-        toast.error('Production Manager data is missing');
+        toast.error("Production Manager data is missing");
         return;
       }
-      toast.success('Record updated successfully');
+      toast.success("Record updated successfully");
       onClose();
       if (fetchRecords) {
         fetchRecords(); // ✅ Refresh the list after update
       }
     } catch (error) {
-      console.error('Error updating record:', error);
-      toast.error(error.response?.data?.message || 'Oops! Something went wrong. Please try again.');
+      console.error("Error updating record:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Oops! Something went wrong. Please try again."
+      );
     }
   };
 
@@ -78,14 +98,28 @@ export default function UpdateDetailsDialog({ open, onClose, record, quantityKg,
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} md={12}>
-              <TextField fullWidth label="Roll Size" name="roll_size" value={formData.roll_size} onChange={handleChange} required />
+              <TextField
+                fullWidth
+                label="Roll Size"
+                name="roll_size"
+                value={formData.roll_size}
+                onChange={handleChange}
+                required
+              />
             </Grid>
-            <Grid item xs={12} md={6} sx={{ display: 'none' }}>
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{ display: `${type === "DCut" ? "none" : "block"}` }}
+            >
               <TextField
                 fullWidth
                 label="Cylinder Size"
                 name="cylinder_size"
-                value={formData.cylinder_size === "" ? 0 : formData.cylinder_size}
+                value={
+                  formData.cylinder_size === "" ? 0 : formData.cylinder_size
+                }
                 onChange={handleChange}
               />
             </Grid>
@@ -103,14 +137,32 @@ export default function UpdateDetailsDialog({ open, onClose, record, quantityKg,
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField fullWidth label="Quantity (in Kgs)" name="quantity_rolls" type="number" value={formData.quantity_rolls} onChange={handleChange} required />
+              <TextField
+                fullWidth
+                label="Quantity (in Rolls)"
+                name="quantity_rolls"
+                type="number"
+                value={formData.quantity_rolls}
+                onChange={handleChange}
+                required
+              />
             </Grid>
             <Grid item xs={12}>
-              <TextField fullWidth label="Remarks (if Any)" name="remarks" value={formData.remarks} onChange={handleChange} multiline rows={3} />
+              <TextField
+                fullWidth
+                label="Remarks (if Any)"
+                name="remarks"
+                value={formData.remarks}
+                onChange={handleChange}
+                multiline
+                rows={3}
+              />
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" color="primary">
             Update

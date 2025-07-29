@@ -1,19 +1,20 @@
-import { useState } from 'react';
-import { Grid } from '@mui/material';
-import SummaryCard from '../../../components/dashboard/SummaryCard';
-import FlexoOrderList from '../../production/components/FlexoOrderList';
-import VerifyOrderDialog from '../../production/components/VerifyOrderDialog';
-import { useAdminData } from '../../../hooks/useAdminData';
+import { useState } from "react";
+import { Grid } from "@mui/material";
+import SummaryCard from "../../../components/dashboard/SummaryCard";
+import FlexoOrderList from "../../production/components/FlexoOrderList";
+import VerifyOrderDialog from "../../production/components/VerifyOrderDialog";
+import { useAdminData } from "../../../hooks/useAdminData";
+import Loader from "../../../utils/Loader";
 
 export default function AdminFlexoOverview() {
   const [verifyDialogOpen, setVerifyDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [filters, setFilters] = useState({
-    status: '',
-    date: ''
+    status: "",
+    date: "",
   });
 
-  const { data, loading, updateParams } = useAdminData('getWCutFlexo', filters);
+  const { data, loading, updateParams } = useAdminData("getWCutFlexo", filters);
 
   const handleVerify = (order) => {
     setSelectedOrder(order);
@@ -25,7 +26,7 @@ export default function AdminFlexoOverview() {
     updateParams(newFilters);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loader />;
 
   return (
     <Grid container spacing={3}>

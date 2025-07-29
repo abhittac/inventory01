@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Card,
   Table,
@@ -10,13 +10,27 @@ import {
   IconButton,
   Typography,
   Button,
-} from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
-import DeleteConfirmDialog from '../common/DeleteConfirmDialog';
+  CircularProgress,
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import DeleteConfirmDialog from "../common/DeleteConfirmDialog";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 const mockCustomers = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', phone: '+1234567890', orders: 5 },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', phone: '+0987654321', orders: 3 },
+  {
+    id: 1,
+    name: "John Doe",
+    email: "john@example.com",
+    phone: "+1234567890",
+    orders: 5,
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    email: "jane@example.com",
+    phone: "+0987654321",
+    orders: 3,
+  },
 ];
 
 export default function CustomerList() {
@@ -32,7 +46,9 @@ export default function CustomerList() {
     <Card>
       <div className="flex justify-between items-center p-4">
         <Typography variant="h6">Customers</Typography>
-        <Button variant="contained" color="primary">Add Customer</Button>
+        <Button variant="contained" color="primary">
+          Add Customer
+        </Button>
       </div>
       <TableContainer>
         <Table>
@@ -46,26 +62,40 @@ export default function CustomerList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockCustomers.map((customer) => (
-              <TableRow key={customer.id}>
-                <TableCell>{customer.name}</TableCell>
-                <TableCell>{customer.email}</TableCell>
-                <TableCell>{customer.phone}</TableCell>
-                <TableCell>{customer.orders}</TableCell>
-                <TableCell>
-                  <IconButton size="small" color="primary">
-                    <Edit />
-                  </IconButton>
-                  <IconButton 
-                    size="small" 
-                    color="error"
-                    onClick={() => handleDelete(customer)}
-                  >
-                    <Delete />
-                  </IconButton>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  <CircularProgress />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : mockCustomers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  <Typography>No customers found</Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              mockCustomers.map((customer) => (
+                <TableRow key={customer.id}>
+                  <TableCell>{formatSnakeCase(customer.name)}</TableCell>
+                  <TableCell>{customer.email}</TableCell>
+                  <TableCell>{customer.phone}</TableCell>
+                  <TableCell>{customer.orders}</TableCell>
+                  <TableCell>
+                    <IconButton size="small" color="primary">
+                      <Edit />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDelete(customer)}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../../config/constants";
 import authService from "../../services/authService";
+import Loader from "../../utils/Loader";
 
 export default function RecentActivities() {
   const [activities, setActivities] = useState([]);
@@ -69,7 +70,7 @@ export default function RecentActivities() {
       <Divider />
       <CardContent sx={{ p: 0 }}>
         {loading ? (
-          <Typography sx={{ p: 2, textAlign: "center" }}>Loading...</Typography>
+          <Loader />
         ) : activities.length === 0 ? (
           <Typography sx={{ p: 2, textAlign: "center" }}>
             No recent activities.

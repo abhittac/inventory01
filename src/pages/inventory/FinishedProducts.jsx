@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Card,
   Table,
@@ -15,15 +15,17 @@ import {
   Button,
   Select,
   TablePagination,
-} from '@mui/material';
-import { Delete, Visibility, PictureAsPdf } from '@mui/icons-material';
+  CircularProgress,
+} from "@mui/material";
+import { Delete, Visibility, PictureAsPdf } from "@mui/icons-material";
 
-import FinishedProductForm from '../../components/inventory/forms/FinishedProductForm';
-import DeleteConfirmDialog from '../../components/common/DeleteConfirmDialog';
-import toast from 'react-hot-toast';
-import productService from '../../services/productService';
-import FinishedProductModel from './FinishedProductModel';
-import { pdfFinishedProduct } from '../../utils/pdfFinishedProduct';
+import FinishedProductForm from "../../components/inventory/forms/FinishedProductForm";
+import DeleteConfirmDialog from "../../components/common/DeleteConfirmDialog";
+import toast from "react-hot-toast";
+import productService from "../../services/productService";
+import FinishedProductModel from "./FinishedProductModel";
+import { pdfFinishedProduct } from "../../utils/pdfFinishedProduct";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 export default function FinishedProducts() {
   const [products, setProducts] = useState([]);
@@ -31,11 +33,11 @@ export default function FinishedProducts() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [selectedFinishedProduct, setSelectedFinishedProduct] = useState(null);
-  const [filters, setFilters] = useState({ status: '', search: '' });
+  const [filters, setFilters] = useState({ status: "", search: "" });
 
   // Pagination & Filters
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -49,7 +51,7 @@ export default function FinishedProducts() {
       const response = await productService.getProducts();
       setProducts(response.data);
     } catch (error) {
-      toast.error('Failed to load products');
+      toast.error("Failed to load products");
       setProducts([]);
     } finally {
       setLoading(false);
@@ -64,11 +66,11 @@ export default function FinishedProducts() {
   const handleDeleteConfirm = async () => {
     try {
       await productService.deleteProduct(productToDelete._id);
-      toast.success('Product deleted successfully');
+      toast.success("Product deleted successfully");
       setDeleteDialogOpen(false);
       fetchProducts();
     } catch (error) {
-      toast.error('Failed to delete product');
+      toast.error("Failed to delete product");
     }
   };
 
@@ -77,7 +79,7 @@ export default function FinishedProducts() {
       const productDetails = await productService.getFullDetailById(id);
       setSelectedFinishedProduct(productDetails);
     } catch (error) {
-      toast.error('Failed to fetch product details');
+      toast.error("Failed to fetch product details");
     }
   };
 
@@ -85,25 +87,25 @@ export default function FinishedProducts() {
     try {
       const productDetails = await productService.getFullDetailById(id);
       pdfFinishedProduct(productDetails.data);
-      toast.success('Detail downloaded successfully');
+      toast.success("Detail downloaded successfully");
     } catch (error) {
-      toast.error('Failed to download details');
+      toast.error("Failed to download details");
     }
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      delivered: 'success',
-      pending: 'warning',
-      completed: 'primary',
-      out_of_stock: 'error',
+      delivered: "success",
+      pending: "warning",
+      completed: "primary",
+      out_of_stock: "error",
     };
-    return colors[status] || 'default';
+    return colors[status] || "default";
   };
 
   const handleResetFilters = () => {
-    setSearchQuery('');
-    setStatusFilter('');
+    setSearchQuery("");
+    setStatusFilter("");
     setPage(0);
   };
 
@@ -115,29 +117,26 @@ export default function FinishedProducts() {
     setPage(0);
   };
 
-
   // Apply Filters & Pagination
   const filteredProducts = products
     .filter((product) => {
-      const customerName = product?.orderDetails?.customerName || '';
-      const jobName = product?.orderDetails?.jobName || '';
-      const orderId = product?.order_id?.toString() || '';
+      const customerName = product?.orderDetails?.customerName || "";
+      const jobName = product?.orderDetails?.jobName || "";
+      const orderId = product?.order_id?.toString() || "";
       return (
         customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        jobName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        orderId.includes(searchQuery)
+        orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        jobName.toLowerCase().includes(searchQuery.toLowerCase())
       );
     })
-    .filter((product) => (statusFilter ? product.status === statusFilter : true))
+    .filter((product) =>
+      statusFilter ? product.status === statusFilter : true
+    )
     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage); // Pagination
-
-  if (loading) {
-    return <Typography variant="h6">Loading products...</Typography>;
-  }
 
   return (
     <>
-      <Card>
+      <Card sx={{ mb: 2, p: 3 }}>
         <div className="flex justify-between items-center p-4">
           <Typography variant="h6">Finished Products</Typography>
 
@@ -148,13 +147,13 @@ export default function FinishedProducts() {
               variant="outlined"
               size="small"
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
 
             {/* Status Filter */}
             <Select
               value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
+              onChange={(e) => setStatusFilter(e.target.value)}
               displayEmpty
               size="small"
             >
@@ -163,7 +162,9 @@ export default function FinishedProducts() {
               <MenuItem value="pending">Pending</MenuItem>
               <MenuItem value="delivered">Delivered</MenuItem>
             </Select>
-            <Button variant="outlined" onClick={handleResetFilters}>Reset</Button>
+            <Button variant="outlined" onClick={handleResetFilters}>
+              Reset
+            </Button>
           </div>
         </div>
         <TableContainer>
@@ -172,7 +173,7 @@ export default function FinishedProducts() {
               <TableRow>
                 <TableCell>Order ID</TableCell>
                 <TableCell>Customer Name</TableCell>
-                <TableCell>jobName</TableCell>
+                <TableCell>Job Name</TableCell>
                 <TableCell>Quantity</TableCell>
                 <TableCell>Bag Type</TableCell>
 
@@ -182,30 +183,81 @@ export default function FinishedProducts() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredProducts.map((product) => (
-                <TableRow key={product._id}>
-                  <TableCell>{product.order_id || 'N/A'}</TableCell>
-                  <TableCell>{product.orderDetails?.customerName || 'N/A'}</TableCell>
-                  <TableCell>{product.orderDetails?.jobName || 'N/A'}</TableCell>
-                  <TableCell>{product.orderDetails?.quantity || 'N/A'}</TableCell>
-                  <TableCell>{product.productionManagerDetails?.production_details?.type || 'N/A'}</TableCell>
-                  <TableCell>₹{product.orderDetails?.orderPrice || 'N/A'}</TableCell>
-                  <TableCell>
-                    <Chip label={product.status} color={getStatusColor(product.status)} size="small" />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton size="small" color="error" onClick={() => handleDelete(product)}>
-                      <Delete />
-                    </IconButton>
-                    <IconButton size="small" color="primary" onClick={() => handleView(product._id)}>
-                      <Visibility />
-                    </IconButton>
-                    <IconButton size="small" color="primary" onClick={() => handleDownloadPDF(product._id)}>
-                      <PictureAsPdf />
-                    </IconButton>
+              {filteredProducts.length === 0 && !loading ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    No data available
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : loading ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredProducts.map((product) => (
+                  <TableRow key={product._id}>
+                    <TableCell>{formatSnakeCase(product.order_id)}</TableCell>
+
+                    <TableCell>
+                      {formatSnakeCase(product.orderDetails?.customerName)}
+                    </TableCell>
+
+                    <TableCell>
+                      {formatSnakeCase(product.orderDetails?.jobName)}
+                    </TableCell>
+
+                    <TableCell>
+                      {formatSnakeCase(product.orderDetails?.quantity)}
+                    </TableCell>
+
+                    <TableCell>
+                      {formatSnakeCase(
+                        product.productionManagerDetails?.production_details
+                          ?.type
+                      )}
+                    </TableCell>
+
+                    <TableCell>
+                      {product.orderDetails?.orderPrice !== undefined
+                        ? `₹${product.orderDetails.orderPrice}`
+                        : "N/A"}
+                    </TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={formatSnakeCase(product.status)}
+                        color={getStatusColor(product.status)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(product)}
+                      >
+                        <Delete />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleView(product._id)}
+                      >
+                        <Visibility />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleDownloadPDF(product._id)}
+                      >
+                        <PictureAsPdf />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>

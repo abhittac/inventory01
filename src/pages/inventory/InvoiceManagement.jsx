@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Card,
   Table,
@@ -14,13 +14,15 @@ import {
   TablePagination,
   TextField,
   Select,
-  MenuItem
-} from '@mui/material';
-import { PictureAsPdf, Print } from '@mui/icons-material';
-import toast from 'react-hot-toast';
-import { generateInvoicePDF } from '../../utils/pdfGenerator';
-import invoiceService from '../../services/invoiceService'; // Assuming you have an API service for invoices
-import { MailOutline } from '@mui/icons-material';
+  MenuItem,
+  CircularProgress,
+} from "@mui/material";
+import { PictureAsPdf, Print } from "@mui/icons-material";
+import toast from "react-hot-toast";
+import { generateInvoicePDF } from "../../utils/pdfGenerator";
+import invoiceService from "../../services/invoiceService"; // Assuming you have an API service for invoices
+import { MailOutline } from "@mui/icons-material";
+import { formatSnakeCase } from "../../utils/formatSnakeCase";
 
 const InvoiceManagement = () => {
   const [invoices, setInvoices] = useState([]);
@@ -30,8 +32,8 @@ const InvoiceManagement = () => {
   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -43,8 +45,8 @@ const InvoiceManagement = () => {
         console.log(response.data);
         setInvoices(response.data);
       } catch (error) {
-        console.error('Error fetching invoices:', error);
-        toast.error('Failed to load invoices');
+        console.error("Error fetching invoices:", error);
+        toast.error("Failed to load invoices");
       } finally {
         setLoading(false);
       }
@@ -54,13 +56,13 @@ const InvoiceManagement = () => {
 
   // Handle downloading PDF for an invoice
   const handleDownloadPDF = (invoice) => {
-    console.log('Invoice details:', invoice);
+    console.log("Invoice details:", invoice);
 
     try {
       generateInvoicePDF(invoice);
-      toast.success('Invoice downloaded successfully');
+      toast.success("Invoice downloaded successfully");
     } catch (error) {
-      toast.error('Failed to download invoice');
+      toast.error("Failed to download invoice");
     }
   };
 
@@ -69,9 +71,10 @@ const InvoiceManagement = () => {
 
   const filteredInvoices = invoices
     .filter((invoice) => {
-      const invoiceId = invoice?.invoice_id || '';
-      const orderId = invoice?.orderDetails?.orderId || '';// Ensuring order_id is a string
-      const customerName = invoice?.orderDetails?.customerName?.toLowerCase() || '';
+      const invoiceId = invoice?.invoice_id || "";
+      const orderId = invoice?.orderDetails?.orderId || ""; // Ensuring order_id is a string
+      const customerName =
+        invoice?.orderDetails?.customerName?.toLowerCase() || "";
 
       return (
         invoiceId.toLowerCase().includes(searchLower) ||
@@ -80,10 +83,10 @@ const InvoiceManagement = () => {
       );
     })
     .filter((invoice) =>
-      statusFilter ? invoice.status.toLowerCase() === statusFilter.toLowerCase() : true
+      statusFilter
+        ? invoice.status.toLowerCase() === statusFilter.toLowerCase()
+        : true
     );
-
-
 
   // Handle adding new invoice
   const handleAddInvoice = () => {
@@ -108,37 +111,36 @@ const InvoiceManagement = () => {
     try {
       if (selectedInvoice) {
         await invoiceService.updateInvoice(selectedInvoice._id, formData);
-        toast.success('Invoice updated successfully');
+        toast.success("Invoice updated successfully");
       } else {
         await invoiceService.createInvoice(formData);
-        toast.success('Invoice created successfully');
+        toast.success("Invoice created successfully");
       }
       setFormOpen(false);
       refreshInvoices();
     } catch (error) {
-      toast.error('Failed to save invoice');
+      toast.error("Failed to save invoice");
     }
   };
 
   const handleSendInvoice = async (invoice) => {
     try {
       await invoiceService.sendInvoiceEmail(invoice.invoice_id);
-      toast.success('Invoice sent successfully');
+      toast.success("Invoice sent successfully");
     } catch (error) {
-      toast.error('Failed to send invoice');
+      toast.error("Failed to send invoice");
     }
   };
-
 
   // Handle delete confirmation
   const handleDeleteConfirm = async () => {
     try {
       await invoiceService.deleteInvoice(invoiceToDelete._id);
-      toast.success('Invoice deleted successfully');
+      toast.success("Invoice deleted successfully");
       setDeleteDialogOpen(false);
       refreshInvoices();
     } catch (error) {
-      toast.error('Failed to delete invoice');
+      toast.error("Failed to delete invoice");
     }
   };
 
@@ -149,8 +151,8 @@ const InvoiceManagement = () => {
       const response = await invoiceService.getInvoices();
       setInvoices(response.data);
     } catch (error) {
-      console.error('Error refreshing invoices:', error);
-      toast.error('Failed to refresh invoices');
+      console.error("Error refreshing invoices:", error);
+      toast.error("Failed to refresh invoices");
     } finally {
       setLoading(false);
     }
@@ -159,14 +161,17 @@ const InvoiceManagement = () => {
   // Get status color for the chip
   const getStatusColor = (status) => {
     const colors = {
-      sending: 'success',
-      pending: 'warning',
-      paid: 'error',
+      sending: "success",
+      pending: "warning",
+      paid: "error",
     };
-    return colors[status.toLowerCase()] || 'default';
+    return colors[status.toLowerCase()] || "default";
   };
 
-  const paginatedInvoices = filteredInvoices.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedInvoices = filteredInvoices.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
   return (
     <Card>
       <Box sx={{ p: 3 }}>
@@ -179,19 +184,22 @@ const InvoiceManagement = () => {
               variant="outlined"
               size="small"
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
 
             {/* Status Filter */}
             <Select
               value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
+              onChange={(e) => setStatusFilter(e.target.value)}
               displayEmpty
               size="small"
             >
               <MenuItem value="">All Status</MenuItem>
               <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="done">Completed</MenuItem>
+              <MenuItem value="paid">Paid</MenuItem>
+              <MenuItem value="overdue">Overdue</MenuItem>
+              <MenuItem value="cancelled">Cancelled</MenuItem>
+              <MenuItem value="sending">Sending</MenuItem>
             </Select>
           </div>
         </div>
@@ -210,64 +218,79 @@ const InvoiceManagement = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedInvoices.map((invoice) => (
-                <TableRow key={invoice._id}>
-                  <TableCell>{invoice.invoice_id}</TableCell>
-                  <TableCell>{invoice.order_id}</TableCell>
-                  <TableCell>{invoice.orderDetails?.customerName || 'N/A'}</TableCell>
-                  <TableCell>₹{invoice.orderDetails?.orderPrice || '0'}</TableCell>
-                  <TableCell>
-                    {invoice.date ? (
-                      new Intl.DateTimeFormat('en-GB', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      }).format(new Date(invoice.date))
-                    ) : (
-                      'Date not available'
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={invoice.status.toUpperCase()}
-                      color={getStatusColor(invoice.status)}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={() => handleDownloadPDF(invoice)}
-                    >
-                      <PictureAsPdf />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={() => handleSendInvoice(invoice)}
-                    >
-                      <MailOutline />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="secondary"
-                      onClick={() => handleEditInvoice(invoice)}
-                    >
-                      {/* Edit icon */}
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleDeleteInvoice(invoice)}
-                    >
-                      {/* Delete icon */}
-                    </IconButton>
-
-
+              {paginatedInvoices.length === 0 && !loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    No data available
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paginatedInvoices.map((invoice) => (
+                  <TableRow key={invoice._id}>
+                    <TableCell>{invoice.invoice_id}</TableCell>
+                    <TableCell>{invoice.order_id}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(invoice.orderDetails?.customerName) ||
+                        "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      ₹{invoice.orderDetails?.orderPrice || "0"}
+                    </TableCell>
+                    <TableCell>
+                      {invoice.date
+                        ? new Intl.DateTimeFormat("en-GB", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }).format(new Date(invoice.date))
+                        : "Date not available"}
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={formatSnakeCase(invoice.status)}
+                        color={getStatusColor(invoice.status)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleDownloadPDF(invoice)}
+                      >
+                        <PictureAsPdf />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleSendInvoice(invoice)}
+                      >
+                        <MailOutline />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="secondary"
+                        onClick={() => handleEditInvoice(invoice)}
+                      >
+                        {/* Edit icon */}
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteInvoice(invoice)}
+                      >
+                        {/* Delete icon */}
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>

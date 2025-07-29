@@ -1,44 +1,57 @@
-import { Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Button } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import orderService from '/src/services/orderService.js';
+import {
+  Card,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  Button,
+  CircularProgress,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import orderService from "/src/services/orderService.js";
+import { formatSnakeCase } from "../../../utils/formatSnakeCase";
 
 const mockOrders = [
   {
     id: 1,
-    customerName: 'John Doe',
-    jobName: 'Premium Shopping Bags',
+    customerName: "John Doe",
+    jobName: "Premium Shopping Bags",
     quantity: 5000,
-    status: 'pending'
+    status: "pending",
   },
   {
     id: 2,
-    customerName: 'Jane Smith',
-    jobName: 'Eco Friendly Bags',
+    customerName: "Jane Smith",
+    jobName: "Eco Friendly Bags",
     quantity: 3000,
-    status: 'completed'
+    status: "completed",
   },
   {
     id: 3,
-    customerName: 'Mike Johnson',
-    jobName: 'Gift Bags - Large',
+    customerName: "Mike Johnson",
+    jobName: "Gift Bags - Large",
     quantity: 2000,
-    status: 'in_progress'
+    status: "in_progress",
   },
   {
     id: 4,
-    customerName: 'Sarah Williams',
-    jobName: 'Custom Print Bags',
+    customerName: "Sarah Williams",
+    jobName: "Custom Print Bags",
     quantity: 4000,
-    status: 'pending'
+    status: "pending",
   },
   {
     id: 5,
-    customerName: 'Robert Brown',
-    jobName: 'Luxury Shopping Bags',
+    customerName: "Robert Brown",
+    jobName: "Luxury Shopping Bags",
     quantity: 1500,
-    status: 'completed'
-  }
+    status: "completed",
+  },
 ];
 
 export default function RecentOrders() {
@@ -48,12 +61,12 @@ export default function RecentOrders() {
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: 'warning',
-      in_progress: 'info',
-      completed: 'success',
-      cancelled: 'error'
+      pending: "warning",
+      in_progress: "info",
+      completed: "success",
+      cancelled: "error",
     };
-    return colors[status] || 'default';
+    return colors[status] || "default";
   };
 
   useEffect(() => {
@@ -63,7 +76,7 @@ export default function RecentOrders() {
         const response = await orderService.recentOrders();
         setOrders(response.data);
       } catch (error) {
-        console.error('Error fetching recent orders:', error);
+        console.error("Error fetching recent orders:", error);
       } finally {
         setLoading(false);
       }
@@ -73,13 +86,13 @@ export default function RecentOrders() {
   }, []);
 
   return (
-    <Card>
+    <Card sx={{ mb: 2, p: 2 }}>
       <div className="flex justify-between items-center p-4">
         <Typography variant="h6">Recent Orders</Typography>
         <Button
           variant="text"
           color="primary"
-          onClick={() => navigate('/sales/orders')}
+          onClick={() => navigate("/sales/orders")}
         >
           View All
         </Button>
@@ -96,15 +109,21 @@ export default function RecentOrders() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.length > 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  <CircularProgress />
+                </TableCell>
+              </TableRow>
+            ) : orders.length > 0 ? (
               orders.map((order) => (
                 <TableRow key={order.id || `order-${order._id}`}>
-                  <TableCell>{order.customerName}</TableCell>
-                  <TableCell>{order.jobName}</TableCell>
+                  <TableCell>{formatSnakeCase(order.customerName)}</TableCell>
+                  <TableCell>{formatSnakeCase(order.jobName)}</TableCell>
                   <TableCell>{order.quantity}</TableCell>
                   <TableCell>
                     <Chip
-                      label={order.status.replace('_', ' ').toUpperCase()}
+                      label={formatSnakeCase(order.status)}
                       color={getStatusColor(order.status)}
                       size="small"
                     />

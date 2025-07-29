@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -17,30 +17,38 @@ import {
   Select,
   MenuItem,
   TextField,
-} from '@mui/material';
-import { Print, Update, LocalShipping } from '@mui/icons-material';
-import toast from 'react-hot-toast';
-import OrderService from '../../../services/dcutOpsertService.js';
+  Tooltip,
+} from "@mui/material";
+import { Print, Update, LocalShipping } from "@mui/icons-material";
+import toast from "react-hot-toast";
+import OrderService from "../../../services/dcutOpsertService.js";
+import { formatSnakeCase } from "../../../utils/formatSnakeCase.js";
 
-export default function OpsertOrderList({ orders, status, noOrdersFound, onStatusUpdated }) {
+export default function OpsertOrderList({
+  orders,
+  status,
+  noOrdersFound,
+  onStatusUpdated,
+}) {
   const [updateStatusModalOpen, setUpdateStatusModalOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [unitToUpdate, setUnitToUpdate] = useState('');
-  const getStatusColor = (status) => ({
-    pending: 'warning',
-    in_progress: 'info',
-    completed: 'success',
-  }[status] || 'default');
+  const [unitToUpdate, setUnitToUpdate] = useState("");
+  const getStatusColor = (status) =>
+    ({
+      pending: "warning",
+      in_progress: "info",
+      completed: "success",
+    }[status] || "default");
 
   const updateOrderStatus = (orderId, newStatus, unitToUpdate, remarks) => {
     OrderService.updateOrderStatus(orderId, newStatus, unitToUpdate, remarks)
       .then(() => {
-        toast.success(`Order marked as ${newStatus.replace('_', ' ')}`);
+        toast.success(`Order marked as ${newStatus.replace("_", " ")}`);
         setUpdateStatusModalOpen(false);
         onStatusUpdated();
       })
       .catch(() => {
-        toast.error('Failed to update order status');
+        toast.error("Failed to update order status");
       });
   };
 
@@ -50,25 +58,30 @@ export default function OpsertOrderList({ orders, status, noOrdersFound, onStatu
   };
   const handleStatusUpdate = () => {
     if (!unitToUpdate) {
-      toast.error('Please select a unit number');
+      toast.error("Please select a unit number");
       return;
     }
-    updateOrderStatus(selectedOrderId, 'completed', unitToUpdate, 'order move to completed');
+    updateOrderStatus(
+      selectedOrderId,
+      "completed",
+      unitToUpdate,
+      "order move to completed"
+    );
   };
   const handleMoveToPackaging = (orderId) => {
     OrderService.moveToPackaging(orderId)
       .then(() => {
-        toast.success('Order moved to packaging');
+        toast.success("Order moved to packaging");
         onStatusUpdated();
       })
       .catch((error) => {
-        toast.error('Failed to move to packaging');
+        toast.error("Failed to move to packaging");
       });
   };
   return (
     <Box>
       {/* Desktop View */}
-      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+      <Box sx={{ display: { xs: "none", md: "block" } }}>
         <TableContainer component={Card}>
           <Table>
             <TableHead>
@@ -93,7 +106,7 @@ export default function OpsertOrderList({ orders, status, noOrdersFound, onStatu
             <TableBody>
               {noOrdersFound ? (
                 <TableRow>
-                  <TableCell colSpan={9} align="center">
+                  <TableCell colSpan={15} align="center">
                     <Typography variant="body1" color="text.secondary">
                       No Orders Found
                     </Typography>
@@ -102,40 +115,63 @@ export default function OpsertOrderList({ orders, status, noOrdersFound, onStatu
               ) : (
                 orders.map((order) => (
                   <TableRow key={order._id}>
-
                     <TableCell>{order.orderId}</TableCell>
                     <TableCell>{order.jobName}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.roll_size || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.gsm || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.color || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.printColor || '-'}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.type || '-'}</TableCell>
-                    <TableCell>{order.fabricQuality || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.type || '-'}</TableCell>
-                    <TableCell>{order.bagDetails?.size || '-'}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.cylinder_size || '-'}</TableCell>
+                    <TableCell>
+                      {order.productionManagers?.[0]?.production_details
+                        ?.roll_size || "-"}
+                    </TableCell>
+                    <TableCell>{order.bagDetails?.gsm || "-"}</TableCell>
+                    <TableCell>{order.bagDetails?.color || "-"}</TableCell>
+                    <TableCell>{order.bagDetails?.printColor || "-"}</TableCell>
+                    <TableCell>
+                      {order.productionManagers?.[0]?.production_details
+                        ?.type || "-"}
+                    </TableCell>
+                    <TableCell>{order.fabricQuality || "-"}</TableCell>
+                    <TableCell>
+                      {formatSnakeCase(order.bagDetails?.type) || "-"}
+                    </TableCell>
+                    <TableCell>{order.bagDetails?.size || "-"}</TableCell>
+                    <TableCell>
+                      {order.productionManagers?.[0]?.production_details
+                        ?.cylinder_size || "-"}
+                    </TableCell>
                     <TableCell>{order.quantity}</TableCell>
-                    <TableCell>{order.productionManagers?.[0]?.production_details?.remarks || order.remarks || '-'}</TableCell>
+                    <TableCell>
+                      {order.productionManagers?.[0]?.production_details
+                        ?.remarks ||
+                        order.remarks ||
+                        "-"}
+                    </TableCell>
                     <TableCell>
                       <Chip
-                        label={order.opsertDetails[0].status.replace('_', ' ').toUpperCase()}
+                        label={order.opsertDetails[0].status
+                          .replace("_", " ")
+                          .toUpperCase()}
                         color={getStatusColor(order.opsertDetails[0].status)}
                         size="small"
                       />
                     </TableCell>
                     <TableCell>
-                      {order.opsertDetails[0].status === 'pending' && (
+                      {order.opsertDetails[0].status === "pending" && (
                         <Button
                           startIcon={<Print />}
                           variant="contained"
                           color="primary"
                           size="small"
-                          onClick={() => updateOrderStatus(order.orderId, 'in_progress', 'Printing started')}
+                          onClick={() =>
+                            updateOrderStatus(
+                              order.orderId,
+                              "in_progress",
+                              "Printing started"
+                            )
+                          }
                         >
                           Start Printing
                         </Button>
                       )}
-                      {order.opsertDetails[0].status === 'in_progress' && (
+                      {order.opsertDetails[0].status === "in_progress" && (
                         <Button
                           startIcon={<Update />}
                           variant="contained"
@@ -146,16 +182,17 @@ export default function OpsertOrderList({ orders, status, noOrdersFound, onStatu
                           Complete Order
                         </Button>
                       )}
-                      {order.opsertDetails[0].status === 'completed' && (
-                        <Button
-                          startIcon={<LocalShipping />}
-                          variant="contained"
-                          color="primary"
-                          size="small"
-                          onClick={() => handleMoveToPackaging(order.orderId)}
-                        >
-                          Move to Packaging
-                        </Button>
+                      {order.opsertDetails[0].status === "completed" && (
+                        <Tooltip title="Move to Packaging" arrow>
+                          <Button
+                            variant="contained"
+                            color="info"
+                            onClick={() => handleMoveToPackaging(order.orderId)}
+                            size="small"
+                          >
+                            <LocalShipping color="white" />
+                          </Button>
+                        </Tooltip>
                       )}
                     </TableCell>
                   </TableRow>
@@ -187,9 +224,13 @@ export default function OpsertOrderList({ orders, status, noOrdersFound, onStatu
               </Select>
             </FormControl>
 
-
-            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-              <Button onClick={() => setUpdateStatusModalOpen(false)} sx={{ mr: 1 }}>
+            <Box
+              sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}
+            >
+              <Button
+                onClick={() => setUpdateStatusModalOpen(false)}
+                sx={{ mr: 1 }}
+              >
                 Cancel
               </Button>
               <Button variant="contained" onClick={handleStatusUpdate}>
@@ -205,12 +246,12 @@ export default function OpsertOrderList({ orders, status, noOrdersFound, onStatu
 
 // Modal Styling
 const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
+  bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
   borderRadius: 2,
