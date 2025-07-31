@@ -149,11 +149,14 @@ export default function BagMakingOrderList({ status = "pending", bagType }) {
     try {
       const response = await OrderService.listMaterials(orderId);
       console.log("Response Data:", response);
+      if (!response.success) {
+             throw new Error(response.message || "Unknown error occurred.");
+      }
       if (response.totalQuantity === 0) {
         console.warn("No required materials found, resetting state...");
         fetchOrders(); // Refresh orders
         setSelectedOrderId(null); // Reset selected order ID
-        setAddSubcategoryDialogOpen(false);
+        setAddSubcategoryDialogOpen(true);
       } else {
         console.log("response data is", response);
 
@@ -170,12 +173,12 @@ export default function BagMakingOrderList({ status = "pending", bagType }) {
 
       // setSelectedOrderId(orderId);
       // setShowScanner(true);
-    } catch (error) {
-      console.log("error is", error);
-      const errorMessage =
-        error?.message || "Error checking active jobs. Please try again.";
-      toast.error(errorMessage);
-    }
+     } catch (error) {
+    console.log("error is", error);
+    const errorMessage =
+      error?.message || "Error checking active jobs. Please try again.";
+    toast.error(errorMessage);
+  }
   };
 
   const handleOpenModal = (orderId) => {
