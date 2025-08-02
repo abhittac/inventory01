@@ -156,7 +156,7 @@ export default function BagMakingOrderList({ status = "pending", bagType }) {
         console.warn("No required materials found, resetting state...");
         fetchOrders(); // Refresh orders
         setSelectedOrderId(null); // Reset selected order ID
-        setAddSubcategoryDialogOpen(true);
+        setAddSubcategoryDialogOpen(false);
       } else {
         console.log("response data is", response);
 
