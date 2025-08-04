@@ -1003,8 +1003,14 @@ export default function RawMaterials() {
             alignItems: "center",
           }}
         >
-          <Typography variant="h6">Raw Materials</Typography>
-          <Button
+        <Typography variant="h6">
+          Raw Materials -{" "}
+          <Typography component="span" variant="body2" color="error">
+            * To create a category, the Fabric Color, GSM, and Quality must match the selected order.
+          </Typography>
+        </Typography>
+
+            <Button
             variant="contained"
             color="primary"
             startIcon={<Add />}

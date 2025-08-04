@@ -85,7 +85,7 @@ export const generateInvoicePDF = (invoiceData) => {
 
     // Order Details Table
     currentY += 30;
-    const tableColumns = ['Job Name', 'Total Qty', 'Scrap Qty', 'Remaining Qty', 'Order Price'];
+    const tableColumns = ['Job Name', 'Total Qty', 'Scrap Qty', 'Remaining Qty', 'Rate'];
     const tableData = [
       [
         invoiceData?.orderDetails?.jobName || 'N/A',

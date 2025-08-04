@@ -56,7 +56,7 @@ export const pdfFinishedProduct = (Details) => {
         doc.autoTable({
             startY: currentY,
             head: [
-                ['Job Name', 'Quantity', 'Order Price']
+                ['Job Name', 'Quantity', 'Rate']
             ],
             body: [
                 [

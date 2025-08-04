@@ -83,7 +83,7 @@ export default function FinishedProductModel({ open, production, onClose }) {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body2" color="text.secondary">
-                    Order Price
+                    Rate
                   </Typography>
                   <Typography variant="body1" fontWeight="bold">
                     {productionData.orderDetails?.orderPrice || "N/A"}

@@ -177,7 +177,7 @@ export default function FinishedProducts() {
                 <TableCell>Quantity</TableCell>
                 <TableCell>Bag Type</TableCell>
 
-                <TableCell>Order Price</TableCell>
+                <TableCell>Rate</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>

@@ -211,7 +211,7 @@ const InvoiceManagement = () => {
                 <TableCell>Invoice ID</TableCell>
                 <TableCell>Order ID</TableCell>
                 <TableCell>Customer</TableCell>
-                <TableCell>Order Price</TableCell>
+                <TableCell>Rate</TableCell>
                 <TableCell>Date</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Actions</TableCell>
