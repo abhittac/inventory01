@@ -276,15 +276,16 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 options={mobileNumbers}
                 getOptionLabel={(option) => option}
                 freeSolo
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Search or enter mobile number"
-                    variant="outlined"
-                    fullWidth
-                    required
-                  />
-                )}
+             inputProps={{
+                ...params.inputProps,
+                maxLength: 10, // Optional: limit to 10 digits
+                onKeyPress: (e) => {
+                  const isNumber = /^[0-9]$/.test(e.key);
+                  if (!isNumber) {
+                    e.preventDefault(); // Block non-numeric characters
+                  }
+                },
+              }}
               />
             </Grid>
             <Grid item xs={12}>
