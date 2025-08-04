@@ -258,6 +258,12 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 onChange={handleChange}
                 required
                 placeholder="Enter customer name"
+                 onKeyPress={(e) => {
+                  const regex = /^[a-zA-Z\s]*$/;
+                  if (!regex.test(e.key)) {
+                    e.preventDefault(); // Block non-alphabet input
+                  }
+                }}
               />
             </Grid>
           <Grid item xs={12} md={6}>
@@ -276,16 +282,25 @@ export default function OrderForm({ open, onClose, onSubmit, order = null }) {
                 options={mobileNumbers}
                 getOptionLabel={(option) => option}
                 freeSolo
-             inputProps={{
-                ...params.inputProps,
-                maxLength: 10, // Optional: limit to 10 digits
-                onKeyPress: (e) => {
-                  const isNumber = /^[0-9]$/.test(e.key);
-                  if (!isNumber) {
-                    e.preventDefault(); // Block non-numeric characters
-                  }
-                },
-              }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search or enter mobile number"
+                    variant="outlined"
+                    fullWidth
+                    required
+                    inputProps={{
+                      ...params.inputProps,
+                      maxLength: 10,
+                      inputMode: "numeric",
+                      onKeyPress: (e) => {
+                        if (!/^[0-9]$/.test(e.key)) {
+                          e.preventDefault(); // block non-numeric
+                        }
+                      },
+                    }}
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12}>
