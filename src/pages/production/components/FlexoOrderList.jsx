@@ -339,7 +339,6 @@ export default function FlexoOrderList({ status = "pending", bagType }) {
   };
 
   const renderAddSubcategoryDialog = () => {
-
     const filteredMaterials = useMemo(() => {
       if (!searchTerm) return requiredMaterials;
 
@@ -348,7 +347,10 @@ export default function FlexoOrderList({ status = "pending", bagType }) {
         return (
           material.gsm.toString().toLowerCase().includes(searchLower) ||
           material.fabricColor.toLowerCase().includes(searchLower) ||
-          (material.rollSize ? material.rollSize.toString().toLowerCase() : "").includes(searchLower) ||
+          (material.rollSize
+            ? material.rollSize.toString().toLowerCase()
+            : ""
+          ).includes(searchLower) ||
           material.quantity.toString().toLowerCase().includes(searchLower)
         );
       });
@@ -396,7 +398,7 @@ export default function FlexoOrderList({ status = "pending", bagType }) {
               <Table>
                 <TableHead>
                   <TableRow>
-                          <TableCell>ID</TableCell>
+                    <TableCell>ID</TableCell>
                     <TableCell>Order ID</TableCell>
                     <TableCell>GSM</TableCell>
                     <TableCell>Fabric Color</TableCell>
@@ -424,7 +426,7 @@ export default function FlexoOrderList({ status = "pending", bagType }) {
                   ) : (
                     filteredMaterials.map((material) => (
                       <TableRow key={material._id}>
-                          <TableCell>{material._id}</TableCell>
+                        <TableCell>{material._id}</TableCell>
                         <TableCell>{selectedOrderId}</TableCell>
                         <TableCell>{formatSnakeCase(material.gsm)}</TableCell>
                         <TableCell style={{ filter: "blur(5px)" }}>
@@ -437,14 +439,20 @@ export default function FlexoOrderList({ status = "pending", bagType }) {
                         <TableCell>
                           <Chip
                             label={material.status}
-                            color={material.status === 'inactive' ? 'default' : 'success'}
+                            color={
+                              material.status === "inactive"
+                                ? "default"
+                                : "success"
+                            }
                             variant="outlined"
                             color="primary"
                             size="small"
-                            onClick={() => handleVerifyOrder(selectedOrderId, material._id)}
+                            onClick={() =>
+                              handleVerifyOrder(selectedOrderId, material._id)
+                            }
                           >
                             Scanner
-                          </Button>
+                          </Chip>
                         </TableCell>
                       </TableRow>
                     ))
