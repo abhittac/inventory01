@@ -638,7 +638,11 @@ export default function BagMakingOrderList({ status = "pending", bagType }) {
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={order.dcutbagmakingDetails?.[0]?.status || "N/A"}
+                        label={
+                          formatSnakeCase(
+                            order.dcutbagmakingDetails?.[0]?.status
+                          ) || "N/A"
+                        }
                         color={getStatusColor(
                           order.dcutbagmakingDetails?.[0]?.status || "default"
                         )}
