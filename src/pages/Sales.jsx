@@ -32,6 +32,7 @@ export default function Sales() {
   return (
     <Grid container spacing={3}>
       <SaleAnalyticBoard />
+
       <Grid item xs={12}>
         <RecentOrders />
       </Grid>

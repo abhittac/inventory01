@@ -26,39 +26,35 @@ export default function SaleAnalyticBoard() {
   if (!stats) return null; // Optional: Replace with a loader/spinner if needed
 
   return (
-    <>
-      <Grid item xs={12} md={3}>
-        <SummaryCard
-          title="Total Orders"
-          value={stats.totalOrders?.value}
-          changeFromLastMonth={stats.totalOrders?.changeFromLastMonth}
-          color="primary"
-        />
-      </Grid>
-      <Grid item xs={12} md={3}>
-        <SummaryCard
-          title="Pending Orders"
-          value={stats.pendingOrders?.value}
-          changeFromLastMonth={stats.pendingOrders?.changeFromLastMonth}
-          color="warning"
-        />
-      </Grid>
-      <Grid item xs={12} md={3}>
-        <SummaryCard
-          title="Completed Orders"
-          value={stats.completedOrders?.value}
-          changeFromLastMonth={stats.completedOrders?.changeFromLastMonth}
-          color="success"
-        />
-      </Grid>
-      <Grid item xs={12} md={3}>
-        <SummaryCard
-          title="Total Amount"
-          value={stats.totalAmount?.value}
-          changeFromLastMonth={stats.totalAmount?.changeFromLastMonth}
-          color="info"
-        />
-      </Grid>
-    </>
+    <Grid container spacing={2} className="p-2">
+      {[
+        { title: "Total Orders", data: stats.totalOrders, color: "primary" },
+        {
+          title: "Pending Orders",
+          data: stats.pendingOrders,
+          color: "warning",
+        },
+        {
+          title: "Completed Orders",
+          data: stats.completedOrders,
+          color: "success",
+        },
+        {
+          title: "Cancelled Orders",
+          data: stats.cancelledOrders,
+          color: "error",
+        },
+        { title: "Total Amount", data: stats.totalAmount, color: "info" },
+      ].map((item, i) => (
+        <Grid item xs={12} md={2.4} key={i} sx={{ flexGrow: 1 }}>
+          <SummaryCard
+            title={item.title}
+            value={item.data?.value}
+            changeFromLastMonth={item.data?.changeFromLastMonth}
+            color={item.color}
+          />
+        </Grid>
+      ))}
+    </Grid>
   );
 }
