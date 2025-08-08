@@ -438,7 +438,7 @@ export default function FlexoOrderList({ status = "pending", bagType }) {
                         <TableCell>{material.quantity}</TableCell>
                         <TableCell>
                           <Chip
-                            label={material.status}
+                            label={formatSnakeCase(material.status)}
                             color={
                               material.status === "inactive"
                                 ? "default"
